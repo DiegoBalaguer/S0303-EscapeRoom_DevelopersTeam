@@ -1,0 +1,400 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+' https://plantuml.com/es/class-diagram
+
+title Relationships - UML EscapeRoomA
+
+enum Difficulty {
+    EASY
+    MEDIUM
+    EXPERT
+}
+Difficulty -right-> Room
+
+
+enum Theme {
+   EGYPT
+   SPACE
+   GANGSTERS
+}
+Theme -right-> Room
+
+
+class Actions {
+    +executeCommand(command: Command, element: T)
+    +undoCommand(command: Command, element: T)
+}
+
+
+interface Observer {
+    +update(): void {User user, String message}
+
+}
+
+interface Observable {
+    +notifyObservers()
+
+}
+
+interface TimeReward {
+    +default void generateRewardsRecordTime(user)
+
+}
+
+interface EscapeRoomsReward {
+    +default void generateRewardsTenEscapeRooms(user)
+
+}
+interface CluesReward {
+    +default void generateRewardsCluesResolved(user)
+
+}
+
+
+class User implements Command, Observer {
+   '.. Fields ..
+   -id: integer
+   -username: String
+   -email: String
+   -password: String
+   -phoneNumber: String
+   -address: String
+   -zipCode: String
+   -idCity: integer
+   -subscribed: boolean
+   -active: boolean
+   -certificate[]: Certificates
+   -reward[]: Rewards
+   '.. Methods ..
+   +constructor()
+   +isSubscribed()
+   +setSubscribed()
+   +toString()
+   +update()
+}
+User -down-> EscapeRoom
+
+
+interface Command<T> {
+    +execute(T execute)
+    +undo(T undo)
+    }
+
+class AddCommand<T extends Element, User> implements Command<T> {
+    -list List<T> (final)
+    +AddCommand
+    }
+
+class UpdateCommand<T extends Element, User> implements Command<T> {
+    -list List<T> (final)
+    +UpdateCommand
+    }
+
+class RemoveCommand<T extends Element, User> implements Command<T>{
+    -list List<T> (final)
+    +RemoveCommand
+    }
+
+class ShowCommand<T extends Element, User> implements Command<T> {
+     -list List<T> (final)
+     +ShowCommand
+    }
+
+class CalculateCommand<T extends Element> implements Command<T> {
+      -list List<T> (final)
+      +CalculateCommand
+     }
+
+class Element implements Command{
+    -id: integer
+    -name: String
+    -description: String
+    -value: BigDecimal
+   -active: boolean
+}
+
+
+
+class Rewards extends Element implements TimeReward, EscapeRoomsReward, CluesReward {
+
+}
+
+class Certificates extends Element {
+
+}
+
+
+class Room extends Element implements Inventory {
+    -theme: Theme
+    -difficulty: Difficulty
+  /'  -clues: Clue[]
+    -decorations: Decoration[]'/
+    -inventoryItems: Inventory []
+    +constructor()
+    +addInventoryItem()
+    +removeInventoryItem()
+    +calculateValue()
+    +showInventory
+}
+Room -down-> EscapeRoom
+
+interface Inventory {
+    +calculateValue()
+    +showInventory()
+}
+
+class Clue extends Element implements Inventory  {
+'    -theme: Theme
+    +constructor()
+}
+Clue -down-> Room
+
+
+class Decoration extends Element implements Inventory{
+'    -theme: Theme
+    +constructor()
+}
+Decoration -down-> Room
+
+
+enum Menu {
+    .. Fields ..
+    -DESCRIPTION: String
+    EXIT
+    ROOM_CREATE
+    ROOM_DELETE
+    (Enum) ...
+
+    .. Methods ..
+    +Constructor() {String title}
+    +viewMenu()
+}
+Menu -right->AppController
+
+
+class Main {
+    .. Fields ..
+    -AppController {static} appController
+    .. Methods ..
+    -Main(): ()
+}
+Main -down-> AppController
+
+
+class AppController {
+    '.. Fields ..
+    -{static} escapeRoom: EscapeRoom
+    -{static} appWorkers: AppWorkers
+    .. Methods ..
+    +loadInits()
+    +run()
+    +getEscapeRoom()
+    -menu()
+    -menuWithoutRooms(optionMenu)
+    -menuWithRooms(optionMenu)
+}
+AppController -down-> EscapeRoom
+
+
+class EscapeRoom <<Singleton>> implements Observable {
+    .. Fields ..
+    -name: String
+    -{static} escapeRoom: EscapeRoom
+    -ticketPrice: BigDecimal
+    -rooms: Room[]
+    -users: User[]
+    .. Methods ..
+    -constructor()
+    +{static} getInstance(): EscapeRoom
+    +notifyObservers()
+
+}
+
+Actions ..> EscapeRoom: uses getInstance()
+
+Command <|.. AddCommand
+Command <|.. RemoveCommand
+Command <|.. ShowCommand
+Command <|.. CalculateCommand
+
+Actions ..> Command: executes
+
+
+EscapeRoom -> EscapeRoom : getInstance()
+note left of EscapeRoom::instance
+    private static EscapeRoom instance;
+end note
+
+
+
+' ABSTRACT FACTORY
+
+interface AbstractFactory {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteEgypt {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteSpace {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteGangster {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+interface AbstractClue {
+    +operation(): void
+}
+
+
+interface AbstractDecoration {
+    +operation(): void
+}
+
+
+class ConcreteClue1 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration1 {
+    +operation(): void
+}
+
+
+class ConcreteClue2 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration2 {
+    +operation(): void
+}
+
+class ConcreteClue3 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration3 {
+    +operation(): void
+}
+
+AbstractFactory <|.. ConcreteEgypt
+AbstractFactory <|.. ConcreteSpace
+AbstractFactory <|.. ConcreteGangster
+AbstractClue <|..up- ConcreteClue1
+AbstractDecoration <|..up- ConcreteDecoration1
+AbstractClue <|..up- ConcreteClue2
+AbstractDecoration <|..up- ConcreteDecoration2
+AbstractClue <|..up- ConcreteClue3
+AbstractDecoration <|..up- ConcreteDecoration3
+ConcreteEgypt ..> ConcreteClue1
+ConcreteEgypt ..> ConcreteDecoration1
+ConcreteSpace ..> ConcreteClue2
+ConcreteSpace ..> ConcreteDecoration2
+ConcreteGangster ..> ConcreteClue3
+ConcreteGangster ..> ConcreteDecoration3
+
+AbstractFactory <-up- Room : operation()
+AbstractClue <-up- Room : operation()
+AbstractDecoration <-up- Room : operation()
+
+' DATABASE
+
+package dao <<Database>> {
+
+interface ScapeRoomDAO {
+    +addScapeRoom(String: name)
+    +updateScapeRoom(String: name)
+}
+
+class ScapeRoomDAOImpl implements ScapeRoomDAO {
+
+}
+
+interface UserDAO {
+    +addUser(User: user)
+    +getUserById(int: id): User
+    +getAllUsers(): List<User>
+    +updateUser(User: user)
+    +deleteUser(int: id)
+    +getUserCertificates(int: id): List<Certificate>
+    +getUserRewards(int: id): List<Reward>
+}
+
+class UserDAOImpl implements UserDAO {
+
+}
+
+interface RoomDAO {
+    +addRoom(Room: room)
+    +getRoomById(int: id): Room
+    +getAllRooms(): List<Room>
+    +updateRoom(Room: room)
+    +deleteRoom(Room: room)
+    +getRoomClues(int: idRoom): List<Clues>
+    +getRoomDecorations(int: idRoom): List<Decorations>
+}
+
+class RoomDAOImpl implements RoomDAO {
+
+}
+
+interface ClueDAO {
+    +addClue(Clue: clue)
+    +getClueById(int: id): Clue
+    +getAllClues(): List<Clue>
+    +updateClue(Clue: clue)
+    +deleteClue(Clue: clue)
+    +getCluesByRoom(int: idRoom): List<Clue>
+}
+
+class ClueDAOImpl implements ClueDAO {
+
+}
+
+interface DecorationDAO {
+    +addDecoration(Decoration: decoration)
+    +getDecorationById(int: id): Decoration
+    +getAllDecorations(): List<Decoration>
+    +updateDecoration(Decoration: decoration)
+    +deleteDecoration(Decoration: decoration)
+    +getDecorationsByRoom(int: idRoom): List<Decoration>
+}
+
+class DecorationDAOImpl implements DecorationDAO {
+
+}
+}
+
+
+
+
+package Database <<Database>> {
+
+class dataConnection {
+    -name: String
+    -driver: String
+    -server: String
+    -port: String
+    -user: String
+    -Password: String
+    +constructor()
+
+}
+
+}
+
+@enduml
