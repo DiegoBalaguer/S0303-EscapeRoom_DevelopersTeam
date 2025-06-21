@@ -1,6 +1,9 @@
 package model;
 
-public class Certificate {
+import lombok.Data;
+
+@Data
+public class Certificate extends Element {
 
 
 }
