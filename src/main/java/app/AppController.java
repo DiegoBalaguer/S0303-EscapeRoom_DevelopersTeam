@@ -1,9 +1,11 @@
 package app;
 
 import enums.OptionsMenuMain;
+
 import lombok.extern.slf4j.Slf4j;
 import model.EscapeRoom;
 import utils.ConsoleUtils;
+
 
 @Slf4j
 public class AppController {
@@ -14,8 +16,10 @@ public class AppController {
         log.info("run has started successfully.");
 
         escapeRoom = EscapeRoom.getInstance();
+
         menu();
         ConsoleUtils.closeScanner();
+
     }
 
     private void menu() {
@@ -38,7 +42,7 @@ public class AppController {
             case ESCAPE_ROOM_MANAGEMENT -> nada();
             default -> {
                 if (escapeRoom.isEmptyRooms()) {
-                    log.warn("Option {} incorrect, no rooms registered into the system.",  idMenu);
+                    log.warn("Option {} incorrect, no rooms registered into the system.", idMenu);
                 } else menuOptionsWithRooms(idMenu);
             }
         }
@@ -50,7 +54,7 @@ public class AppController {
             case ESCAPE_ROOM_MANAGEMENT -> nada();
             case FINANCIAL_MANAGEMENT -> nada();
 
-            default -> log.warn("Error: The value {} is wrong.",  idMenu);
+            default -> log.warn("Error: The value {} is wrong.", idMenu);
         }
     }
 

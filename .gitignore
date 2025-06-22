@@ -48,4 +48,6 @@ README.final.md
 crearGitHub.bat
 crearUnJava.bat
 **/*.secret.properties
+**/*.secret.ini
+
 
