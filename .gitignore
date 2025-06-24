@@ -40,10 +40,9 @@ build/
 ### Extra ###
 
 /.idea/
-/.local/
+/_local/
 /target/
 /out/
-/_log/
 README.final.md
 crearGitHub.bat
 crearUnJava.bat
