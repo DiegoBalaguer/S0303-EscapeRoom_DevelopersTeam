@@ -9,4 +9,9 @@ import java.math.BigDecimal;
 @SuperBuilder
 public class Ticket extends Element {
     private BigDecimal price;
+
+    @Override
+    public BigDecimal getPrice() {
+        return null;
+    }
 }

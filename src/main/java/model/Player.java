@@ -1,13 +1,14 @@
 package model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Data
+@Getter
+@Setter
 @Builder
 @ToString(exclude = "password")
 @AllArgsConstructor
@@ -21,12 +22,7 @@ public class Player {
     private List<RewardWin> rewardsWin;
     private boolean isActive;
 
-    public Player(int id, String username, String email) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = "default";
-        this.subscribed = false;
-    }
+
+
 
 }

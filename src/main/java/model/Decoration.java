@@ -10,4 +10,9 @@ import java.math.BigDecimal;
 public class Decoration extends Element {
     private int idRoom;
     private BigDecimal price;
+
+    @Override
+    public BigDecimal getPrice() {
+        return null;
+    }
 }

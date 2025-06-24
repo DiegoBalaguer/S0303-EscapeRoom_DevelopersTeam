@@ -17,5 +17,8 @@ public class Room extends Element {
     private Difficulty difficulty;
     private Theme theme;
 
-
+    @Override
+    public BigDecimal getPrice() {
+        return null;
+    }
 }
