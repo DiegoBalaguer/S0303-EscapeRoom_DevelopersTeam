@@ -21,4 +21,12 @@ public class Player {
     private List<RewardWin> rewardsWin;
     private boolean isActive;
 
+    public Player(int id, String username, String email) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = "default";
+        this.subscribed = false;
+    }
+
 }

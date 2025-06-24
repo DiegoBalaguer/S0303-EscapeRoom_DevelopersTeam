@@ -12,4 +12,9 @@ public abstract class Element {
     private String description;
     private boolean isActive;
 
+    public Element() {
+    }
+    public abstract boolean isActive();
+    public abstract BigDecimal getValue();
+
 }
