@@ -55,6 +55,30 @@
             <version>1.18.38</version>
         </dependency>
 
+        <!-- HikaryCP Pool connections BBDD -->
+        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>6.3.0</version>
+        </dependency>
+
+        <!-- Dependency conector H2 -->
+        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+        </dependency>
+
+        <!-- Dependency conector SQLite -->
+        <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.50.1.0</version>
+        </dependency>
+
         <!-- Dependency conector MySQL -->
         <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <dependency>
