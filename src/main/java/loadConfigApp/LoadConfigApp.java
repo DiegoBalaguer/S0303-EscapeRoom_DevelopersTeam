@@ -9,7 +9,7 @@ import java.util.Properties;
 
 @Slf4j
 public class LoadConfigApp {
-    private static final Path INPUT_FILE_WITH_PATH = Path.of(".local", "config", "config.app.properties").normalize();
+    private static final Path INPUT_FILE_WITH_PATH = Path.of(".local/config/config.app.properties").normalize();
     private static LoadConfigApp loadConfigApp;
     private static Properties properties;
 
@@ -40,8 +40,12 @@ public class LoadConfigApp {
         return Integer.parseInt(properties.getProperty(key));
     }
 
-    public static String getAppUser() {
-        return properties.getProperty("app.user");
+    public static String getAppName() {
+        return properties.getProperty("app.name");
+    }
+
+    public static String getAppFileDbConfig() {
+        return properties.getProperty("app.fileDbConfig");
     }
 
     public static String getAppCreateSchema() {

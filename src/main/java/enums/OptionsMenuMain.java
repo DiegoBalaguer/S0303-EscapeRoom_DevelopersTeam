@@ -25,7 +25,7 @@ public enum OptionsMenuMain {
         for (OptionsMenuMain optionMenu : OptionsMenuMain.values()) {
             System.out.println(optionMenu.ordinal() + 1 + ". " + optionMenu.getDESCRIPTION());
         }
-        System.out.print(System.lineSeparator() + "Choose an option: ");
+        System.out.println("");
     }
 }
 

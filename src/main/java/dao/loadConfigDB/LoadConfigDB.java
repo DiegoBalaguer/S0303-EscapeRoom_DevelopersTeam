@@ -1,5 +1,6 @@
 package dao.loadConfigDB;
 
+import loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
@@ -10,7 +11,7 @@ import java.util.Properties;
 @Slf4j
 public class LoadConfigDB {
 
-    private static final Path INPUT_FILE_WITH_PATH = Path.of(".local", "config", "config.db.secret.properties").normalize();
+    private static final Path INPUT_FILE_WITH_PATH = Path.of(LoadConfigApp.getAppFileDbConfig()).normalize();
     private static Properties properties = new Properties();
 
     private LoadConfigDB() {}
@@ -43,6 +44,10 @@ public class LoadConfigDB {
         return properties.getProperty("db.type");
     }
 
+    public static boolean getSshEnable() {
+        return Boolean.parseBoolean(properties.getProperty("db.sshEnabled"));
+    }
+
     // Database MySql configuration
     public static String getMysqlUrl() {
         return properties.getProperty("mysql.url");
@@ -68,10 +73,32 @@ public class LoadConfigDB {
         return properties.getProperty("mysql.password");
     }
 
-    // SSH optional
-    public static boolean getSshEnable() {
-        return Boolean.parseBoolean(properties.getProperty("ssh.enabled"));
+    // Database H2 configuration
+    public static String getH2Url() {
+        return properties.getProperty("h2.url");
     }
+
+    public static String getH2Driver() {
+        return properties.getProperty("h2.driver");
+    }
+
+    public static String getH2File() {
+        return properties.getProperty("h2.fileWithPath");
+    }
+
+    public static int getH2Schema() {
+        return Integer.parseInt(properties.getProperty("h2.Schema"));
+    }
+
+    public static String getH2User() {
+        return properties.getProperty("h2.user");
+    }
+
+    public static String getH2Password() {
+        return properties.getProperty("h2.password");
+    }
+
+    // SSH optional
 
     public static String getSshHost() {
         return properties.getProperty("ssh.host");
@@ -100,6 +127,4 @@ public class LoadConfigDB {
     public static int getSshRemotePort() {
         return Integer.parseInt(properties.getProperty("ssh.remotePort"));
     }
-
-
 }

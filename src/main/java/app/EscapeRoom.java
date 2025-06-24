@@ -1,8 +1,10 @@
-package model;
+package app;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import model.Player;
+import model.Room;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EscapeRoom {
+    private int id;
     private static EscapeRoom escapeRoom;
     private List<Room> rooms;
     private List<Player> players;
@@ -28,6 +31,5 @@ public class EscapeRoom {
 
     private void initialize() {
         rooms = new ArrayList<>();
-
     }
 }

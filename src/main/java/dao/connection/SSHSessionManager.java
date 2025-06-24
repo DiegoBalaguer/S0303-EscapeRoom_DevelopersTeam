@@ -1,4 +1,4 @@
-package dao.databaseConnection;
+package dao.connection;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
