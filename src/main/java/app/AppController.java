@@ -1,9 +1,10 @@
 package app;
 
+import dao.loadConfigDB.LoadConfigDB;
 import enums.OptionsMenuMain;
 
+import loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
-import model.EscapeRoom;
 import utils.ConsoleUtils;
 
 
@@ -15,8 +16,10 @@ public class AppController {
     public void run() {
         log.info("run has started successfully.");
 
+        LoadConfigApp.initialitze();
+        LoadConfigDB.initialitze();
+        System.out.println("Tipo bD: " + LoadConfigDB.getDbType());
         escapeRoom = EscapeRoom.getInstance();
-
         menu();
         ConsoleUtils.closeScanner();
 
@@ -24,8 +27,8 @@ public class AppController {
 
     private void menu() {
         do {
-            OptionsMenuMain.viewMenu("Escape room management");
-            int answer = ConsoleUtils.readRequiredInt("");
+            OptionsMenuMain.viewMenu(LoadConfigApp.getAppName());
+            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
             try {
                 OptionsMenuMain idMenu = OptionsMenuMain.values()[answer - 1];
                 if (idMenu == OptionsMenuMain.EXIT) {

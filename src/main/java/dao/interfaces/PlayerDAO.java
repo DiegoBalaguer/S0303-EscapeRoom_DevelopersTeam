@@ -5,7 +5,6 @@ import model.Player;
 
 import java.util.List;
 
-public interface PlayerDAO extends GenericDAO<Player, Integer> {
-    List<Player> findByName(String name) throws DAOException;
+public interface PlayerDAO extends BaseDAO<Player, Integer> {
     List<Player> findTopPlayers(int limit) throws DAOException;
 }

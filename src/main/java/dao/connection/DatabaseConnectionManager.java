@@ -1,4 +1,4 @@
-package dao.databaseConnection;
+package dao.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -12,14 +12,11 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 @Data
 @Slf4j
-
-
 public class DatabaseConnectionManager {
-    private static final Logger LOGGER = Logger.getLogger(DatabaseConnectionManager.class.getName());
+
     private static final String DEFAULT_CONFIG_FILE = "database.properties";
     private static final String JDBC_URL = LoadConfigDB.getMysqlUrl();
     private static final String JDBC_USER = LoadConfigDB.getMysqlUser();
@@ -83,7 +80,7 @@ public class DatabaseConnectionManager {
         config.addDataSourceProperty("useServerPrepStmts", "true");
 
         dataSource = new HikariDataSource(config);
-        LOGGER.info("HikariCP connection pool initialized successfully");
+        log.info("HikariCP connection pool initialized successfully");
     }
 
 
@@ -104,7 +101,6 @@ public class DatabaseConnectionManager {
         }
     }
 
-
     public Connection getConnection() throws SQLException {
         Connection connection = dataSource.getConnection();
         if (connection == null) {
@@ -117,7 +113,7 @@ public class DatabaseConnectionManager {
     public void shutdown() {
         if (!isClosed()) {
             dataSource.close();
-            LOGGER.info("HikariCP connection pool has been shutdown");
+            log.info("HikariCP connection pool has been shutdown");
         }
     }
 
@@ -133,7 +129,6 @@ public class DatabaseConnectionManager {
         }
         return "Pool not initialized";
     }
-
 
     public boolean isClosed() {
         return dataSource == null || dataSource.isClosed();

@@ -13,15 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 public class Player {
     private int id;
-    private String username;
+    private String name;
     private String email;
     private String password;
-    private String phoneNumber;
-    private String address;
-    private String zipCode;
-    private String IdCity;
-    private boolean subscribed;
-    private List<Certificate> certificates;
-    private List<Reward> rewards;
+    private boolean isSubscribed;
+    private List<CertificateWin> certificatesWin;
+    private List<RewardWin> rewardsWin;
+    private boolean isActive;
 
 }

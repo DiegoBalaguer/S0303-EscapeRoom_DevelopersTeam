@@ -1,14 +1,14 @@
 package dao.impl;
 
 import dao.exceptions.DAOException;
-import dao.interfaces.GenericDAO;
+import dao.interfaces.BaseDAO;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public abstract class BaseDAO<T, I> implements GenericDAO<T, I> {
+public abstract class BaseDAOImpl<T, I> implements BaseDAO<T, I> {
     protected final Map<I, T> entities = new HashMap<>();
     protected AtomicInteger idSequence = new AtomicInteger(1);
 
@@ -17,23 +17,15 @@ public abstract class BaseDAO<T, I> implements GenericDAO<T, I> {
     private static final String FINDING_ALL = "Finding all entities";
 
     @Override
-    public List<T> findAll() throws DAOException {
-        log.debug(FINDING_ALL);
-        return new ArrayList<>(entities.values());
-    }
-
-    @Override
     public Optional<T> findById(I id) throws DAOException {
         log.debug(FINDING_ENTITY, id);
         return Optional.ofNullable(entities.get(id));
     }
 
     @Override
-    public void delete(T entity) throws DAOException {
-        I id = getEntityId(entity);
-        if (id != null) {
-            deleteById(id);
-        }
+    public List<T> findAll() throws DAOException {
+        log.debug(FINDING_ALL);
+        return new ArrayList<>(entities.values());
     }
 
     @Override
