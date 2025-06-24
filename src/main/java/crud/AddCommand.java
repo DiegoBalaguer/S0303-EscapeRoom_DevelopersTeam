@@ -1,25 +1,23 @@
 package crud;
 
 import interfaces.Command;
-import model.Element;
+import wrapperCrud.ElementListWrapper;
 
-import java.util.List;
+public class AddCommand<T> implements Command<T> {
+    private final ElementListWrapper<T> listWrapper;
 
-public class AddCommand <T extends Element, User> implements Command<T> {
-    List<T> list;
-
-    public AddCommand(List<T> list) {
-        this.list = list;
+    public AddCommand(ElementListWrapper<T> listWrapper) {
+        this.listWrapper = listWrapper;
     }
 
     @Override
     public void execute(T element) {
-        System.out.println("Enter the details for the new element:");
-        list.add(element);
+        if (element == null) {
+            System.out.println("No element provided. Cannot add.");
+            return;
+        }
+        listWrapper.add(element);
         System.out.println("Element added successfully: " + element);
-
     }
 }
-
-
 

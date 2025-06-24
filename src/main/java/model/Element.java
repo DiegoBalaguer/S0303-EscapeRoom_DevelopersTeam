@@ -9,4 +9,9 @@ public abstract class Element {
     private BigDecimal value;
     private boolean active;
 
+    public Element() {
+    }
+    public abstract boolean isActive();
+    public abstract BigDecimal getValue();
+
 }

@@ -5,16 +5,23 @@ import model.Element;
 
 import java.util.List;
 
-public class ShowCommand <T extends Element, User> implements Command<T> {
-    List<T> list;
+import interfaces.Command;
+import wrapperCrud.ElementListWrapper;
 
-    public ShowCommand(List<T> list) {
-        this.list = list;
+public class ShowCommand<T> implements Command<T> {
+    private final ElementListWrapper<T> listWrapper;
+
+    public ShowCommand(ElementListWrapper<T> listWrapper) {
+        this.listWrapper = listWrapper;
     }
 
     @Override
     public void execute(T element) {
-        System.out.println(element);
-
+        System.out.println("Showing all elements:");
+        if (listWrapper.getAll().isEmpty()) {
+            System.out.println("No elements found.");
+        } else {
+            listWrapper.getAll().forEach(System.out::println);
+        }
     }
 }
