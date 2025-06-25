@@ -2,19 +2,23 @@ package model;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 @Data
 @SuperBuilder
-public abstract class Element {
+@Getter
+
+public abstract class Element{
     private int id;
     private String name;
     private String description;
     private boolean isActive;
 
-    public Element() {
+
+    protected Element(ElementBuilder<?, ?> builder) {
+        this.name = builder.name;
+        this.description = builder.description;
     }
-    public abstract boolean isActive();
-    public abstract BigDecimal getValue();
 
 }

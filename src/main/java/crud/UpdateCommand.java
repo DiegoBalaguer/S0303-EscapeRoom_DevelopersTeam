@@ -1,34 +1,34 @@
 package crud;
-
 import interfaces.Command;
 import model.Element;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
-import interfaces.Command;
-import wrapperCrud.ElementListWrapper;
+public class UpdateCommand<T extends Element> implements Command<T> {
+    private final List<T> list;
+    private final BiConsumer<T, T> updateFunction; // Función que aplica las actualizaciones
 
-public class UpdateCommand<T> implements Command<T> {
-    private final ElementListWrapper<T> listWrapper;
-
-    public UpdateCommand(ElementListWrapper<T> listWrapper) {
-        this.listWrapper = listWrapper;
+    public UpdateCommand(List<T> list, BiConsumer<T, T> updateFunction) {
+        this.list = list;
+        this.updateFunction = updateFunction;
     }
 
     @Override
     public void execute(T element) {
-        if (element == null) {
-            System.out.println("No element provided. Cannot update.");
-            return;
-        }
+        // Encuentra el elemento por ID
+        Optional<T> existingElement = list.stream()
+                .filter(e -> e.getId() == element.getId())
+                .findFirst();
 
-        int index = listWrapper.getAll().indexOf(element);
-        if (index != -1) {
-            listWrapper.remove(element);
-            listWrapper.add(element); // Reemplazar con el nuevo elemento
-            System.out.println("Element updated successfully: " + element);
+        if (existingElement.isPresent()) {
+            // Aplica la función de actualización
+            updateFunction.accept(existingElement.get(), element);
+            System.out.println("Element updated successfully: " + existingElement.get());
         } else {
-            System.out.println("Element not found. Cannot update.");
+            System.out.println("Element with ID " + element.getId() + " not found.");
         }
     }
+
 }

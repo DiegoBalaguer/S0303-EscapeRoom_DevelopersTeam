@@ -1,10 +1,10 @@
 package crud;
 
-public class Action {
-   /* public executeCommand(command Command, element <T>){
+import interfaces.Command;
 
+public class Actions<T> {
+    public void executeCommand(Command<T> command, T element) {
+        command.execute(element);
     }
-    public undoCommand(command Command, element <T>){
-
-    }*/
 }
+

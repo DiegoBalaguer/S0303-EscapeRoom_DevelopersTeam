@@ -1,17 +1,18 @@
+
 package enums;
 
 
 public enum OptionsMenuMain {
 
     TICKET_SALE("Ticket sale"),
-    USER_MANAGEMENT("Player management"),
+    PLAYER_MANAGEMENT("Player management"),
     ESCAPE_ROOM_MANAGEMENT("Escape room management"),
-    ELEMENT_MANAGEMENT("Element management"),
     FINANCIAL_MANAGEMENT("Financial management"),
     EXIT("Exit");
 
     private final String DESCRIPTION;
 
+    // Constructor del enum
     OptionsMenuMain(String description) {
         this.DESCRIPTION = description;
     }
@@ -25,11 +26,6 @@ public enum OptionsMenuMain {
         for (OptionsMenuMain optionMenu : OptionsMenuMain.values()) {
             System.out.println(optionMenu.ordinal() + 1 + ". " + optionMenu.getDESCRIPTION());
         }
-<<<<<<< HEAD
-        System.out.println(System.lineSeparator() + "Choose an option: ");
-=======
         System.out.println("");
->>>>>>> 04232f6687ecd18771ec8f7ee29a19169caeb16c
     }
 }
-

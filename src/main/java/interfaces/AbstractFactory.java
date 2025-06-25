@@ -1,4 +1,7 @@
 package interfaces;
 
-public class AbstractFactory {
+import model.Element;
+
+public interface AbstractFactory {
+    <T extends Element> T createElement(String type, Object... args);
 }
