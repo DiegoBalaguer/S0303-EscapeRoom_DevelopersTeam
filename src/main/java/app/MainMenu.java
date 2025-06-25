@@ -16,7 +16,7 @@ public class MainMenu {
     public void showMainMenu() {
         while (true) {
             try {
-                System.out.println("\n=== Main SubMenu ===");
+                System.out.println("\n=== Main ===");
                 System.out.println("1. Manage Rooms");
                 System.out.println("2. Manage Clues");
                 System.out.println("3. Manage Players"); // Nota: Player no es compatible con SubMenu debido a la restricción genérica

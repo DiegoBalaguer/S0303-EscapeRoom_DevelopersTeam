@@ -2,11 +2,12 @@ package crud;
 
 import interfaces.Command;
 import model.Element;
+import model.Room;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public class CalculateCommand<T extends Element> implements Command<T> {
+public class CalculateCommand<T extends Room> implements Command<T> {
     private final List<T> list;
 
     public CalculateCommand(List<T> list) {
@@ -22,8 +23,9 @@ public class CalculateCommand<T extends Element> implements Command<T> {
         }
 
         BigDecimal total = list.stream()
-                .map(Element::getPrice) // Llamamos al método `getPrice`, que pertenece a `Element`
+                .map(T::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         System.out.println("The total price of all elements is: " + total);
     }

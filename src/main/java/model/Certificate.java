@@ -10,8 +10,4 @@ import java.math.BigDecimal;
 public class Certificate extends Element {
 
 
-    @Override
-    public BigDecimal getPrice() {
-        return null;
-    }
 }

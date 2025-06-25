@@ -1,6 +1,6 @@
 package app;
 
-import abstractFactories.AbstractEscapeRoom;
+import abstractEscapeRoom.AbstractEscapeRoom;
 import crud.*;
 import enums.Difficulty;
 import interfaces.AbstractFactory;
@@ -13,14 +13,19 @@ import java.util.List;
 import java.util.Scanner;
 
 public class SubMenu<T extends Element> {
+
+    private static final String INVALID_OPTION_MESSAGE = "Invalid option. Try again.";
+    private static final String EMPTY_FIELD_MESSAGE = "Field cannot be empty. Operation canceled.";
+    private static final String SUBMENU_HEADER = "\n=== Submenu ===";
+
     private final List<T> elements = new ArrayList<>();
     private final Actions<T> actions = new Actions<>();
 
     public void showSubMenu() {
-        Scanner scanner = new Scanner(System.in);
+        Scanner userInput = new Scanner(System.in);
 
         while (true) {
-            System.out.println("\n=== Submenu ===");
+            System.out.println(SUBMENU_HEADER);
             System.out.println("1. Add Element");
             System.out.println("2. Show Elements");
             System.out.println("3. Delete Element");
@@ -28,105 +33,104 @@ public class SubMenu<T extends Element> {
             System.out.println("0. Back to Main Menu");
             System.out.print("Select an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-            switch (choice) {
-                case 1 -> addElement(scanner);
+            int userChoice = userInput.nextInt();
+            userInput.nextLine(); // Clear buffer
+
+            switch (userChoice) {
+                case 1 -> addElement(userInput);
                 case 2 -> showElements();
-                case 3 -> deleteElement(scanner);
+                case 3 -> deleteElement(userInput);
                 case 4 -> calculateTotalPrice();
                 case 0 -> {
                     System.out.println("Returning to Main Menu...");
                     return;
                 }
-                default -> System.out.println("Invalid option. Try again.");
+                default -> System.out.println(INVALID_OPTION_MESSAGE);
             }
         }
     }
 
-    private void addElement(Scanner scanner) {
-        System.out.print("Enter element type (Room, Clue, Player, Decoration): ");
-        String type = scanner.nextLine().trim();
-
-        // Validar que el tipo no sea nulo o vacío
-        if (type == null || type.isBlank()) {
-            System.out.println("Element type cannot be null or empty. Operation canceled.");
+    private void addElement(Scanner userInput) {
+        String type = readInput(userInput, "Enter element type (Room, Clue, Player, Decoration): ");
+        if (!validateType(type)) {
+            System.out.println("Invalid type. Valid types: Room, Clue, Decoration, Player.");
             return;
         }
 
-        System.out.print("Enter element name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Enter price: ");
-        BigDecimal price;
-        try {
-            price = scanner.nextBigDecimal();
-            scanner.nextLine();
-        } catch (Exception e) {
-            System.out.println("Invalid price format. Operation canceled.");
-            scanner.nextLine();
-            return;
-        }
-
-        Object[] args;
+        String name = readInput(userInput, "Enter element name: ");
+        BigDecimal price = parsePrice(userInput, "Enter price: ");
+        if (price == null) return;
 
         try {
-            switch (type.toLowerCase()) {
-                case "room" -> {
-                    System.out.print("Enter difficulty [1: EASY, 2: MEDIUM, 3: EXPERT]: ");
-                    int difficultyInput = scanner.nextInt();
-                    scanner.nextLine();
-                    Difficulty difficulty = switch (difficultyInput) {
-                        case 1 -> Difficulty.EASY;
-                        case 2 -> Difficulty.MEDIUM;
-                        case 3 -> Difficulty.EXPERT;
-                        default -> throw new IllegalArgumentException("Invalid difficulty value. Operation canceled.");
-                    };
-                    args = new Object[]{type.toLowerCase(), difficulty};
-
-                }
-                case "clue" -> {
-                    System.out.print("Enter theme: ");
-                    String theme = scanner.nextLine().trim();
-                    if (theme.isBlank()) {
-                        throw new IllegalArgumentException("Theme cannot be empty. Operation canceled.");
-                    }
-                    args = new Object[]{"clue", theme};
-                }
-                case "decoration" -> {
-                    System.out.print("Enter material: ");
-                    String material = scanner.nextLine().trim();
-                    if (material.isBlank()) {
-                        throw new IllegalArgumentException("Material cannot be empty. Operation canceled.");
-                    }
-                    args = new Object[]{"decoration", material};
-                }
-                case "player" -> {
-                    System.out.print("Enter email: ");
-                    String email = scanner.nextLine().trim();
-                    if (email.isBlank() || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-                        throw new IllegalArgumentException("Invalid email format. Operation canceled.");
-                    }
-                    args = new Object[]{"player", email};
-                }
-                default -> throw new IllegalArgumentException("Invalid type. Valid types: Room, Clue, Decoration, Player. Operation canceled.");
+            Element element = createElementByType(type, name, price, userInput);
+            if (element != null) {
+                Command<T> command = new AddCommand<>(elements);
+                actions.executeCommand(command, (T) element);
             }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return;
-        } catch (Exception e) {
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-            return;
-        }
-
-        try {
-            AbstractFactory factory = new AbstractEscapeRoom();
-            Element element = factory.createElement(name, price, args);
-            Command<T> command = new AddCommand<>(elements);
-            actions.executeCommand(command, (T) element);
         } catch (Exception e) {
             System.out.println("Failed to add the element: " + e.getMessage());
         }
+    }
+
+    private Element createElementByType(String type, String name, BigDecimal price, Scanner userInput) {
+        return switch (type.toLowerCase()) {
+            case "room" -> addRoom(name, price, userInput);
+            case "clue" -> addClue(name, price, userInput);
+            case "decoration" -> addDecoration(name, price, userInput);
+            case "player" -> addPlayer(name, price, userInput);
+            default -> null;
+        };
+    }
+
+    private Element addRoom(String name, BigDecimal price, Scanner userInput) {
+        String input = readInput(userInput, "Enter difficulty [1: EASY, 2: MEDIUM, 3: EXPERT]: ");
+        Difficulty difficulty = switch (input) {
+            case "1" -> Difficulty.EASY;
+            case "2" -> Difficulty.MEDIUM;
+            case "3" -> Difficulty.EXPERT;
+            default -> null;
+        };
+
+        if (difficulty == null) {
+            System.out.println("Invalid difficulty value. Choose from 1 to 3.");
+            return null;
+        }
+
+        AbstractFactory factory = new AbstractEscapeRoom();
+        return factory.createElement(name, price, "room", difficulty);
+    }
+
+    private Element addClue(String name, BigDecimal price, Scanner userInput) {
+        String theme = readInput(userInput, "Enter theme: ");
+        if (theme.isBlank()) {
+            System.out.println(EMPTY_FIELD_MESSAGE);
+            return null;
+        }
+
+        AbstractFactory factory = new AbstractEscapeRoom();
+        return factory.createElement(name, price, "clue", theme);
+    }
+
+    private Element addDecoration(String name, BigDecimal price, Scanner userInput) {
+        String material = readInput(userInput, "Enter material: ");
+        if (material.isBlank()) {
+            System.out.println(EMPTY_FIELD_MESSAGE);
+            return null;
+        }
+
+        AbstractFactory factory = new AbstractEscapeRoom();
+        return factory.createElement(name, price, "decoration", material);
+    }
+
+    private Element addPlayer(String name, BigDecimal price, Scanner userInput) {
+        String email = readInput(userInput, "Enter email: ");
+        if (email.isBlank() || !isValidEmail(email)) {
+            System.out.println("Invalid email format. Operation canceled.");
+            return null;
+        }
+
+        AbstractFactory factory = new AbstractEscapeRoom();
+        return factory.createElement(name, price, "player", email);
     }
 
     private void showElements() {
@@ -134,10 +138,9 @@ public class SubMenu<T extends Element> {
         actions.executeCommand(command, null);
     }
 
-    private void deleteElement(Scanner scanner) {
+    private void deleteElement(Scanner userInput) {
         System.out.print("Enter element index to remove: ");
-        int index = scanner.nextInt();
-
+        int index = userInput.nextInt();
         if (index >= 0 && index < elements.size()) {
             T element = elements.get(index);
             Command<T> command = new RemoveCommand<>(elements);
@@ -148,8 +151,35 @@ public class SubMenu<T extends Element> {
     }
 
     private void calculateTotalPrice() {
-        Command<T> command = new CalculateCommand<>(elements);
+        Command<T> command = new CalculateCommand(elements);
         actions.executeCommand(command, null);
     }
-}
 
+    // Utility methods
+    private String readInput(Scanner userInput, String message) {
+        System.out.print(message);
+        return userInput.nextLine().trim();
+    }
+
+    private BigDecimal parsePrice(Scanner userInput, String message) {
+        String input = readInput(userInput, message);
+        try {
+            return new BigDecimal(input);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid price format. Operation canceled.");
+            return null;
+        }
+    }
+
+    private boolean validateType(String type) {
+        return switch (type.toLowerCase()) {
+            case "room", "clue", "decoration", "player" -> true;
+            default -> false;
+        };
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(emailRegex);
+    }
+}

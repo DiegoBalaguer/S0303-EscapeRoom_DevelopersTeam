@@ -10,8 +10,5 @@ import java.math.BigDecimal;
 public class Reward extends Element {
 
 
-    @Override
-    public BigDecimal getPrice() {
-        return null;
-    }
+
 }

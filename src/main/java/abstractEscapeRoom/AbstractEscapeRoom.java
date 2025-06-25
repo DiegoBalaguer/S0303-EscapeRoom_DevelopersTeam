@@ -1,4 +1,4 @@
-package abstractFactories;
+package abstractEscapeRoom;
 
 import enums.Difficulty;
 import interfaces.AbstractFactory;
@@ -17,16 +17,13 @@ public class AbstractEscapeRoom implements AbstractFactory {
         BigDecimal price = extractPrice(args);
 
         return switch (typeLower) {
-            case ROOM -> createRoom(name, price, args);
-            case CLUE -> createClue(name, price, args);
-            case DECORATION -> createDecoration(name, price, args);
+            case "room" -> createRoom(name, price, args);
+            case "clue" -> createClue(name, price, args);
+            case "decoration" -> createDecoration(name, price, args);
             default -> throw new IllegalArgumentException("Unknown type: " + typeLower);
         };
     }
 
-    private static final String ROOM = "room";
-    private static final String CLUE = "clue";
-    private static final String DECORATION = "decoration";
 
     private BigDecimal extractPrice(Object... args) {
         return args.length >= 3 && args[2] instanceof BigDecimal ? (BigDecimal) args[2] : BigDecimal.ZERO;
@@ -66,9 +63,5 @@ public class AbstractEscapeRoom implements AbstractFactory {
                 .build();
     }
 
-    private void validateEmailFormat(String email) {
-        if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new IllegalArgumentException("Invalid email format.");
-        }
-    }
+
 }

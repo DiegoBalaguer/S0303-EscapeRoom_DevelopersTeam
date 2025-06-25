@@ -1,8 +1,6 @@
 package crud;
 
 import interfaces.Command;
-import model.Element;
-
 import java.util.List;
 
 public class RemoveCommand<T> implements Command<T> {
