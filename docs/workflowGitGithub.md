@@ -45,7 +45,7 @@
   git commit -m "Añadido menú principal"
   
   # Subimos los cambios a GitHub
-  git push  
+  git push --set-upstream origin docs/create-WorkflowGitGithub
 ```
 
 ## 5. Fusionar (merge) la rama de trabajo en develop

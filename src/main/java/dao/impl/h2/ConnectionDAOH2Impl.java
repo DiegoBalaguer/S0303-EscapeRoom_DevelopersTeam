@@ -17,19 +17,24 @@ public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
 
     private static final Path INPUT_FILE_WITH_PATH = Path.of(LoadConfigDB.getH2File()).normalize().toAbsolutePath();
 
+    private static final String DRIVER = LoadConfigDB.getH2Driver();
     private static final String URL = LoadConfigDB.getH2Url() + INPUT_FILE_WITH_PATH;
     private static final String USERNAME = LoadConfigDB.getH2User();
     private static final String PASSWORD = LoadConfigDB.getH2Password();
 
-    private ConnectionDAOH2Impl() {
 
+    private ConnectionDAOH2Impl() {
+        initializeConnection();
+    }
+
+    private void initializeConnection() {
         try {
-            Class.forName(LoadConfigDB.getH2Driver());
+            Class.forName(DRIVER);
             this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            log.info("Conexión a la base de datos establecida exitosamente");
+            log.info("Database connection established successfully");
         } catch (ClassNotFoundException | SQLException e) {
-            log.error("Error al conectar con la base de datos: {}", e.getMessage());
-            throw new RuntimeException("Error de conexión a la base de datos", e);
+            log.error("Error connecting to the database.", e.getMessage());
+            throw new RuntimeException("Database connection error", e);
         }
     }
 
@@ -44,18 +49,19 @@ public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
         return instance;
     }
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         getInstance();
         try {
             if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                initializeConnection();
             }
+            return connection;
         } catch (SQLException e) {
-            log.error("Error al obtener la conexión: {}", e.getMessage());
-            throw new RuntimeException("Error Connection BD H2.", e);
+            log.error("Error getting connection", e.getMessage());
+            throw new RuntimeException("H2 DB Connection Error.", e);
         }
-        return connection;
     }
+
 
     @Override
     public void beginTransaction() throws SQLException {
@@ -79,10 +85,10 @@ public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                log.info("Conexión cerrada exitosamente");
+                log.info("Connection closed successfully");
             }
         } catch (SQLException e) {
-            log.error("Error al cerrar la conexión: {}", e.getMessage());
+            log.error("Error closing the connection.", e.getMessage());
         }
     }
 }

@@ -1,7 +1,6 @@
 package dao.interfaces;
 
 public interface EscapeRoomDAO {
-    ConnectionDAO getConnectionDAO();
     PlayerDAO getPlayerDAO();
     RoomDAO getRoomDAO();
     ClueDAO getClueDAO();

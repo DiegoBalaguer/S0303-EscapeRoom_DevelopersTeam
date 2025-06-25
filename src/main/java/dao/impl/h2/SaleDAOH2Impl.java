@@ -2,6 +2,7 @@ package dao.impl.h2;
 
 import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
+import dao.interfaces.ConnectionDAO;
 import dao.interfaces.SaleDAO;
 import lombok.extern.slf4j.Slf4j;
 import model.Sale;
@@ -14,26 +15,26 @@ import java.util.Optional;
 @Slf4j
 public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
-    private final Connection connection;
+    private final ConnectionDAO connectionDAO;
     private static final String nameObject = "sale";
 
-    public SaleDAOH2Impl() {
-        this.connection = ConnectionDAOH2Impl.getConnection();
+    public SaleDAOH2Impl(ConnectionDAO connectionDAO) {
+        this.connectionDAO = connectionDAO;
     }
 
     @Override
     public Sale create(Sale sale) throws DAOException {
-        String sql = "INSERT INTO ? (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, sale.getIdTicket());
-            stmt.setInt(3, sale.getIdPlayer());
-            stmt.setInt(4, sale.getIdRoom());
-            stmt.setInt(5, sale.getPlayers());
-            stmt.setBigDecimal(6, sale.getPrice());
-            stmt.setInt(7, sale.getCompletion());
-            stmt.setDate(8, Date.valueOf(sale.getDateSale()));
-            stmt.setBoolean(9, sale.isActive());
+        String sql = "INSERT INTO" + nameObject + " (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, sale.getIdTicket());
+            stmt.setInt(2, sale.getIdPlayer());
+            stmt.setInt(3, sale.getIdRoom());
+            stmt.setInt(4, sale.getPlayers());
+            stmt.setBigDecimal(5, sale.getPrice());
+            stmt.setInt(6, sale.getCompletion());
+            stmt.setDate(7, Date.valueOf(sale.getDateSale()));
+            stmt.setBoolean(8, sale.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
@@ -49,10 +50,10 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
     @Override
     public Optional<Sale> findById(Integer id) throws DAOException {
-        String sql = "SELECT idSale, idTicket, idPlayer, idRoom, players, price, isActive FROM ? WHERE idSale = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "SELECT idSale, idTicket, idPlayer, idRoom, players, price, isActive FROM " + nameObject + " WHERE idSale = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return Optional.of(mapResultSetToSale(rs));
@@ -68,8 +69,9 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
     @Override
     public List<Sale> findAll() throws DAOException {
         List<Sale> sales = new ArrayList<>();
-        String sql = "SELECT idSale, idTicket, idPlayer, idRoom, players, price, isActive FROM " + nameObject;
-        try (Statement stmt = connection.createStatement();
+        String sql = "SELECT idSale, idTicket, idPlayer, idRoom, players, price, isActive FROM " + nameObject + ";";
+        try (Connection connection = connectionDAO.getConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 sales.add(mapResultSetToSale(rs));
@@ -84,18 +86,18 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
     @Override
     public Sale update(Sale sale) throws DAOException {
-        String sql = "UPDATE ? SET idTicket = ?, idPlayer = ?, idRoom = ?, players = ?, price = ?, completion = ?, dateSale = ?, isActive = ? WHERE idSale = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, sale.getIdTicket());
-            stmt.setInt(3, sale.getIdPlayer());
-            stmt.setInt(4, sale.getIdRoom());
-            stmt.setInt(5, sale.getPlayers());
-            stmt.setBigDecimal(6, sale.getPrice());
-            stmt.setInt(7, sale.getCompletion());
-            stmt.setDate(8, Date.valueOf(sale.getDateSale()));
-            stmt.setBoolean(9, sale.isActive());
-            stmt.setInt(10, sale.getId());
+        String sql = "UPDATE " + nameObject + " SET idTicket = ?, idPlayer = ?, idRoom = ?, players = ?, price = ?, completion = ?, dateSale = ?, isActive = ? WHERE idSale = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, sale.getIdTicket());
+            stmt.setInt(2, sale.getIdPlayer());
+            stmt.setInt(3, sale.getIdRoom());
+            stmt.setInt(4, sale.getPlayers());
+            stmt.setBigDecimal(5, sale.getPrice());
+            stmt.setInt(6, sale.getCompletion());
+            stmt.setDate(7, Date.valueOf(sale.getDateSale()));
+            stmt.setBoolean(8, sale.isActive());
+            stmt.setInt(9, sale.getId());
             int rows = stmt.executeUpdate();
             if (rows == 0) {
                 String messageError = "No " + nameObject + " found to update with ID: " + sale.getId();
@@ -112,10 +114,10 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        String sql = "DELETE FROM ? WHERE idSale = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "DELETE FROM " + nameObject + " WHERE idSale = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
                 String messageError = "No " + nameObject + " found to delete with ID: " + id;
@@ -131,10 +133,10 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
     @Override
     public boolean isExistsById(Integer id) {
-        String sql = "SELECT 1 FROM ? WHERE idSale = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "SELECT 1 FROM " + nameObject + " WHERE idSale = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {

@@ -44,11 +44,11 @@ public class LoadConfigDB {
         return properties.getProperty("db.type");
     }
 
-    public static boolean getSshEnable() {
-        return Boolean.parseBoolean(properties.getProperty("db.sshEnabled"));
+    // Database MySql configuration
+    public static boolean getMysqlSshEnable() {
+        return Boolean.parseBoolean(properties.getProperty("mysql.sshEnable"));
     }
 
-    // Database MySql configuration
     public static String getMysqlUrl() {
         return properties.getProperty("mysql.url");
     }
@@ -96,6 +96,35 @@ public class LoadConfigDB {
 
     public static String getH2Password() {
         return properties.getProperty("h2.password");
+    }
+
+    // Database MongoDB configuration
+    public static boolean getMongoSshEnable() {
+        return Boolean.parseBoolean(properties.getProperty("mongo.ssh"));
+    }
+
+    public static String getMongoUrl() {
+        return properties.getProperty("mongo.url");
+    }
+
+    public static String getMongoHost() {
+        return properties.getProperty("mongo.host");
+    }
+
+    public static int getMongoPort() {
+        return Integer.parseInt(properties.getProperty("mongo.port"));
+    }
+
+    public static String getMongoSchema() {
+        return properties.getProperty("mongo.schema");
+    }
+
+    public static String getMongoUser() {
+        return properties.getProperty("mongo.user");
+    }
+
+    public static String getMongoPassword() {
+        return properties.getProperty("mongo.password");
     }
 
     // SSH optional
