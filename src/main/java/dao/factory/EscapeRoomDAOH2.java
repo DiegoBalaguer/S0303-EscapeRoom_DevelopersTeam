@@ -5,59 +5,60 @@ import dao.interfaces.*;
 
 
 public class EscapeRoomDAOH2 implements EscapeRoomDAO {
+    private final ConnectionDAOH2Impl connectionDAO;
 
-    @Override
-    public ConnectionDAO getConnectionDAO() {
-        return ConnectionDAOH2Impl.getInstance();
+
+    public EscapeRoomDAOH2() {
+        this.connectionDAO = ConnectionDAOH2Impl.getInstance();
     }
 
     @Override
     public PlayerDAO getPlayerDAO() {
-        return new PlayerDAOH2Impl();
+        return new PlayerDAOH2Impl(connectionDAO);
     }
 
     @Override
     public RoomDAO getRoomDAO() {
-        return new RoomDAOH2Impl();
+        return new RoomDAOH2Impl(connectionDAO);
     }
 
     @Override
     public ClueDAO getClueDAO() {
-        return new ClueDAOH2Impl();
+        return new ClueDAOH2Impl(connectionDAO);
     }
 
     @Override
     public DecorationDAO getDecorationDAO() {
-        return new DecorationDAOH2Impl();
+        return new DecorationDAOH2Impl(connectionDAO);
     }
 
     @Override
     public CertificateDAO getCertificateDAO() {
-        return new CertificateDAOH2Impl();
+        return new CertificateDAOH2Impl(connectionDAO);
     }
 
     @Override
     public RewardDAO getRewardDAO() {
-        return new RewardDAOH2Impl();
+        return new RewardDAOH2Impl(connectionDAO);
     }
 
     @Override
     public TicketDAO getTicketDAO() {
-        return new TicketDAOH2Impl();
+        return new TicketDAOH2Impl(connectionDAO);
     }
 
     @Override
     public SaleDAO getSaleDAO() {
-        return new SaleDAOH2Impl();
+        return new SaleDAOH2Impl(connectionDAO);
     }
 
     @Override
     public CertificateWinDAO getCertificateWinDAO() {
-        return new CertificateWinDAOH2Impl();
+        return new CertificateWinDAOH2Impl(connectionDAO);
     }
 
     @Override
     public RewardWinDAO getRewardWinDAO() {
-        return new RewardWinDAOH2Impl();
+        return new RewardWinDAOH2Impl(connectionDAO);
     }
 }

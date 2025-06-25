@@ -2,6 +2,7 @@ package dao.impl.h2;
 
 import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
+import dao.interfaces.ConnectionDAO;
 import dao.interfaces.RewardWinDAO;
 import lombok.extern.slf4j.Slf4j;
 import model.RewardWin;
@@ -14,23 +15,23 @@ import java.util.Optional;
 @Slf4j
 public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWinDAO {
 
-    private final Connection connection;
+    private final ConnectionDAO connectionDAO;
     private static final String nameObject = "rewardWin";
 
-    public RewardWinDAOH2Impl() {
-        this.connection = ConnectionDAOH2Impl.getConnection();
+    public RewardWinDAOH2Impl(ConnectionDAO connectionDAO) {
+        this.connectionDAO = connectionDAO;
     }
 
     @Override
     public RewardWin create(RewardWin rewardWin) throws DAOException {
-        String sql = "INSERT INTO ? (idReward, idPlayer, description, dateDelivery, isActive) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, rewardWin.getIdReward());
-            stmt.setInt(3, rewardWin.getIdPlayer());
-            stmt.setString(4, rewardWin.getDescription());
-            stmt.setDate(5, Date.valueOf(rewardWin.getDateDelivery()));
-            stmt.setBoolean(6, rewardWin.isActive());
+        String sql = "INSERT INTO " + nameObject + " (idReward, idPlayer, description, dateDelivery, isActive) VALUES (?, ?, ?, ?, ?);";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, rewardWin.getIdReward());
+            stmt.setInt(2, rewardWin.getIdPlayer());
+            stmt.setString(3, rewardWin.getDescription());
+            stmt.setDate(4, Date.valueOf(rewardWin.getDateDelivery()));
+            stmt.setBoolean(5, rewardWin.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
@@ -46,10 +47,10 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
 
     @Override
     public Optional<RewardWin> findById(Integer id) throws DAOException {
-        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM ? WHERE idRewardWin = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM " + nameObject + " WHERE idRewardWin = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return Optional.of(mapResultSetToRewardWin(rs));
@@ -65,8 +66,9 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
     @Override
     public List<RewardWin> findAll() throws DAOException {
         List<RewardWin> rewardWins = new ArrayList<>();
-        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM " + nameObject;
-        try (Statement stmt = connection.createStatement();
+        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM " + nameObject + ";";
+        try (Connection connection = connectionDAO.getConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 rewardWins.add(mapResultSetToRewardWin(rs));
@@ -81,15 +83,15 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
 
     @Override
     public RewardWin update(RewardWin rewardWin) throws DAOException {
-        String sql = "UPDATE ? SET idReward = ?, idPlayer = ?, description = ?, dateDelivery = ?, isActive = ? WHERE idRewardWin = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, rewardWin.getIdReward());
-            stmt.setInt(3, rewardWin.getIdPlayer());
-            stmt.setString(4, rewardWin.getDescription());
-            stmt.setDate(5, Date.valueOf(rewardWin.getDateDelivery()));
-            stmt.setBoolean(6, rewardWin.isActive());
-            stmt.setInt(7, rewardWin.getId());
+        String sql = "UPDATE " + nameObject + " SET idReward = ?, idPlayer = ?, description = ?, dateDelivery = ?, isActive = ? WHERE idRewardWin = ?";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, rewardWin.getIdReward());
+            stmt.setInt(2, rewardWin.getIdPlayer());
+            stmt.setString(3, rewardWin.getDescription());
+            stmt.setDate(4, Date.valueOf(rewardWin.getDateDelivery()));
+            stmt.setBoolean(5, rewardWin.isActive());
+            stmt.setInt(6, rewardWin.getId());
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {
@@ -107,10 +109,10 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        String sql = "DELETE FROM ? WHERE idRewardWin = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "DELETE FROM " + nameObject + " WHERE idRewardWin = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
                 String messageError = "No " + nameObject + " found to delete with ID: " + id;
@@ -126,10 +128,10 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
 
     @Override
     public boolean isExistsById(Integer id) {
-        String sql = "SELECT 1 FROM ? WHERE idRewardWin = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nameObject);
-            stmt.setInt(2, id);
+        String sql = "SELECT 1 FROM " + nameObject + " WHERE idRewardWin = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
