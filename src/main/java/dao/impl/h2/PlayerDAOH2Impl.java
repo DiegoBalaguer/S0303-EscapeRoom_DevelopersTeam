@@ -24,14 +24,14 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player create(Player player) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, isActive) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate) VALUES ( ?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getEmail());
             stmt.setString(3, player.getPassword());
             stmt.setBoolean(4, player.isSubscribed());
-            stmt.setBoolean(5, player.isActive());
+            stmt.setDate(5, Date.valueOf(player.getRegistrationDate()));
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
@@ -83,15 +83,16 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player update(Player player) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET name = ?, email = ?, password = ?, isSubscribed = ?, isActive = ? WHERE idPlayer = ?;";
+        String sql = "UPDATE " + nameObject + " SET name = ?, email = ?, password = ?, isSubscribed = ?, registrationDate =?,  isActive = ? WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getEmail());
             stmt.setString(3, player.getPassword());
             stmt.setBoolean(4, player.isSubscribed());
-            stmt.setBoolean(5, player.isActive());
-            stmt.setInt(6, player.getId());
+            stmt.setDate(5, Date.valueOf(player.getRegistrationDate()));
+            stmt.setBoolean(6, player.isActive());
+            stmt.setInt(7, player.getId());
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {

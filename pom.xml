@@ -55,14 +55,6 @@
             <version>1.18.38</version>
         </dependency>
 
-        <!-- HikaryCP Pool connections BBDD -->
-        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>6.3.0</version>
-        </dependency>
-
         <!-- Dependency conector H2 -->
         <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
         <dependency>

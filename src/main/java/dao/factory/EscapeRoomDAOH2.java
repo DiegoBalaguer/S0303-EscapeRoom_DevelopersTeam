@@ -1,5 +1,6 @@
 package dao.factory;
 
+import dao.exceptions.DatabaseConnectionException;
 import dao.impl.h2.*;
 import dao.interfaces.*;
 
@@ -8,9 +9,15 @@ public class EscapeRoomDAOH2 implements EscapeRoomDAO {
     private final ConnectionDAOH2Impl connectionDAO;
 
 
-    public EscapeRoomDAOH2() {
+    public EscapeRoomDAOH2() throws DatabaseConnectionException {
         this.connectionDAO = ConnectionDAOH2Impl.getInstance();
     }
+
+    @Override
+    public void closeConnection() {
+        if (connectionDAO != null) {
+            connectionDAO.closeConnection();
+        }}
 
     @Override
     public PlayerDAO getPlayerDAO() {

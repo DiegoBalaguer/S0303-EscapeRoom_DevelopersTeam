@@ -74,6 +74,9 @@ public class LoadConfigDB {
     }
 
     // Database H2 configuration
+    public static boolean getH2SshEnable() {
+        return Boolean.parseBoolean(properties.getProperty("h2.sshEnable"));
+    }
     public static String getH2Url() {
         return properties.getProperty("h2.url");
     }

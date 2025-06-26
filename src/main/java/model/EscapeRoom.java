@@ -1,10 +1,8 @@
-package app;
+package model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import model.Player;
-import model.Room;
 
 import java.util.ArrayList;
 import java.util.List;

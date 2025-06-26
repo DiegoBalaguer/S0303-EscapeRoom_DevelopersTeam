@@ -9,7 +9,7 @@ import java.util.Properties;
 
 @Slf4j
 public class LoadConfigApp {
-    private static final Path INPUT_FILE_WITH_PATH = Path.of("_local/config/config.app.properties").normalize();
+    private static final Path INPUT_FILE_WITH_PATH = Path.of("src/main/resources/config/config.app.properties").normalize();
     private static LoadConfigApp loadConfigApp;
     private static Properties properties;
 
