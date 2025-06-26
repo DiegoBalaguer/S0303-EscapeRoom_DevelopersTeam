@@ -25,6 +25,4 @@ public class Player {
     private boolean isActive;
 
 
-
-
 }

@@ -1551,3 +1551,114 @@ INSERT INTO player (name, email, password, isSubscribed, registrationDate, isAct
 	at app.AppWorkers.mainMenu(AppWorkers.java:36)
 	at app.AppController.startApp(AppController.java:37)
 	at Main.main(Main.java:9)
+2025-06-26 17:18:02.697865+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "TICKETS" no encontrada
+Table "TICKETS" not found; SQL statement:
+SELECT * FROM tickets WHERE id = ? [42102-232]
+2025-06-26 17:23:12.409270+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "TICKETS" no encontrada
+Table "TICKETS" not found; SQL statement:
+SELECT * FROM tickets WHERE id = ? [42102-232]
+2025-06-26 17:25:55.895839+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "TICKETS" no encontrada
+Table "TICKETS" not found; SQL statement:
+SELECT * FROM tickets WHERE id = ? [42102-232]
+2025-06-26 17:43:19.264165+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "TICKETS" no encontrada
+Table "TICKETS" not found; SQL statement:
+SELECT * FROM tickets WHERE name = ? [42102-232]
+2025-06-26 17:51:41.056430+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Columna "id" no encontrada
+Column "id" not found [42122-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.jdbc.JdbcResultSet.getColumnIndex(JdbcResultSet.java:3492)
+	at org.h2.jdbc.JdbcResultSet.getInt(JdbcResultSet.java:337)
+	at dao.impl.h2.TicketDAOH2Impl.findByName(TicketDAOH2Impl.java:184)
+	at app.SaleWorkers.createSale(SaleWorkers.java:113)
+	at app.SaleWorkers.mainMenu(SaleWorkers.java:91)
+	at app.AppWorkers.mainMenu(AppWorkers.java:35)
+	at app.AppController.startApp(AppController.java:37)
+	at Main.main(Main.java:9)
+2025-06-26 17:54:46.742306+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Columna "id" no encontrada
+Column "id" not found [42122-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.jdbc.JdbcResultSet.getColumnIndex(JdbcResultSet.java:3492)
+	at org.h2.jdbc.JdbcResultSet.getInt(JdbcResultSet.java:337)
+	at dao.impl.h2.TicketDAOH2Impl.findByName(TicketDAOH2Impl.java:184)
+	at app.SaleWorkers.createSale(SaleWorkers.java:113)
+	at app.SaleWorkers.mainMenu(SaleWorkers.java:91)
+	at app.AppWorkers.mainMenu(AppWorkers.java:35)
+	at app.AppController.startApp(AppController.java:37)
+	at Main.main(Main.java:9)
+2025-06-26 17:56:50.175643+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Columna "ID" no encontrada
+Column "ID" not found; SQL statement:
+SELECT * FROM ticket WHERE id = ? [42122-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.expression.ExpressionColumn.getColumnException(ExpressionColumn.java:244)
+	at org.h2.expression.ExpressionColumn.optimizeOther(ExpressionColumn.java:226)
+	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:213)
+	at org.h2.expression.condition.Comparison.optimize(Comparison.java:147)
+	at org.h2.expression.Expression.optimizeCondition(Expression.java:148)
+	at org.h2.command.query.Select.prepareExpressions(Select.java:1235)
+	at org.h2.command.query.Query.prepare(Query.java:232)
+	at org.h2.command.Parser.prepareCommand(Parser.java:489)
+	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:645)
+	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:561)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1164)
+	at org.h2.jdbc.JdbcPreparedStatement.<init>(JdbcPreparedStatement.java:93)
+	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:315)
+	at dao.impl.h2.TicketDAOH2Impl.findById(TicketDAOH2Impl.java:156)
+	at app.SaleWorkers.createSale(SaleWorkers.java:172)
+	at app.SaleWorkers.mainMenu(SaleWorkers.java:91)
+	at app.AppWorkers.mainMenu(AppWorkers.java:35)
+	at app.AppController.startApp(AppController.java:37)
+	at Main.main(Main.java:9)
+2025-06-26 18:20:04.562163+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Columna "id" no encontrada
+Column "id" not found [42122-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.jdbc.JdbcResultSet.getColumnIndex(JdbcResultSet.java:3492)
+	at org.h2.jdbc.JdbcResultSet.getInt(JdbcResultSet.java:337)
+	at dao.impl.h2.SaleDAOH2Impl.findPlayerById(SaleDAOH2Impl.java:197)
+	at app.SaleWorkers.createSale(SaleWorkers.java:181)
+	at app.SaleWorkers.mainMenu(SaleWorkers.java:91)
+	at app.AppWorkers.mainMenu(AppWorkers.java:35)
+	at app.AppController.startApp(AppController.java:37)
+	at Main.main(Main.java:9)
+2025-06-26 18:24:53.715043+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Columna "id" no encontrada
+Column "id" not found [42122-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.jdbc.JdbcResultSet.getColumnIndex(JdbcResultSet.java:3492)
+	at org.h2.jdbc.JdbcResultSet.getInt(JdbcResultSet.java:337)
+	at dao.impl.h2.SaleDAOH2Impl.findPlayerById(SaleDAOH2Impl.java:197)
+	at app.SaleWorkers.createSale(SaleWorkers.java:181)
+	at app.SaleWorkers.mainMenu(SaleWorkers.java:91)
+	at app.AppWorkers.mainMenu(AppWorkers.java:35)
+	at app.AppController.startApp(AppController.java:37)
+	at Main.main(Main.java:9)
+2025-06-26 18:27:15.656095+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "INSERT [*]INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"; se esperaba "INTO"
+Syntax error in SQL statement "INSERT [*]INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"; expected "INTO"; SQL statement:
+INSERT INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?); [42001-232]
+2025-06-26 18:37:58.910052+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "INSERT [*]INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"; se esperaba "INTO"
+Syntax error in SQL statement "INSERT [*]INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);"; expected "INTO"; SQL statement:
+INSERT INTOsale (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?); [42001-232]

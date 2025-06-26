@@ -5,13 +5,10 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory; // Importar para obtener el PlayerDAO
 import dao.interfaces.PlayerDAO; // Importar la interfaz DAO
 import enums.OptionsMenuPlayer; // Tu enum para el menú de jugadores
-import loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
 import model.Player; // Importar la clase Player
 import utils.ConsoleUtils; // Para leer inputs
 import view.PlayerView; // Importar la vista de jugadores
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
