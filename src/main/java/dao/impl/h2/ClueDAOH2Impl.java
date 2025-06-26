@@ -150,5 +150,23 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+    @Override
+    public List<Clue> findCluesByRoomId(Integer roomId) throws DAOException {
+        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM clue WHERE idRoom = ? AND isActive = TRUE;";
+        List<Clue> clues = new ArrayList<>();
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, roomId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                clues.add(mapResultSetToClue(rs));
+            }
+        } catch (Exception e) {
+            String messageError = "Error retrieving clues for room ID: " + roomId;
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return clues;
+    }
 }
 

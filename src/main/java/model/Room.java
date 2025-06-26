@@ -6,6 +6,7 @@ import interfaces.AbstractClue;
 import interfaces.AbstractDecoration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @SuperBuilder
 @Getter
+@Setter
 public class Room extends Element {
     private int idEscapeRoom;
     private BigDecimal price;
