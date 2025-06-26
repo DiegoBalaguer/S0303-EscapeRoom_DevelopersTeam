@@ -6,7 +6,6 @@ public enum OptionsMenuSale {
     DELETE(2, "Delete Ticket"),
     CALCULATE_TOTAL_BENEFITS(3, "Calculate Total Benefits"),
     SHOW_ALL_TICKETS(4, "Show All Tickets"),
-    SALE_DETAILS(5, "Sale Details"),
     EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;

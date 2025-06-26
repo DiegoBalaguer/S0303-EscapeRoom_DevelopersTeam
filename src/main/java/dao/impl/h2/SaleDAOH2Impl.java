@@ -5,7 +5,9 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.SaleDAO;
 import lombok.extern.slf4j.Slf4j;
+import model.Player;
 import model.Sale;
+import model.Ticket;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
 
     @Override
     public Sale create(Sale sale) throws DAOException {
-        String sql = "INSERT INTO" + nameObject + " (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (idTicket, idPlayer, idRoom, players, price, completion, dateSale, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, sale.getIdTicket());
@@ -157,5 +159,75 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+    @Override
+    public Optional<Ticket> findTicketById(int idTicket) {
+        String query = "SELECT * FROM ticket WHERE idTicket = ?"; // Ajusta el nombre de la tabla y columna si es necesario
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, idTicket);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Ticket ticket = Ticket.builder().build();
+                ticket.setId(rs.getInt("idTicket"));
+                ticket.setName(rs.getString("name"));       // Ajusta los campos según tu modelo
+                ticket.setPrice(rs.getBigDecimal("price")); // Ajusta los campos según tu modelo
+                return Optional.of(ticket);
+            }
+        } catch (SQLException e) {
+            log.error("Error al buscar Player por ID: {}", e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Player> findPlayerById(int idPlayer) throws DAOException {
+        String query = "SELECT * FROM player WHERE idPlayer = ?"; // Ajusta el nombre de la tabla y columna si es necesario
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setInt(1, idPlayer);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Player player = Player.builder().build();
+                player.setId(rs.getInt("idPlayer"));
+                player.setName(rs.getString("name"));
+                player.setEmail(rs.getString("email"));
+                player.setPassword(rs.getString("password"));
+                player.setSubscribed(rs.getBoolean("isSubscribed"));
+                player.setActive(rs.getBoolean("isActive"));
+                return Optional.of(player);
+            }
+                 // Ajusta los campos según tu model
+
+        } catch (SQLException e) {
+            log.error("Error al buscar Ticket por ID: {}", e.getMessage(), e);
+        }
+        return Optional.empty();
+
+
+    }
+    @Override
+    public int getTotalPlayers() throws DAOException {
+        String sql = "SELECT SUM(players) AS totalPlayers FROM sale;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("totalPlayers");
+            }
+            return 0; // Si no hay ventas, devolver 0
+        } catch (SQLException e) {
+            String messageError = "Error calculating players: ";
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+    }
+
 }
 

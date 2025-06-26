@@ -21,4 +21,8 @@ public class Sale {
         private LocalDate dateSale;
         private boolean isActive;
 
-    }
+
+        public Sale() {
+
+        }
+}

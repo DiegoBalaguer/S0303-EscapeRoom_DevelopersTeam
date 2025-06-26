@@ -4,52 +4,64 @@ import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.PlayerDAO;
+import dao.interfaces.TicketDAO;
 import dao.interfaces.SaleDAO;
-import dao.factory.*;
 import dto.SaleDetailsDTO;
 import enums.OptionsMenuSale;
 import lombok.extern.slf4j.Slf4j;
 import model.Player;
 import model.Sale;
+import model.Ticket;
 import utils.ConsoleUtils;
-import view.PlayerView;
 import view.SaleView;
-
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.security.Timestamp;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 public class SaleWorkers {
-    private static SaleWorkers appWorkersInstance;
-    private final SaleView saleView; // Instancia de la vista para Sale
+    private static volatile SaleWorkers appWorkersInstance; // Volatile para asegurar concurrencia en singleton
+    private final SaleView saleView; // Vista para la gestión de ventas
     private final SaleDAO saleDAO;
-    private final PlayerDAO playerDAO;
-// Instancia del DAO de Sale
+    private final TicketDAO ticketDAO;
+    private final PlayerDAO playerDAO; // DAOs desacoplados mediante interfaces
 
-
-    public SaleWorkers() {
-        // Inicializa la vista
-        this.saleView = new SaleView();
+    // Constructor
+    // Constructor
+    private SaleWorkers() {
+        this.saleView = new SaleView(); // Inicialización de la vista
 
         try {
-            // Obtiene el DAO de ventas desde la fábrica
+            // Inicializamos los DAOs desde la fábrica
             this.saleDAO = DAOFactory.getDAOFactory().getSaleDAO();
-
-            // Obtiene el DAO de jugadores desde la fábrica
             this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
+            this.ticketDAO = DAOFactory.getDAOFactory().getTicketDAO(); // Inicialización del ticketDAO
         } catch (DatabaseConnectionException e) {
-            // Loguea el error y relanza una excepción específica
             log.error("Error al inicializar los DAOs debido a problemas de conexión con la base de datos: {}", e.getMessage(), e);
             throw new IllegalStateException("No se pudieron inicializar los DAOs.", e);
         } catch (Exception e) {
-            // Controla cualquier otra excepción inesperada
             log.error("Ocurrió un error inesperado al inicializar los DAOs: {}", e.getMessage(), e);
             throw new IllegalStateException("Error inesperado al inicializar los DAOs.", e);
         }
+
+        // Validación de DAOs para detectar problemas desde el inicio
+        validateNotNull(this.saleDAO, "SaleDAO no pudo ser inicializado.");
+        validateNotNull(this.playerDAO, "PlayerDAO no pudo ser inicializado.");
+        validateNotNull(this.ticketDAO, "TicketDAO no pudo ser inicializado."); // Validamos que el ticketDAO no sea nulo
     }
 
+    // Método helper para validar nulos
+    private void validateNotNull(Object obj, String errorMsg) {
+        if (obj == null) {
+            log.error(errorMsg);
+            throw new IllegalStateException(errorMsg);
+        }
+    }
 
+    // Patrón Singleton (thread-safe)
     public static SaleWorkers getInstance() {
         if (appWorkersInstance == null) {
             synchronized (SaleWorkers.class) {
@@ -61,9 +73,11 @@ public class SaleWorkers {
         return appWorkersInstance;
     }
 
-public void mainMenu() {
-        do {
-            saleView.displaySaleMenu("SALE MANAGEMENT"); // Usamos la vista para mostrar el menú
+    // Menú principal
+    public void mainMenu() {
+        boolean running = true;
+        while (running) {
+            saleView.displaySaleMenu("SALE MANAGEMENT"); // Mostramos el menú al usuario
             int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
             OptionsMenuSale selectedOption = OptionsMenuSale.getOptionByNumber(answer);
 
@@ -72,141 +86,298 @@ public void mainMenu() {
                     switch (selectedOption) {
                         case EXIT -> {
                             saleView.displayMessage("Returning to Main Menu...");
-                            return;
+                            running = false; // Salimos del bucle
                         }
                         case SELL -> createSale();
                         case DELETE -> deleteSale();
                         case CALCULATE_TOTAL_BENEFITS -> calculateTotalBenefits();
                         case SHOW_ALL_TICKETS -> listAllSales();
-                        case SALE_DETAILS -> getSaleDetails(saleView.getSaleId().get());
+
+                        default -> saleView.displayErrorMessage("Unknown option selected.");
                     }
                 } catch (DAOException e) {
-                    saleView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                    log.error("DAO Error in SaleWorkers: {}", e.getMessage(), e);
+                    handleError("Database operation failed: ", e);
                 } catch (Exception e) {
-                    saleView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-                    log.error("Unexpected error in SaleWorkers: {}", e.getMessage(), e);
+                    handleError("An unexpected error occurred: ", e);
                 }
             } else {
                 saleView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
                 log.warn("Error: The value {} is invalid in the sale management menu.", answer);
             }
-        } while (true);
+        }
     }
-
-    // --- Métodos CRUD que actúan como la lógica del controlador ---
-    private void createSale() {
+    /*private void createSale() {
         try {
-            // Obtener detalles de la nueva venta
-            SaleDetailsDTO saleDetailsDTO = getSaleDetails(false); // 'false' indica creación
-            if (saleDetailsDTO == null) { // Validar datos nulos
-                saleView.displayErrorMessage("Sale creation canceled: invalid or missing sale details.");
+            // Solicitar el nombre del ticket
+            String ticketName = ConsoleUtils.readRequiredString("Enter the Ticket Name you want to purchase: ");
+            Optional<Ticket> ticketOptional = ticketDAO.findByName(ticketName);
+
+            if (ticketOptional.isEmpty()) {
+                saleView.displayErrorMessage("Sale failed: Ticket with name '" + ticketName + "' does not exist.");
                 return;
             }
 
-            // Construir la entidad Sale usando los datos del DTO
+            // Solicitar el email del jugador
+            String playerEmail = ConsoleUtils.readRequiredString("Enter the Player Email: ");
+            Optional<Player> playerOptional = playerDAO.findByEmail(playerEmail);
+
+            if (playerOptional.isEmpty()) {
+                saleView.displayErrorMessage("Sale failed: Player with email '" + playerEmail + "' does not exist.");
+                return;
+            }
+
+            // Solicitar el número de jugadores
+            int playersCount = ConsoleUtils.readRequiredInt("Enter the number of players: ");
+            if (playersCount <= 0) {
+                saleView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
+                return;
+            }
+
+            // Calcular el precio total
+            Ticket ticket = ticketOptional.get();
+            BigDecimal totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(playersCount));
+
+            // Crear el objeto Sale
+            int roomId = 1; // En este caso, asumimos que será una sala con ID predeterminada
+            Sale newSale = Sale.builder()
+                    .idTicket(ticket.getId()) // ID del ticket desde la base de datos
+                    .idPlayer(playerOptional.get().getId()) // ID del jugador desde la base de datos
+                    .idRoom(roomId) // ID de la sala definida
+                    .players(playersCount) // Número de jugadores
+                    .price(totalPrice) // Precio calculado
+                    .completion(0) // Valor de completion predeterminado
+                    .dateSale(java.time.LocalDate.now()) // Fecha actual
+                    .isActive(true) // Venta activa
+                    .build();
+
+            // Guardar la venta en la base de datos
+            Sale savedSale = saleDAO.create(newSale);
+            if (savedSale == null || savedSale.getId() == 0) {
+                saleView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
+                return;
+            }
+
+            // Mostrar mensaje de éxito
+            saleView.displayMessage("Sale created successfully! Sale ID: " + savedSale.getId());
+        } catch (DAOException e) {
+            handleError("An error occurred while creating the sale: ", e);
+        } catch (NumberFormatException e) {
+            saleView.displayErrorMessage("Invalid input. Please enter valid data.");
+        }
+    }*/
+  private void createSale() {
+        try {
+            // Solicitar ID del ticket
+            int ticketId = ConsoleUtils.readRequiredInt("Enter the Ticket ID you want to purchase: ");
+            Optional<Ticket> ticketOptional = saleDAO.findTicketById(ticketId);
+
+            if (ticketOptional.isEmpty()) {
+                saleView.displayErrorMessage("Sale failed: Ticket with ID " + ticketId + " does not exist.");
+                return;
+            }
+
+            // Solicitar ID del jugador
+            int playerId = ConsoleUtils.readRequiredInt("Enter the Player ID: ");
+            Optional<Player> playerOptional = saleDAO.findPlayerById(playerId);
+
+            if (playerOptional.isEmpty()) {
+                saleView.displayErrorMessage("Sale failed: Player with ID " + playerId + " does not exist.");
+                return;
+            }
+
+            // Solicitar número de jugadores
+            int playersCount = ConsoleUtils.readRequiredInt("Enter the number of players: ");
+            if (playersCount <= 0) {
+                saleView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
+                return;
+            }
+
+            // Calcular el precio total
+            Ticket ticket = ticketOptional.get();
+            Player player = playerOptional.get();
+            BigDecimal totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(playersCount));
+
+            // Crear el objeto Sale
+            Sale newSale = Sale.builder()
+                    .idTicket(ticketId)
+                    .idPlayer(playerId)
+                    .idRoom(1) // En este caso, asumimos que es la sala con ID 1 (sin lógica para seleccionarla)
+                    .players(playersCount)
+                    .price(totalPrice)
+                    .completion(0) // Por ahora, no estamos calculando "completion"
+                    .dateSale(java.time.LocalDate.now())
+                    .isActive(true)
+                    .build();
+
+            // Guardar la venta en la base de datos
+            Sale savedSale = saleDAO.create(newSale);
+            if (savedSale == null || savedSale.getId() == 0) {
+                saleView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
+                return;
+            }
+
+            // Mostrar mensaje de éxito
+            saleView.displayMessage("Sale created successfully! Sale ID: " + savedSale.getId());
+        } catch (DAOException e) {
+            handleError("An error occurred while creating the sale: ", e);
+        } catch (NumberFormatException e) {
+            saleView.displayErrorMessage("Invalid input. Please enter a valid number.");
+        }
+  }
+    // --- Métodos CRUD que actúan como la lógica del controlador ---
+    /* private void createSale() {
+        try {
+            SaleDetailsDTO saleDetailsDTO = getSaleDetailsForOperation(false); // 'false' indica operación de creación
+            if (saleDetailsDTO == null) return;
+
             Sale newSale = new Sale();
             newSale.setIdTicket(saleDetailsDTO.getTicketId());
             newSale.setPrice(saleDetailsDTO.getPrice());
-            // Aquí necesitaríamos un método para obtener el ID del jugador a partir del nombre
-            Optional<Player> playerOptional = playerDAO.findByName(saleDetailsDTO.getPlayerName());
 
+            Optional<Player> playerOptional = playerDAO.findByName(saleDetailsDTO.getPlayerName());
             if (playerOptional.isEmpty()) {
                 saleView.displayErrorMessage("Sale creation failed: Player not found with name: " + saleDetailsDTO.getPlayerName());
                 return;
             }
 
             newSale.setIdPlayer(playerOptional.get().getId());
-
-            // Insertar la nueva venta en la base de datos
             Sale savedSale = saleDAO.create(newSale);
 
-            // Validar si se guarda correctamente
             if (savedSale == null || savedSale.getId() == 0) {
                 saleView.displayErrorMessage("Sale creation failed: Unable to save sale to the database.");
                 log.error("Failed to save sale: {}", newSale);
                 return;
             }
 
-            // Retroalimentar al usuario
             saleView.displayMessage("Sale created successfully: (ID: " + savedSale.getId() + ")");
         } catch (DAOException e) {
-            // Manejo de errores DAO y log
-            saleView.displayErrorMessage("An error occurred while creating the sale: " + e.getMessage());
-            log.error("Error in createSale: ", e);
-        } catch (Exception e) {
-            // Manejo de cualquier otro error inesperado
-            saleView.displayErrorMessage("Unexpected error during sale creation: " + e.getMessage());
-            log.error("Unexpected error in createSale: ", e);
+            handleError("An error occurred while creating the sale: ", e);
         }
-    }
+    }*/
 
-    private void deleteSale() throws DAOException {
-        Optional<Integer> idOpt = saleView.getSaleId(); // Obtener ID de la Sale
-        if (idOpt.isPresent()) {
-            saleDAO.deleteById(idOpt.get());
-            saleView.displayMessage("Sale with ID " + idOpt.get() + " deleted successfully (if existed).");
-        }
-    }
-
-    private void calculateTotalBenefits() throws DAOException {
-        // Implementar lógica para calcular beneficios totales, si aplica.
-        List<Sale> sales = saleDAO.findAll();
-        double totalBenefits = sales.stream()
-                .mapToDouble(sale -> sale.getPrice().doubleValue())
-                .sum();
-        saleView.displayMessage("Total Benefits from sales: $" + totalBenefits);
-    }
-
-    private void listAllSales() throws DAOException {
-        List<Sale> sales = saleDAO.findAll();
-        saleView.displaySales(sales);
-    }
-
-    public SaleDetailsDTO getSaleDetails(boolean forUpdate) {
+    private void deleteSale() {
         try {
+            Optional<Integer> idOpt = saleView.getSaleId();
+            if (idOpt.isPresent()) {
+                saleDAO.deleteById(idOpt.get());
+                saleView.displayMessage("Sale with ID " + idOpt.get() + " deleted successfully (if existed).");
+            } else {
+                saleView.displayErrorMessage("Sale ID is required to delete a sale.");
+            }
+        } catch (DAOException e) {
+            handleError("An error occurred while deleting the sale: ", e);
+        }
+    }
+
+    private void calculateTotalBenefits() {
+        try {
+            List<Sale> sales = saleDAO.findAll();
+            double totalBenefits = sales.stream()
+                    .mapToDouble(sale -> sale.getPrice().doubleValue())
+                    .sum();
+            saleView.displayMessage("Total Benefits from sales: $" + totalBenefits);
+        } catch (DAOException e) {
+            handleError("An error occurred while calculating total benefits: ", e);
+        }
+    }
+
+    private void listAllSales() {
+        try {
+            List<Sale> sales = saleDAO.findAll();
+            saleView.displaySales(sales);
+        } catch (DAOException e) {
+            handleError("An error occurred while listing sales: ", e);
+        }
+    }
+
+    private SaleDetailsDTO getSaleDetailsForOperation(boolean forUpdate) {
+        try {
+            // Solicitar el ID de la venta (saleId) al usuario
             int saleId = ConsoleUtils.readRequiredInt("Enter sale ID: ");
             if (saleId <= 0) {
                 saleView.displayErrorMessage("Invalid Sale ID. Operation canceled.");
                 return null;
             }
 
-            // Obtener la venta del DAO
+            // Buscar la venta en la base de datos
             Optional<Sale> saleOptional = saleDAO.findById(saleId);
-
             if (saleOptional.isEmpty()) {
                 saleView.displayErrorMessage("Sale not found with ID: " + saleId);
                 return null;
             }
 
-            // Extraemos los datos de la venta
+            // Obtener la venta (sale)
             Sale sale = saleOptional.get();
-            int ticketId = sale.getIdTicket();
-            BigDecimal price = sale.getPrice();
-            int playerId = sale.getIdPlayer();
 
-            // Consultamos el nombre del usuario en PlayerDAO
-            Optional<Player> playerOptional = playerDAO.findById(playerId);
+            // Buscar el Player relacionado a la venta
+            Optional<Player> playerOptional = playerDAO.findById(sale.getIdPlayer());
             if (playerOptional.isEmpty()) {
-                saleView.displayErrorMessage("Player not found with ID: " + playerId);
+                saleView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
                 return null;
             }
 
-            String playerName = playerOptional.get().getName();
+            // Obtener el nombre del Player
+            Player player = playerOptional.get();
 
-            // Si es una operación de "actualización", podemos permitir modificar detalles como el precio
+            // Obtener el precio (actualizar si se requiere para edición)
+            BigDecimal price = sale.getPrice();
             if (forUpdate) {
                 price = ConsoleUtils.readRequiredBigDecimal("Enter new sale price: ");
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    saleView.displayErrorMessage("Invalid price. Price must be greater than zero.");
+                    return null;
+                }
             }
 
-            // Creamos y retornamos el DTO con los datos requeridos
-            return new SaleDetailsDTO(ticketId, price, playerName);
-
+            // Devolver el DTO con la información del Player y el Ticket
+            return new SaleDetailsDTO(sale.getIdTicket(), price, player.getName());
         } catch (DAOException e) {
-            saleView.displayErrorMessage("Error while retrieving sale details: " + e.getMessage());
-            log.error("DAOException in getSaleDetails: ", e);
+            handleError("Error while retrieving sale details: ", e);
+            return null;
+        } catch (NumberFormatException e) {
+            saleView.displayErrorMessage("Invalid input. Please enter valid numeric data.");
             return null;
         }
     }
 
+    private int readSaleIdFromUser() {
+        try {
+            return ConsoleUtils.readRequiredInt("Enter sale ID: ");
+        } catch (NumberFormatException e) {
+            saleView.displayErrorMessage("Invalid input. Sale ID must be a number.");
+            return -1;
+        }
+    }
+
+    private Optional<SaleDetailsDTO> validateAndRetrieveSaleDetails(int saleId, boolean forUpdate) {
+        Optional<Sale> saleOptional = saleDAO.findById(saleId);
+        if (saleOptional.isEmpty()) {
+            saleView.displayErrorMessage("Sale not found with ID: " + saleId);
+            return Optional.empty();
+        }
+
+        Sale sale = saleOptional.get();
+        Optional<Player> playerOptional = playerDAO.findById(sale.getIdPlayer());
+        if (playerOptional.isEmpty()) {
+            saleView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
+            return Optional.empty();
+        }
+
+        BigDecimal price = sale.getPrice();
+        if (forUpdate) {
+            try {
+                price = ConsoleUtils.readRequiredBigDecimal("Enter new sale price: ");
+            } catch (NumberFormatException e) {
+                saleView.displayErrorMessage("Invalid price entered. Operation canceled.");
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(new SaleDetailsDTO(sale.getIdTicket(), price, playerOptional.get().getName()));
+    }
+
+    private void handleError(String message, Exception e) {
+        saleView.displayErrorMessage(message + e.getMessage());
+        log.error(message, e);
+    }
 }

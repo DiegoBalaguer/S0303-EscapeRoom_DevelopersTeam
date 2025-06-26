@@ -1,16 +1,10 @@
 package view;
 
-import dao.exceptions.DAOException;
-import dto.SaleDetailsDTO;
-import enums.OptionsMenuPlayer;
+import enums.OptionsMenuSale;
 import loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
-import model.Player;
 import model.Sale;
 import utils.ConsoleUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +12,7 @@ import java.util.Optional;
 public class SaleView {
 
     public void displaySaleMenu(String title) {
-        OptionsMenuPlayer.viewMenu(LoadConfigApp.getAppName());
+        OptionsMenuSale.viewMenu(LoadConfigApp.getAppName());
     }
 
     public Optional<Integer> getSaleId() {
@@ -31,20 +25,9 @@ public class SaleView {
         }
     }
 
-    public void displaySale(Sale sale) {
-        if (sale != null) {
-            System.out.println("\n--- Sale Details ---");
-            System.out.println("ID: " + sale.getId());
-            System.out.println("Registration Date: " + sale.getDateSale());
-            System.out.println("----------------------");
-        } else {
-            System.out.println("Player not found.");
-        }
-    }
-
     public void displaySales(List<Sale> sales) {
         if (sales.isEmpty()) {
-            System.out.println("No players found.");
+            System.out.println("No sales found.");
             return;
         }
         System.out.println("\n--- All Sales ---");

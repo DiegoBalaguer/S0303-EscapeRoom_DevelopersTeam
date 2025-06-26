@@ -81,10 +81,10 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
         }
     }
 
-    @Override
+   /* @Override
     public Player save(Player player) throws DAOException {
         return null;
-    }
+    }*/
 
     @Override
     public void deleteById(int id) throws DAOException {
@@ -152,7 +152,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
         }
     }
 
-    @Override
+   /* @Override
     public List<Player> findTopPlayers(int limit) throws DAOException {
         List<Player> players = new ArrayList<>();
         String sql = "SELECT idPlayer, name, email, isSubscribed, isActive FROM " + nameObject + " ORDER BY name DESC LIMIT ?;";
@@ -169,17 +169,17 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
-    }
+    }*/
 
     @Override
     public Optional<Player> findById(int id) throws DAOException {
         return Optional.empty();
     }
 
-    @Override
+ /*   @Override
     public Optional<Player> findByName(String name) throws DAOException {
         return Optional.empty();
-    }
+    }*/
 
     private Player mapResultSetToPlayer(ResultSet rs) throws SQLException {
         return Player.builder()
@@ -190,4 +190,29 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+    /*@Override
+    public Optional<Player> findByEmail(String email) {
+        String query = "SELECT * FROM players WHERE email = ?";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Player player = Player.builder().build();
+                player.setId(rs.getInt("id"));
+                player.setName(rs.getString("name"));
+                player.setEmail(rs.getString("email"));
+                player.setPassword(rs.getString("password"));
+                player.setSubscribed(rs.getBoolean("isSubscribed"));
+                player.setActive(rs.getBoolean("isActive"));
+                return Optional.of(player);
+            }
+        } catch (SQLException e) {
+            log.error("Error finding Player by Email: {}", e.getMessage(), e);
+        }
+        return Optional.empty();
+        }*/
 }
+
