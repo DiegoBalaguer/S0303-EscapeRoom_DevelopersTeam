@@ -1,51 +1,108 @@
 package view;
 
-
 import enums.OptionsMenuPlayer;
 import loadConfigApp.LoadConfigApp;
 import model.Player;
 import lombok.extern.slf4j.Slf4j;
 import utils.ConsoleUtils;
+import utils.StringUtils;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j // Para logging
+@Slf4j
 public class PlayerView {
+
+    private final String LINE = System.lineSeparator();
 
     public void displayPlayerMenu(String title) {
         OptionsMenuPlayer.viewMenu(LoadConfigApp.getAppName());
     }
 
-    public Player getPlayerDetails(boolean forUpdate) {
-        String name = ConsoleUtils.readRequiredString("Enter player name: ");
-        if (name == null || name.isEmpty()) {
-            displayErrorMessage("Player name cannot be empty. Operation canceled.");
-            return null;
-        }
+    public Player getPlayerDetailsCreate(Player player) {
+        player.setName(
+                getInputString("Enter player name: "));
 
-        String email = ConsoleUtils.readRequiredString("Enter player email: ");
-        if (email == null || !isValidEmail(email)) {
-            displayErrorMessage("Invalid email format. Operation canceled.");
-            return null;
-        }
+        player.setEmail(
+                getInputEmail("Enter player email: "));
 
-        String password = ConsoleUtils.readRequiredString("Enter player password: ");
+        player.setPassword(
+                getInputString("Enter player password: "));
 
-        boolean subscribed = ConsoleUtils.readRequiredBoolean("Enter player subscribed: ");
+        player.setSubscribed(
+                getInputBoolean("Enter player subscribed: "));
 
+        player.setActive(
+                getInputBoolean("Enter player Active: "));
 
-        // Si es para crear, asignamos la fecha de registro actual
-        LocalDate registrationDate = forUpdate ? null : LocalDate.now(); // null si es update, para no sobrescribir
+        player.setRegistrationDate(LocalDateTime.now());
 
-        return Player.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .registrationDate(registrationDate)
-                .build();
+        player.setActive(true);
+
+        return player;
     }
+
+
+    public Player getUpdatePlayerDetails(Player player) {
+        player.setName(
+                getUdateString(player.getName(), "Enter player name: "));
+
+        player.setEmail(
+                getUpdateEmail(player.getEmail(), "Enter player email: "));
+
+        player.setPassword(
+                getUdateString(player.getName(), "Enter player password: "));
+
+        player.setSubscribed(
+                getUpdateBoolean(player.isSubscribed(), "Enter player subscribed: "));
+
+        player.setActive(
+                getUpdateBoolean(player.isActive(), "Enter player Active: "));
+
+        return player;
+    }
+
+    private String getInputString(String message) {
+        return ConsoleUtils.readRequiredString(message);
+    }
+
+    private boolean getInputBoolean(String message) {
+        return ConsoleUtils.readRequiredBoolean(message);
+    }
+
+    private String getInputEmail(String message) {
+        String email = "";
+        do {
+            email = getInputString(message);
+            if (!StringUtils.isValidEmail(email)) {
+                displayErrorMessage("Invalid email format. Retype email.");
+            }
+        } while (!StringUtils.isValidEmail(email));
+        return email;
+    }
+
+    private String getUdateString(String oldValue, String message) {
+        return ConsoleUtils.readStringWithDefault(message, Optional.of(oldValue)).get();
+    }
+
+    private Boolean getUpdateBoolean(boolean oldValue, String message) {
+        return ConsoleUtils.readBooleanWithDefault(message, Optional.of(oldValue)).get();
+    }
+
+
+    private String getUpdateEmail(String oldValue, String message) {
+        String email = "";
+        do {
+            email = ConsoleUtils.readStringWithDefault(message, Optional.of(oldValue)).get();
+            if (!StringUtils.isValidEmail(email)) {
+                displayErrorMessage("Invalid email format. Retype email.");
+            }
+        } while (!StringUtils.isValidEmail(email));
+        return email;
+    }
+
 
     public Optional<Integer> getPlayerId() {
         try {
@@ -59,41 +116,67 @@ public class PlayerView {
 
     public void displayPlayer(Player player) {
         if (player != null) {
-            System.out.println("\n--- Player Details ---");
+            System.out.println("--- Player Details ---");
             System.out.println("ID: " + player.getId());
             System.out.println("Name: " + player.getName());
             System.out.println("Email: " + player.getEmail());
+            System.out.println("Password: " + player.getPassword());
             System.out.println("Registration Date: " + player.getRegistrationDate());
+            System.out.println("Subscribed: " + player.isSubscribed());
+            System.out.println("Active: " + player.isActive());
             System.out.println("----------------------");
         } else {
             System.out.println("Player not found.");
         }
     }
 
+
     public void displayPlayers(List<Player> players) {
+
+        System.out.println(makeHeadLineToList());
         if (players.isEmpty()) {
             System.out.println("No players found.");
             return;
         }
-        System.out.println("\n--- All Players ---");
         players.forEach(player -> System.out.println(
-                "ID: " + player.getId() +
-                        ", Name: " + player.getName() +
-                        ", Email: " + player.getEmail() +
-                        ", Reg. Date: " + player.getRegistrationDate()
+                makeLineToList(player.toList())
         ));
         System.out.println("-------------------");
     }
 
+    public void displayMessageln(String message) {
+        System.out.println(LINE + message + LINE);
+    }
+
     public void displayMessage(String message) {
-        System.out.println(System.lineSeparator() + message + System.lineSeparator());
+        System.out.print(message);
     }
 
     public void displayErrorMessage(String message) {
-        System.err.println(System.lineSeparator() + "ERROR: " + message + System.lineSeparator());
+        System.err.println(LINE + "ERROR: " + message + LINE);
     }
 
-    private boolean isValidEmail(String email) {
-        return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
+    private String makeHeadLineToList() {
+        ArrayList<String> dataLine = new ArrayList<>();
+        dataLine.add("ID");
+        dataLine.add("NAME");
+        dataLine.add("EMAIL");
+        dataLine.add("PASSWORD");
+        dataLine.add("REG.DATE");
+        dataLine.add("SUBSCRIBE");
+        dataLine.add("ACTIVE");
+        return makeLineToList(dataLine);
+    }
+
+    private String makeLineToList(ArrayList<String> dataLine) {
+        int i = 0;
+
+        return StringUtils.formatToChars(dataLine.get(i++), 8) +
+                StringUtils.formatToChars(dataLine.get(i++), 25) +
+                StringUtils.formatToChars(dataLine.get(i++), 35) +
+                StringUtils.formatToChars(dataLine.get(i++), 25) +
+                StringUtils.formatToChars(dataLine.get(i++), 24) +
+                StringUtils.formatToChars(dataLine.get(i++), 8) +
+                StringUtils.formatToChars(dataLine.get(i), 8);
     }
 }

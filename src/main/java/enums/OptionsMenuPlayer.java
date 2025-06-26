@@ -6,12 +6,13 @@ public enum OptionsMenuPlayer {
     LIST_ALL(2, "List All Players"), // Nueva opción
     READ(3, "Find Player by ID"),
     UPDATE(4, "Update Player"),
-    DELETE(5, "Delete Player"),
-    PROVIDE_CERTIFICATES(6, "Provide Certificates"),
-    PROVIDE_REWARDS(7, "Provide Rewards"),
-    SUBSCRIBE(8, "Subscribe"),
-    UNSUBSCRIBE(9, "Unsubscribe"),
-    NOTIFY(10, "Notify Player"),
+    SOFT_DELETE(5, "Soft delete Player"),
+    DELETE(6, "Delete Player"),
+    PROVIDE_CERTIFICATES(7, "Provide Certificates"),
+    PROVIDE_REWARDS(8, "Provide Rewards"),
+    SUBSCRIBE(9, "Subscribe"),
+    UNSUBSCRIBE(10, "Unsubscribe"),
+    NOTIFY(11, "Notify Player"),
     EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;
