@@ -82,6 +82,16 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
     }
 
     @Override
+    public Player save(Player player) throws DAOException {
+        return null;
+    }
+
+    @Override
+    public void deleteById(int id) throws DAOException {
+
+    }
+
+    @Override
     public Player update(Player player) throws DAOException {
         String sql = "UPDATE " + nameObject + " SET name = ?, email = ?, password = ?, isSubscribed = ?, registrationDate =?,  isActive = ? WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
@@ -159,6 +169,16 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
+    }
+
+    @Override
+    public Optional<Player> findById(int id) throws DAOException {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Player> findByName(String name) throws DAOException {
+        return Optional.empty();
     }
 
     private Player mapResultSetToPlayer(ResultSet rs) throws SQLException {
