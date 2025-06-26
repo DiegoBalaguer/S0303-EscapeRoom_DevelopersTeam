@@ -11,4 +11,5 @@ public interface EscapeRoomDAO {
     SaleDAO getSaleDAO();
     CertificateWinDAO getCertificateWinDAO();
     RewardWinDAO getRewardWinDAO();
+    void closeConnection();
 }

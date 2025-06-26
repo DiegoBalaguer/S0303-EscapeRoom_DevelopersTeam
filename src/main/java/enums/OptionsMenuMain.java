@@ -1,20 +1,24 @@
-
 package enums;
-
 
 public enum OptionsMenuMain {
 
-    TICKET_SALE("Ticket sale"),
-    PLAYER_MANAGEMENT("Player management"),
-    ESCAPE_ROOM_MANAGEMENT("Escape room management"),
-    FINANCIAL_MANAGEMENT("Financial management"),
-    EXIT("Exit");
+    TICKET_MANAGEMENT(1, "Ticket management"),
+    ROOM_MANAGEMENT(2, "Room management"),
+    PLAYER_MANAGEMENT(3, "Player management"),
+    ESCAPE_ROOM_MANAGEMENT(4, "Escape room management"),
+    FINANCIAL_MANAGEMENT(5, "Financial management"),
+    EXIT(0, "Exit");
 
+    private final int OPTION_NUMBER;
     private final String DESCRIPTION;
 
-    // Constructor del enum
-    OptionsMenuMain(String description) {
+    OptionsMenuMain(int optionNumber, String description) {
+        this.OPTION_NUMBER = optionNumber;
         this.DESCRIPTION = description;
+    }
+
+    public int getOPTION_NUMBER() {
+        return OPTION_NUMBER;
     }
 
     public String getDESCRIPTION() {
@@ -23,9 +27,22 @@ public enum OptionsMenuMain {
 
     public static void viewMenu(String title) {
         System.out.println(System.lineSeparator() + title + System.lineSeparator());
-        for (OptionsMenuMain optionMenu : OptionsMenuMain.values()) {
-            System.out.println(optionMenu.ordinal() + 1 + ". " + optionMenu.getDESCRIPTION());
+
+        OptionsMenuMain[] options = OptionsMenuMain.values();
+
+        for (OptionsMenuMain optionMenu : options) {
+             System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
         }
         System.out.println("");
+    }
+
+    // Optional
+    public static OptionsMenuMain getOptionByNumber(int number) {
+        for (OptionsMenuMain option : OptionsMenuMain.values()) {
+            if (option.getOPTION_NUMBER() == number) {
+                return option;
+            }
+        }
+        return null;
     }
 }

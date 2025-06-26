@@ -1,3 +1,4 @@
+/*
 package app;
 
 import model.Clue;
@@ -49,4 +50,4 @@ public class MainMenu {
     private void managePlayers() {
         System.out.println("Manage Players functionality is not implemented yet.");
     }
-}
+}*/
