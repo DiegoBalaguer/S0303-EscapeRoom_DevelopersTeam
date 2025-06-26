@@ -1,6 +1,8 @@
 package utils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -60,4 +62,17 @@ public class StringUtils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(date);
     }
+
+    public static String getDateFormatUSA(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return dateTime.format(formatter);
+    }
+
+    public static boolean isValidEmail(String email) {
+        return email != null && email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
+    }
+
 }

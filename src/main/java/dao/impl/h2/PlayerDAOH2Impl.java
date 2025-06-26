@@ -24,14 +24,15 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player create(Player player) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate) VALUES ( ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate, isActive) VALUES (?, ?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, player.getName());
             stmt.setString(2, player.getEmail());
             stmt.setString(3, player.getPassword());
             stmt.setBoolean(4, player.isSubscribed());
-            stmt.setDate(5, Date.valueOf(player.getRegistrationDate()));
+            stmt.setObject(5, player.getRegistrationDate());
+            stmt.setBoolean(6, player.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
@@ -47,7 +48,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Optional<Player> findById(Integer id) throws DAOException {
-        String sql = "SELECT idPlayer, name, email, isSubscribed, isActive FROM " + nameObject + " WHERE idPlayer = ?;";
+        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + " WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -66,7 +67,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
     @Override
     public List<Player> findAll() throws DAOException {
         List<Player> players = new ArrayList<>();
-        String sql = "SELECT idPlayer, name, email, isSubscribed, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -90,7 +91,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             stmt.setString(2, player.getEmail());
             stmt.setString(3, player.getPassword());
             stmt.setBoolean(4, player.isSubscribed());
-            stmt.setDate(5, Date.valueOf(player.getRegistrationDate()));
+            stmt.setObject(5, player.getRegistrationDate());
             stmt.setBoolean(6, player.isActive());
             stmt.setInt(7, player.getId());
 
@@ -145,7 +146,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
     @Override
     public List<Player> findTopPlayers(int limit) throws DAOException {
         List<Player> players = new ArrayList<>();
-        String sql = "SELECT idPlayer, name, email, isSubscribed, isActive FROM " + nameObject + " ORDER BY name DESC LIMIT ?;";
+        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + " ORDER BY name DESC LIMIT ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, limit);
@@ -166,7 +167,9 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
                 .id(rs.getInt("idPlayer"))
                 .name(rs.getString("name"))
                 .email(rs.getString("email"))
+                .password(rs.getString("password"))
                 .isSubscribed(rs.getBoolean("isSubscribed"))
+                .registrationDate(rs.getTimestamp("registrationDate").toLocalDateTime())
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }

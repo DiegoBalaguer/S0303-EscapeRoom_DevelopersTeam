@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -110,10 +111,27 @@ public class ConsoleUtils {
     private static boolean calculateValueBoolean(char valueBoolean) {
 
         return switch (valueBoolean) {
-            case 'Y', 'T', 'S' -> true;
+            case 'T', 'Y', 'S' -> true;
             case 'F', 'N' -> false;
-            default -> throw new IllegalArgumentException("Only 'S', 'N', 'Y', 'N', 'T' or 'F' allowed.");
+            default -> throw new IllegalArgumentException("Only 'T', 'F', 'S', 'Y' or 'N' allowed.");
         };
+    }
+
+
+    public static Optional<Boolean> readBooleanWithDefault(String message, Optional<Boolean> defaultValue) {
+        do {
+            String input = readValueString(message);
+
+            if (input.isEmpty()) {
+                return defaultValue;
+            }
+            try {
+                char value = input.toUpperCase().charAt(0);
+                return Optional.of(calculateValueBoolean(value));
+            } catch (Exception e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
     public static String readValueString(String message) {
@@ -122,37 +140,104 @@ public class ConsoleUtils {
         return sc.nextLine();
     }
 
-    public static <T> T readValueWithDefault(String message, T defaultValue, Function<String, T> parser) {
+    public static Optional<String> readStringWithDefault(String message, Optional<String> defaultValue) {
         do {
             String input = readValueString(message);
-            input = input.isEmpty() ? defaultValue.toString() : input;
 
+            if (input.isEmpty()) {
+                return defaultValue;
+            }
             try {
-                return parser.apply(input);
+                return Optional.of(input);
             } catch (Exception e) {
                 System.err.println("Error: input not valid (" + e.getMessage() + ").");
             }
         } while (true);
     }
 
-    public static int readValueInt(String message) {
-        return readValueWithDefault(message, 0, Integer::parseInt);
+    public static <T> Optional<T> readValueWithDefault(String message, Optional<T> defaultValue, Function<String, T> parser) {
+        do {
+            String input = readValueString(message);
+
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(parser.apply(input));
+            } catch (Exception e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
-    public static long readValueLong(String message) {
-        return readValueWithDefault(message, 0L, Long::parseLong);
+    public static Optional<Integer> readValueInt(String message) {
+        do {
+            String input = readValueString(message);
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(Integer.parseInt(input));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
-    public static double readValueDouble(String message) {
-        return readValueWithDefault(message, 0.0, Double::parseDouble);
+    public static Optional<Long> readValueLong(String message) {
+        do {
+            String input = readValueString(message);
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(Long.parseLong(input));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
-    public static float readValueFloat(String message) {
-        return readValueWithDefault(message, 0.0f, Float::parseFloat);
+    public static Optional<Double> readValueDouble(String message) {
+        do {
+            String input = readValueString(message);
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(Double.parseDouble(input));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
-    public static byte readValueByte(String message) {
-        return readValueWithDefault(message, (byte) 0, Byte::parseByte);
+    public static Optional<Float> readValueFloat(String message) {
+        do {
+            String input = readValueString(message);
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(Float.parseFloat(input));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
+    }
+
+    public static Optional<Byte> readValueByte(String message) {
+        do {
+            String input = readValueString(message);
+            if (input.isEmpty()) {
+                return Optional.empty();
+            }
+            try {
+                return Optional.of(Byte.parseByte(input));
+            } catch (NumberFormatException e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
     }
 
     public static int valueIntWithoutException(String message) {

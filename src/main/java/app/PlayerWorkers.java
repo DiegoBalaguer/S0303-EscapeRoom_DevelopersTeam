@@ -1,17 +1,15 @@
 package app;
 
-import dao.exceptions.DAOException; // Importar para manejar excepciones del DAO
+import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
-import dao.factory.DAOFactory; // Importar para obtener el PlayerDAO
-import dao.interfaces.PlayerDAO; // Importar la interfaz DAO
-import enums.OptionsMenuPlayer; // Tu enum para el menú de jugadores
-import loadConfigApp.LoadConfigApp;
+import dao.factory.DAOFactory;
+import dao.interfaces.PlayerDAO;
+import enums.OptionsMenuPlayer;
 import lombok.extern.slf4j.Slf4j;
-import model.Player; // Importar la clase Player
-import utils.ConsoleUtils; // Para leer inputs
-import view.PlayerView; // Importar la vista de jugadores
+import model.Player;
+import utils.ConsoleUtils;
+import view.PlayerView;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,13 +17,14 @@ import java.util.Optional;
 public class PlayerWorkers {
 
     private static PlayerWorkers appWorkersInstance;
-    private final PlayerView playerView; // Instancia de la vista
-    private final PlayerDAO playerDAO;   // Instancia del DAO de jugadores
+    private final PlayerView playerView;
+    private final PlayerDAO playerDAO;
+    private final String LINE = System.lineSeparator();
 
     private PlayerWorkers() {
-        this.playerView = new PlayerView(); // Inicializa la vista
+        this.playerView = new PlayerView();
         try {
-            this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO(); // Obtiene el DAO de la fábrica
+            this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
@@ -39,99 +38,153 @@ public class PlayerWorkers {
                 }
             }
         }
-        log.debug("Created PlayerWorkers Singleton"); // Corregido el log
+        log.debug("Created PlayerWorkers Singleton");
         return appWorkersInstance;
     }
 
     public void mainMenu() {
         do {
-            playerView.displayPlayerMenu("PLAYER MANAGEMENT"); // Usamos la vista para mostrar el menú
-            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
+            playerView.displayPlayerMenu("PLAYER MANAGEMENT");
+            playerView.displayMessage("Choose an option: ");
+            int answer = ConsoleUtils.readRequiredInt("");
             OptionsMenuPlayer selectedOption = OptionsMenuPlayer.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            playerView.displayMessage("Returning to Main Menu...");
+                            playerView.displayMessageln("Returning to Main Menu...");
                             return;
                         }
                         case CREATE -> createPlayer();
                         case LIST_ALL -> listAllPlayers();
                         case READ -> findPlayerById();
                         case UPDATE -> updatePlayer();
+                        case SOFT_DELETE -> softDeletePlayer();
                         case DELETE -> deletePlayer();
-
-                        // No se necesita `default` si `getOptionByNumber` ya devuelve `null` para inválidos
+                        case SUBSCRIBE -> subscribePlayer();
+                        case UNSUBSCRIBE -> unSubscribePlayer();
                     }
                 } catch (DAOException e) {
                     playerView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                    log.error("DAO Error in PlayerWorkers: {}", e.getMessage(), e);
                 } catch (Exception e) {
                     playerView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-                    log.error("Unexpected error in PlayerWorkers: {}", e.getMessage(), e);
                 }
             } else {
                 playerView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
-                log.warn("Error: The value {} is wrong in player management menu.", answer);
             }
         } while (true);
     }
 
-    // --- Métodos CRUD que actúan como la lógica del controlador ---
     private void createPlayer() throws DAOException {
-        Player newPlayer = playerView.getPlayerDetails(false); // false indica que es un nuevo jugador
+        Player newPlayer = new Player();
+        newPlayer = playerView.getPlayerDetailsCreate(new Player());
         if (newPlayer != null) {
             Player savedPlayer = playerDAO.create(newPlayer);
-            playerView.displayMessage("Player created successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
+            playerView.displayMessageln("Player created successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
         }
     }
 
     private void listAllPlayers() throws DAOException {
+        playerView.displayMessageln("#### LIST ALL PLAYERS  #################");
+        listAllPayersIntern();
+    }
+
+    private void listAllPayersIntern()  throws DAOException {
         List<Player> players = playerDAO.findAll();
         playerView.displayPlayers(players);
     }
 
     private void findPlayerById() throws DAOException {
+        playerView.displayMessageln("#### FIND PLAYER BY ID  #################");
+        listAllPayersIntern();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             Optional<Player> player = playerDAO.findById(idOpt.get());
-            playerView.displayPlayer(player.orElse(null)); // Pasa null si no se encontró
+            playerView.displayPlayer(player.orElse(null));
         }
     }
 
     private void updatePlayer() throws DAOException {
+        playerView.displayMessageln("#### UPDATE PLAYER  #################");
+        listAllPayersIntern();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
             if (existingPlayerOpt.isPresent()) {
                 Player existingPlayer = existingPlayerOpt.get();
-                playerView.displayMessage("Current Player Details:");
+                playerView.displayMessageln("Current Player Details:");
                 playerView.displayPlayer(existingPlayer);
 
-                playerView.displayMessage("Enter new details:");
-                Player updatedDetails = playerView.getPlayerDetails(true); // true indica que es para actualización
+                playerView.displayMessageln("Enter new details:");
+                Player updatedDetails = playerView.getUpdatePlayerDetails(existingPlayer);
 
-                if (updatedDetails != null) {
-                    // Actualiza solo los campos que quieras permitir actualizar desde el input del usuario
-                    existingPlayer.setName(updatedDetails.getName());
-                    existingPlayer.setEmail(updatedDetails.getEmail());
-                    // La fecha de registro normalmente no se actualiza, se mantiene la original.
-
-                    Player updatedPlayer = playerDAO.update(existingPlayer);
-                    playerView.displayMessage("Player updated successfully: " + updatedPlayer.getName() + " (ID: " + updatedPlayer.getId() + ")");
-                }
-            } else {
-                playerView.displayMessage("Player with ID " + idOpt.get() + " not found. Cannot update.");
+                Player savedPlayer = playerDAO.update(updatedDetails);
+                playerView.displayMessageln("Player updated successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
             }
+        } else {
+            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot update.");
         }
     }
 
     private void deletePlayer() throws DAOException {
+        playerView.displayMessageln("#### DELETE PLAYER  #################");
+        listAllPayersIntern();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             playerDAO.deleteById(idOpt.get());
-            playerView.displayMessage("Player with ID " + idOpt.get() + " deleted successfully (if existed).");
+            playerView.displayMessageln("Player with ID " + idOpt.get() + " deleted successfully (if existed).");
+        }
+    }
+
+    private void softDeletePlayer() throws DAOException {
+        playerView.displayMessageln("#### SOFT DELETE PLAYER  #################");
+        listAllPayersIntern();
+        Optional<Integer> idOpt = playerView.getPlayerId();
+        if (idOpt.isPresent()) {
+            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
+            if (existingPlayerOpt.isPresent()) {
+                Player existingPlayer = existingPlayerOpt.get();
+                existingPlayer.setActive(false);
+                playerDAO.update(existingPlayer);
+                playerView.displayMessageln("Player soft deleted successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
+            }
+        } else {
+            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot soft deleted.");
+        }
+    }
+
+    private void subscribePlayer() throws DAOException {
+        playerView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
+        listAllPayersIntern();
+        Optional<Integer> idOpt = playerView.getPlayerId();
+        if (idOpt.isPresent()) {
+            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
+            if (existingPlayerOpt.isPresent()) {
+                Player existingPlayer = existingPlayerOpt.get();
+                existingPlayer.setSubscribed(true);
+                playerDAO.update(existingPlayer);
+                playerView.displayMessageln("Player subscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
+            }
+        } else {
+            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot subscribed.");
+        }
+    }
+
+    private void unSubscribePlayer() throws DAOException {
+        playerView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
+        listAllPayersIntern();
+        Optional<Integer> idOpt = playerView.getPlayerId();
+        if (idOpt.isPresent()) {
+            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
+            if (existingPlayerOpt.isPresent()) {
+                Player existingPlayer = existingPlayerOpt.get();
+                existingPlayer.setSubscribed(false);
+                playerDAO.update(existingPlayer);
+                playerView.displayMessageln("Player unsubscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
+            }
+        } else {
+            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot unsubscribed.");
         }
     }
 }
