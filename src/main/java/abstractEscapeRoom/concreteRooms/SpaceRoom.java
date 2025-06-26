@@ -1,7 +1,5 @@
 package abstractEscapeRoom.concreteRooms;
 
-import abstractEscapeRoom.concreteClues.EgyptClue;
-import abstractEscapeRoom.concreteDecorations.EgyptDecoration;
 import interfaces.AbstractFactory;
 import model.Clue;
 import model.Decoration;
@@ -9,7 +7,7 @@ import model.Element;
 
 import java.math.BigDecimal;
 
-public class ConcreteEgypt implements AbstractFactory {
+public class SpaceRoom implements AbstractFactory {
     @Override
     public <T extends Element> T createElement(String type, Object... args) {
         String name = (String) args[0];
@@ -18,15 +16,15 @@ public class ConcreteEgypt implements AbstractFactory {
         return switch (type.toLowerCase()) {
             case "clue" -> (T) Clue.builder()
                     .name(name)
-                    .description("Ancient Egyptian-themed clue.")
+                    .description("Space-themed clue.")
+                    .price(price)
                     .build();
             case "decoration" -> (T) Decoration.builder()
                     .name(name)
-                    .description("Gold-plated Egyptian material.")
+                    .description("Futuristic space decoration.")
+                    .price(price)
                     .build();
             default -> throw new IllegalArgumentException("Unknown element type: " + type);
         };
     }
-
-
 }

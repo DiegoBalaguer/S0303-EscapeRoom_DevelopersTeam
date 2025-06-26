@@ -3,7 +3,6 @@ package model;
 import lombok.*;
 import utils.StringUtils;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ public class Player {
     private List<RewardWin> rewardsWin;
     private boolean isActive;
 
-
     public ArrayList<String> toList() {
         ArrayList<String> dataLine = new ArrayList<>();
         dataLine.add(String.valueOf(id));
@@ -34,7 +32,6 @@ public class Player {
         dataLine.add(email);
         dataLine.add(password);
         dataLine.add(StringUtils.getDateFormatUSA(registrationDate));
-        //dataLine.add(registrationDate.getYear() + "-" + registrationDate.getMonthValue() + "-" + registrationDate.getDayOfMonth());
         dataLine.add(isSubscribed ? "True" : "False");
         dataLine.add(isActive ? "True" : "False");
        return dataLine;

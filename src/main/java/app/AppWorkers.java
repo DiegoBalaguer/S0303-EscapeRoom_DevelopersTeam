@@ -32,7 +32,7 @@ public class AppWorkers {
                     case EXIT -> {
                         return;
                     }
-                    case TICKET_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
+                    case TICKET_MANAGEMENT -> SaleWorkers.getInstance().mainMenu();
                     case ROOM_MANAGEMENT ->  nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
                     case PLAYER_MANAGEMENT -> PlayerWorkers.getInstance().mainMenu();
                     case ESCAPE_ROOM_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());

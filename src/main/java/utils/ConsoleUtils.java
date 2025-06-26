@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.Optional;
+import java.math.BigDecimal;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -248,4 +249,22 @@ public class ConsoleUtils {
             }
         } while (true);
     }
+    public static BigDecimal readRequiredBigDecimal(String message) {
+        String input = readValueString(message);
+        while (true) {
+            try {
+                System.out.print(input);
+                input = sc.nextLine().trim();
+                if (input.isEmpty()) {
+                    System.out.println("This field is required. Please enter a valid number.");
+                    continue;
+                }
+                // Intenta convertir el valor a BigDecimal
+                return new BigDecimal(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number format. Please enter a valid decimal value.");
+            }
+        }
+    }
+
 }

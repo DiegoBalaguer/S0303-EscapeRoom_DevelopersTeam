@@ -150,5 +150,23 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+    @Override
+    public List<Decoration> findDecorationsByRoomId(Integer roomId) throws DAOException {
+        String sql = "SELECT idDecoration, idRoom, name, description, price, isActive FROM decoration WHERE idRoom = ? AND isActive = TRUE;";
+        List<Decoration> decorations = new ArrayList<>();
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, roomId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                decorations.add(mapResultSetToDecoration(rs));
+            }
+        } catch (Exception e) {
+            String messageError = "Error retrieving decorations for room ID: " + roomId;
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return decorations;
+    }
 }
 
