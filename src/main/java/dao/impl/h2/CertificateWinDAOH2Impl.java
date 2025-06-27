@@ -4,8 +4,10 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.CertificateWinDAO;
 import dao.interfaces.ConnectionDAO;
+import dto.CertificateWinDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
 import model.CertificateWin;
+import utils.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             stmt.setInt(2, certificateWin.getIdPlayer());
             stmt.setInt(3, certificateWin.getIdRoom());
             stmt.setString(4, certificateWin.getDescription());
-            stmt.setDate(5, Date.valueOf(certificateWin.getDateDelivery()));
+            stmt.setObject(5, certificateWin.getDateDelivery());
             stmt.setBoolean(6, certificateWin.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
@@ -91,7 +93,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             stmt.setInt(2, certificateWin.getIdPlayer());
             stmt.setInt(3, certificateWin.getIdRoom());
             stmt.setString(4, certificateWin.getDescription());
-            stmt.setDate(5, Date.valueOf(certificateWin.getDateDelivery()));
+            stmt.setObject(5, certificateWin.getDateDelivery());
             stmt.setBoolean(6, certificateWin.isActive());
             stmt.setInt(7, certificateWin.getId());
 
@@ -143,13 +145,55 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
         }
     }
 
+    @Override
+    public List<CertificateWinDisplayDTO> findByPlayerId(Integer playerId) throws DAOException {
+        List<CertificateWinDisplayDTO> certificateWinsDisplayDTO = new ArrayList<>();
+        String sql = "SELECT " +
+                "cw.idCertificateWin, cw.idCertificate, cw.idPlayer, cw.idRoom, cw.description, cw.dateDelivery, cw.isActive, " +
+                "c.name AS certificateName, " +
+                "r.name AS roomName " +
+                "FROM CertificateWin cw " +
+                "JOIN Certificate c ON cw.idCertificate = c.idCertificate " +
+                "JOIN Room r ON cw.idRoom = r.idRoom " +
+                "WHERE cw.idPlayer = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, playerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                certificateWinsDisplayDTO.add(mapResultSetToCertificateWinDisplayDTO(rs));
+            }
+        } catch (SQLException e) {
+            String messageError = "Error retrieving certificate wins for player ID: " + playerId;
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return certificateWinsDisplayDTO;
+    }
+
     private CertificateWin mapResultSetToCertificateWin(ResultSet rs) throws SQLException {
         return CertificateWin.builder()
                 .id(rs.getInt("idCertificateWin"))
                 .idCertificate(rs.getInt("idCertificate"))
                 .idPlayer(rs.getInt("idPlayer"))
                 .idRoom(rs.getInt("idRoom"))
+                .description(rs.getString("description"))
+                .dateDelivery(rs.getTimestamp("dateDelivery").toLocalDateTime())
                 .isActive(rs.getBoolean("isActive"))
+                .build();
+    }
+
+    private CertificateWinDisplayDTO mapResultSetToCertificateWinDisplayDTO(ResultSet rs) throws SQLException {
+        return CertificateWinDisplayDTO.builder()
+                .id(rs.getInt("idCertificateWin"))
+                .idCertificate(rs.getInt("idCertificate"))
+                .idPlayer(rs.getInt("idPlayer"))
+                .idRoom(rs.getInt("idRoom"))
+                .description(rs.getString("description"))
+                .dateDelivery(rs.getTimestamp("dateDelivery").toLocalDateTime())
+                .isActive(rs.getBoolean("isActive"))
+                .certificateName(rs.getString("certificateName"))
+                .roomName(rs.getString("roomName"))
                 .build();
     }
 }

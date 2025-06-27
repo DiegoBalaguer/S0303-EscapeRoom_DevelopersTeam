@@ -4,6 +4,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * PROGRAM: StringUtils
@@ -56,6 +60,13 @@ public class StringUtils {
         } else {
             return String.format("%-" + lengthString + "s", text); // Fill with spaces if it is short.
         }
+    }
+    public static String makeLineToList(Map<String, Integer> dataLine) {
+        StringBuilder resultado = new StringBuilder();
+        dataLine.forEach((k, v) -> {
+            resultado.append(formatToChars(k, v));
+        });
+        return resultado.toString();
     }
 
     public static String getDateFormatUSA(Date date) {

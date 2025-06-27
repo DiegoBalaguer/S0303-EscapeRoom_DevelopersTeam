@@ -4,10 +4,13 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.RewardWinDAO;
+import dto.RewardWinDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
 import model.RewardWin;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +33,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
             stmt.setInt(1, rewardWin.getIdReward());
             stmt.setInt(2, rewardWin.getIdPlayer());
             stmt.setString(3, rewardWin.getDescription());
-            stmt.setDate(4, Date.valueOf(rewardWin.getDateDelivery()));
+            stmt.setObject(4, rewardWin.getDateDelivery());
             stmt.setBoolean(5, rewardWin.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
@@ -89,7 +92,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
             stmt.setInt(1, rewardWin.getIdReward());
             stmt.setInt(2, rewardWin.getIdPlayer());
             stmt.setString(3, rewardWin.getDescription());
-            stmt.setDate(4, Date.valueOf(rewardWin.getDateDelivery()));
+            stmt.setObject(4, rewardWin.getDateDelivery());
             stmt.setBoolean(5, rewardWin.isActive());
             stmt.setInt(6, rewardWin.getId());
 
@@ -141,12 +144,52 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
         }
     }
 
+    @Override
+    public List<RewardWinDisplayDTO> findByPlayerId(Integer playerId) throws DAOException {
+        List<RewardWinDisplayDTO> rewardWinsDisplayDTO = new ArrayList<>();
+        String sql = "SELECT " +
+                "rw.idRewardWin, rw.idReward, rw.idPlayer, rw.description, rw.dateDelivery, rw.isActive, " +
+                "r.name AS rewardName " +
+                "FROM " + nameObject + " rw " +
+                "JOIN reward r ON rw.idReward = r.idReward " +
+                " WHERE idPlayer = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, playerId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                rewardWinsDisplayDTO.add(mapResultSetToRewardWinDisplayDTO(rs));
+            }
+        } catch (SQLException e) {
+            String messageError = "Error retrieving reward wins for player ID: " + playerId;
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return rewardWinsDisplayDTO;
+    }
+
     private RewardWin mapResultSetToRewardWin(ResultSet rs) throws SQLException {
         return RewardWin.builder()
                 .id(rs.getInt("idRewardWin"))
                 .idReward(rs.getInt("idReward"))
                 .idPlayer(rs.getInt("idPlayer"))
-                 .isActive(rs.getBoolean("isActive"))
+                .description(rs.getString("description"))
+
+                .dateDelivery(LocalDateTime.from(rs.getDate("dateDelivery").toLocalDate()))
+                .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+
+    private RewardWinDisplayDTO mapResultSetToRewardWinDisplayDTO(ResultSet rs) throws SQLException {
+        return RewardWinDisplayDTO.builder()
+                .id(rs.getInt("idRewardWin"))
+                .idReward(rs.getInt("idReward"))
+                .idPlayer(rs.getInt("idPlayer"))
+                .description(rs.getString("description"))
+                .dateDelivery(rs.getTimestamp("dateDelivery").toLocalDateTime())
+                .isActive(rs.getBoolean("isActive"))
+                .rewardName(rs.getString("rewardName"))
+                .build();
+    }
+
 }

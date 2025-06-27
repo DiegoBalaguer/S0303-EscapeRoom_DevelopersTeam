@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,6 +15,6 @@ public class CertificateWin {
     private int idPlayer;
     private int idRoom;
     private String description;
-    private LocalDate dateDelivery;
+    private LocalDateTime dateDelivery;
     private boolean isActive;
 }

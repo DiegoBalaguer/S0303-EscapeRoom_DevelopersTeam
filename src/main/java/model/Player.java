@@ -25,15 +25,4 @@ public class Player {
     private List<RewardWin> rewardsWin;
     private boolean isActive;
 
-    public ArrayList<String> toList() {
-        ArrayList<String> dataLine = new ArrayList<>();
-        dataLine.add(String.valueOf(id));
-        dataLine.add(name);
-        dataLine.add(email);
-        dataLine.add(password);
-        dataLine.add(StringUtils.getDateFormatUSA(registrationDate));
-        dataLine.add(isSubscribed ? "True" : "False");
-        dataLine.add(isActive ? "True" : "False");
-       return dataLine;
-    }
 }
