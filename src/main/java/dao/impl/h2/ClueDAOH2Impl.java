@@ -7,6 +7,7 @@ import dao.interfaces.ConnectionDAO;
 import lombok.extern.slf4j.Slf4j;
 import model.Clue;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,5 +169,24 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
         }
         return clues;
     }
+    @Override
+    public BigDecimal findPriceByRoomId(Integer roomId) throws DAOException {
+        String sql = "SELECT COALESCE(SUM(price), 0) AS totalPrice FROM clue WHERE idRoom = ?;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, roomId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("totalPrice");
+                }
+            }
+        } catch (SQLException e) {
+            String errorMessage = "Error al obtener el precio total de las Clues para Room con ID: " + roomId;
+            log.error(errorMessage, e);
+            throw new DAOException(errorMessage, e);
+        }
+        return BigDecimal.ZERO;
+    }
+
 }
 

@@ -176,4 +176,5 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
                 .theme(Theme.values()[rs.getInt("idTheme")])
                 .build();
     }
+
 }
