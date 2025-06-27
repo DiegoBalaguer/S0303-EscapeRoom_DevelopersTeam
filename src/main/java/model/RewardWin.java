@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -14,6 +14,6 @@ public class RewardWin {
     private int idReward;
     private int idPlayer;
     private String description;
-    private LocalDate dateDelivery;
+    private LocalDateTime dateDelivery;
     private boolean isActive;
 }

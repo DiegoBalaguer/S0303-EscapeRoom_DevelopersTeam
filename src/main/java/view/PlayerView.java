@@ -1,16 +1,23 @@
 package view;
 
+import dto.CertificateWinDisplayDTO;
+import dto.PlayerDisplayDTO;
+import dto.PlayerMapper;
+import dto.RewardWinDisplayDTO;
 import enums.OptionsMenuPlayer;
 import loadConfigApp.LoadConfigApp;
 import model.Player;
 import lombok.extern.slf4j.Slf4j;
+import model.CertificateWin;
+import model.RewardWin;
 import utils.ConsoleUtils;
 import utils.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
 
 @Slf4j
 public class PlayerView {
@@ -130,19 +137,149 @@ public class PlayerView {
         }
     }
 
+    public void displayRewardWins(List<RewardWin> rewardWins) {
+        if (rewardWins.isEmpty()) {
+            System.out.println("No reward wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Reward Wins ---");
+        rewardWins.forEach(rw -> System.out.println(
+                "ID: " + rw.getId() +
+                        ", Reward ID: " + rw.getIdReward() +
+                        ", Date: " + rw.getDateDelivery()
+        ));
+        System.out.println("--------------------------");
+    }
 
+    public void displayCertificateWins(List<CertificateWin> certificateWins) {
+        if (certificateWins.isEmpty()) {
+            System.out.println("No certificate wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Certificate Wins ---");
+        certificateWins.forEach(cw -> System.out.println(
+                "ID: " + cw.getId() +
+                        ", Certificate ID: " + cw.getIdCertificate() +
+                        ", Room ID: " + cw.getIdRoom() +
+                        ", Description: " + cw.getDescription() +
+                        ", Date: " + cw.getDateDelivery()
+        ));
+        System.out.println("-----------------------------");
+    }
+
+
+    public void displayRewardWinsEnhanced(List<Map<String, Object>> rewardWinsData) {
+        if (rewardWinsData.isEmpty()) {
+            System.out.println("No reward wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Reward Wins ---");
+        rewardWinsData.forEach(data -> {
+            RewardWin rw = (RewardWin) data.get("rewardWin");
+            String rewardName = (String) data.getOrDefault("rewardName", "N/A");
+            System.out.println(
+                    "ID: " + rw.getId() +
+                            ", Reward: " + rewardName + " (ID: " + rw.getIdReward() + ")" +
+                            ", Date: " + rw.getDateDelivery()
+
+            );
+        });
+        System.out.println("--------------------------");
+    }
+
+    public void displayCertificateWinsEnhanced(List<Map<String, Object>> certificateWinsData) {
+        if (certificateWinsData.isEmpty()) {
+            System.out.println("No certificate wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Certificate Wins ---");
+        certificateWinsData.forEach(data -> {
+            CertificateWin cw = (CertificateWin) data.get("certificateWin");
+            String certificateName = (String) data.getOrDefault("certificateName", "N/A");
+            String roomName = (String) data.getOrDefault("roomName", "N/A");
+            System.out.println(
+                    "ID: " + cw.getId() +
+                            ", Certificate: " + certificateName + " (ID: " + cw.getIdCertificate() + ")" +
+                            ", Room: " + roomName + " (ID: " + cw.getIdRoom() + ")" +
+                            ", Description: " + cw.getDescription() +
+                            ", Date: " + cw.getDateDelivery()
+            );
+        });
+        System.out.println("-----------------------------");
+    }
+
+
+    public void displayRewardWinDTOs(List<RewardWinDisplayDTO> rewardWinsData) {
+        if (rewardWinsData.isEmpty()) {
+            System.out.println("No reward wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Reward Wins ---");
+        System.out.println(StringUtils.makeLineToList(rewardWinsData.getFirst().toListHead()));
+        rewardWinsData.forEach(dto -> System.out.println(
+                StringUtils.makeLineToList(dto.toList())
+        ));
+        System.out.println("--------------------------");
+    }
+
+    public void displayCertificateWinDTOs(List<CertificateWinDisplayDTO> certificateWinsData) {
+        if (certificateWinsData.isEmpty()) {
+            System.out.println("No certificate wins found for this player.");
+            return;
+        }
+        System.out.println("\n--- Player Certificate Wins ---");
+        System.out.println(StringUtils.makeLineToList(certificateWinsData.getFirst().toListHead()));
+        certificateWinsData.forEach(dto -> System.out.println(
+                StringUtils.makeLineToList(dto.toList())
+        ));
+        System.out.println("-----------------------------");
+    }
+/*
     public void displayPlayers(List<Player> players) {
 
-        System.out.println(makeHeadLineToList());
+        System.out.println(StringUtils.makeLineToList(players.getFirst().toListHead()));
         if (players.isEmpty()) {
             System.out.println("No players found.");
             return;
         }
         players.forEach(player -> System.out.println(
-                makeLineToList(player.toList())
+                StringUtils.makeLineToList(player.toList())
         ));
         System.out.println("-------------------");
     }
+
+*/
+    public void displayPlayers(List<Player> players) {
+        if (players.isEmpty()) {
+            System.out.println("No players found.");
+            return;
+        }
+
+        PlayerDisplayDTO firstDTO = PlayerMapper.toDisplayDTO(players.getFirst());
+        System.out.println(StringUtils.makeLineToList(firstDTO.toListHead()));
+
+        players.stream()
+                .map(PlayerMapper::toDisplayDTO)
+                .map(PlayerDisplayDTO::toList)
+                .map(StringUtils::makeLineToList)
+                .forEach(System.out::println);
+
+        System.out.println("-------------------");
+    }
+
+    private PlayerDisplayDTO convertToDisplayDTO(Player player) {
+        return PlayerDisplayDTO.builder()
+                .id(player.getId())
+                .name(player.getName())
+                .email(player.getEmail())
+                .password(player.getPassword())
+                .registrationDate(player.getRegistrationDate())
+                .isSubscribed(player.isSubscribed())
+                .isActive(player.isActive())
+                .build();
+    }
+
+
 
     public void displayMessageln(String message) {
         System.out.println(LINE + message + LINE);
@@ -154,29 +291,5 @@ public class PlayerView {
 
     public void displayErrorMessage(String message) {
         System.err.println(LINE + "ERROR: " + message + LINE);
-    }
-
-    private String makeHeadLineToList() {
-        ArrayList<String> dataLine = new ArrayList<>();
-        dataLine.add("ID");
-        dataLine.add("NAME");
-        dataLine.add("EMAIL");
-        dataLine.add("PASSWORD");
-        dataLine.add("REG.DATE");
-        dataLine.add("SUBSCRIBE");
-        dataLine.add("ACTIVE");
-        return makeLineToList(dataLine);
-    }
-
-    private String makeLineToList(ArrayList<String> dataLine) {
-        int i = 0;
-
-        return StringUtils.formatToChars(dataLine.get(i++), 8) +
-                StringUtils.formatToChars(dataLine.get(i++), 25) +
-                StringUtils.formatToChars(dataLine.get(i++), 35) +
-                StringUtils.formatToChars(dataLine.get(i++), 25) +
-                StringUtils.formatToChars(dataLine.get(i++), 24) +
-                StringUtils.formatToChars(dataLine.get(i++), 8) +
-                StringUtils.formatToChars(dataLine.get(i), 8);
     }
 }

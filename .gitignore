@@ -45,6 +45,4 @@ build/
 README.final.md
 crearGitHub.bat
 crearUnJava.bat
-
-
-
+*.trace.db

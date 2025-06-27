@@ -4,6 +4,7 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.PlayerDAO;
+import dto.PlayerDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
 import model.Player;
 
@@ -82,16 +83,6 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
         }
     }
 
-   /* @Override
-    public Player save(Player player) throws DAOException {
-        return null;
-    }*/
-
-    @Override
-    public void deleteById(int id) throws DAOException {
-
-    }
-
     @Override
     public Player update(Player player) throws DAOException {
         String sql = "UPDATE " + nameObject + " SET name = ?, email = ?, password = ?, isSubscribed = ?, registrationDate =?,  isActive = ? WHERE idPlayer = ?;";
@@ -153,35 +144,6 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
         }
     }
 
-   /* @Override
-    public List<Player> findTopPlayers(int limit) throws DAOException {
-        List<Player> players = new ArrayList<>();
-        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + " ORDER BY name DESC LIMIT ?;";
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, limit);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                players.add(mapResultSetToPlayer(rs));
-            }
-            return players;
-        } catch (Exception e) {
-            String messageError = "Error retrieving top " + nameObject + "s";
-            log.error(messageError, e);
-            throw new DAOException(messageError, e);
-        }
-    }*/
-
-    @Override
-    public Optional<Player> findById(int id) throws DAOException {
-        return Optional.empty();
-    }
-
- /*   @Override
-    public Optional<Player> findByName(String name) throws DAOException {
-        return Optional.empty();
-    }*/
-
     private Player mapResultSetToPlayer(ResultSet rs) throws SQLException {
         return Player.builder()
                 .id(rs.getInt("idPlayer"))
@@ -193,29 +155,5 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
-    /*@Override
-    public Optional<Player> findByEmail(String email) {
-        String query = "SELECT * FROM players WHERE email = ?";
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement ps = connection.prepareStatement(query)) {
-
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                Player player = Player.builder().build();
-                player.setId(rs.getInt("id"));
-                player.setName(rs.getString("name"));
-                player.setEmail(rs.getString("email"));
-                player.setPassword(rs.getString("password"));
-                player.setSubscribed(rs.getBoolean("isSubscribed"));
-                player.setActive(rs.getBoolean("isActive"));
-                return Optional.of(player);
-            }
-        } catch (SQLException e) {
-            log.error("Error finding Player by Email: {}", e.getMessage(), e);
-        }
-        return Optional.empty();
-        }*/
 }
 
