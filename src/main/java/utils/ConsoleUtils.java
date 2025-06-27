@@ -29,6 +29,7 @@ public class ConsoleUtils {
         } while (true);
     }
 
+
     private static String readLineString(String message) {
         String input = readValueString(message);
         if (input.isBlank()) {
@@ -250,21 +251,29 @@ public class ConsoleUtils {
         } while (true);
     }
     public static BigDecimal readRequiredBigDecimal(String message) {
-        String input = readValueString(message);
         while (true) {
             try {
-                System.out.print(input);
-                input = sc.nextLine().trim();
+                System.out.print(message);
+                String input = sc.nextLine().trim(); // Solo solicita entrada una vez
                 if (input.isEmpty()) {
                     System.out.println("This field is required. Please enter a valid number.");
-                    continue;
+                    continue; // Solicita nuevamente si el campo está vacío
                 }
-                // Intenta convertir el valor a BigDecimal
-                return new BigDecimal(input);
+                return new BigDecimal(input); // Devuelve el valor si es válido
             } catch (NumberFormatException e) {
-                System.out.println("Invalid number format. Please enter a valid decimal value.");
+                System.out.println("Invalid number format. Please enter a valid decimal value."); // Maneja errores
             }
         }
     }
+    public static Optional<String> readOptionalString(String message) {
+        System.out.print(message); // Mostrar el mensaje
+        String input = sc.nextLine().trim(); // Leer entrada del usuario (eliminando espacios al inicio o final)
+
+        if (input.isEmpty()) {
+            return Optional.empty(); // Devuelve vacío si no hay entrada
+        }
+        return Optional.of(input); // Devuelve el valor opcional si hay entrada
+    }
+
 
 }

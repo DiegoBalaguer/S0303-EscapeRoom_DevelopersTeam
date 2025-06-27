@@ -25,9 +25,11 @@ public class Room extends Element {
     private Theme theme;
     private List<AbstractClue> clues;
     private List<AbstractDecoration> decorations;
+    private Boolean active;
+
 
     public Room(ElementBuilder<?, ?> builder, int idEscapeRoom, BigDecimal price, Difficulty difficulty, Theme theme,
-                List<AbstractClue> clues, List<AbstractDecoration> decorations) {
+                List<AbstractClue> clues, List<AbstractDecoration> decorations, Boolean active) {
         super(builder);
         this.idEscapeRoom = idEscapeRoom;
         this.price = price;
@@ -35,6 +37,8 @@ public class Room extends Element {
         this.theme = theme;
         this.clues = clues;
         this.decorations = decorations;
+        this.active = active;
+
     }
 
 }
