@@ -33,7 +33,7 @@ public class AppWorkers {
                         return;
                     }
                     case TICKET_MANAGEMENT -> SaleWorkers.getInstance().mainMenu();
-                    case ROOM_MANAGEMENT ->  nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
+                    case ROOM_MANAGEMENT ->   RoomWorkers.getInstance().mainMenu();
                     case PLAYER_MANAGEMENT -> PlayerWorkers.getInstance().mainMenu();
                     case ESCAPE_ROOM_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
                     case FINANCIAL_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
