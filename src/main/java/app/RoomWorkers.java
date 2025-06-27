@@ -44,14 +44,15 @@ public class RoomWorkers {
                 }
             }
         }
+        log.debug("Created RoomWorkers Singleton");
         return appWorkersInstance;
     }
 
     public void mainMenu() {
-        boolean running = true;
-        while (running) {
+        do {
             roomView.displayRoomMenu("=== ROOM MANAGEMENT MENU ===");
-            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
+            roomView.displayMessage("Choose an option: ");
+            int answer = ConsoleUtils.readRequiredInt("");
             OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -71,16 +72,16 @@ public class RoomWorkers {
                     }
                 } catch (DAOException e) {
                     roomView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                    log.error("DAO Error in PlayerWorkers: {}", e.getMessage(), e);
+                    //log.error("DAO Error in PlayerWorkers: {}", e.getMessage(), e);
                 } catch (Exception e) {
                     roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-                    log.error("Unexpected error in PlayerWorkers: {}", e.getMessage(), e);
+                    //log.error("Unexpected error in PlayerWorkers: {}", e.getMessage(), e);
                 }
             } else {
                 roomView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
-                log.warn("Error: The value {} is wrong in player management menu.", answer);
+                //log.warn("Error: The value {} is wrong in player management menu.", answer);
             }
-        }
+        } while (true);
     }
 
     private void createRoom() {
@@ -99,7 +100,7 @@ public class RoomWorkers {
 
     private void getRoomById() {
         try {
-            roomView.displayMessage("\n=== QUERY ROOM BY ID ===");
+            roomView.displayMessage("\n=== GET ROOM BY ID ===");
             Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
                 return; // Cancel if invalid input
@@ -138,9 +139,10 @@ public class RoomWorkers {
     private void updateRoom() {
         try {
             roomView.displayMessage("\n=== UPDATE ROOM ===");
-            Optional<Integer> id = roomView.getRoomId();
+            Optional<Integer> id = roomView.getRoomId(); // Solicitamos el ID de la Room
             if (id.isEmpty()) {
-                return; // Cancel if invalid input
+                roomView.displayMessage("No ID provided. Canceling update operation.");
+                return; // Cancelar si no hay ID proporcionado
             }
 
             Optional<Room> optionalRoom = roomDAO.findById(id.get());
@@ -150,22 +152,24 @@ public class RoomWorkers {
             }
 
             Room existingRoom = optionalRoom.get();
-            Room updatedRoom = roomView.getRoomDetails(true);
+            roomView.displayMessage("\n=== Current Room Data ===");
+            roomView.displayRoom(existingRoom); // Mostramos la información actual de la Room
+
+            // Solicitamos los nuevos datos permitiendo que algunos campos sean dejados vacíos
+            Room updatedRoom = roomView.getRoomDetailsWithDefaults(existingRoom);
             if (updatedRoom == null) {
-                return; // Cancel if invalid input
+                return; // Cancelar si el usuario decide salir
             }
 
-            // Update values
-            existingRoom.setName(updatedRoom.getName());
-            existingRoom.setDescription(updatedRoom.getDescription());
-            existingRoom.setPrice(updatedRoom.getPrice());
-            existingRoom.setDifficulty(updatedRoom.getDifficulty());
-            existingRoom.setActive(updatedRoom.isActive());
+            // Actualizar la room en la base de datos
+            roomDAO.update(updatedRoom);
+            roomView.displayMessage("Room successfully updated:\n" + updatedRoom);
 
-            roomDAO.update(existingRoom);
-            roomView.displayMessage("Room successfully updated:\n" + existingRoom);
-        } catch (Exception e) {
+        } catch (DAOException e) {
             roomView.displayErrorMessage("Error updating the room: " + e.getMessage());
+        } catch (Exception e) {
+            roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+            log.error("Unexpected error: ", e);
         }
     }
 

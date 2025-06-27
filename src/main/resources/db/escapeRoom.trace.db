@@ -1844,3 +1844,7 @@ Column "KEY_SEQ" not found [42122-232]
 	at org.jkiss.dbeaver.ui.controls.resultset.ResultSetViewer$ResultSetDataPumpJob.run(ResultSetViewer.java:5146)
 	at org.jkiss.dbeaver.model.runtime.AbstractJob.run(AbstractJob.java:119)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+2025-06-27 13:59:25.980217+02:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Valor demasiado largo para la columna "PRICE DECIMAL(5, 2)": "1000.00 (6)"
+Value too long for column "PRICE DECIMAL(5, 2)": "1000.00 (6)"; SQL statement:
+INSERT INTO room (idEscapeRoom, name, description, price, idDifficulty, idTheme, isActive) VALUES (?, ?, ?, ?, ?, ?, ?) [22001-232]

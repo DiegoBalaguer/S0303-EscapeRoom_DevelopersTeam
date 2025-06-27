@@ -29,10 +29,11 @@ public enum OptionsMenuCrud {
     public static void viewMenuCrud(String title) {
         System.out.println(System.lineSeparator() + title + System.lineSeparator());
         for (OptionsMenuCrud optionMenu : OptionsMenuCrud.values()) {
-            System.out.println(optionMenu.ordinal() + 1 + ". " + optionMenu.getDESCRIPTION());
+            System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
         }
-        System.out.println(System.lineSeparator() + "Choose an option: ");
+        System.out.println("0. Return to main menu");
     }
+
     public static OptionsMenuCrud getOptionByNumber(int number) {
         for (OptionsMenuCrud option : OptionsMenuCrud.values()) {
             if (option.getOPTION_NUMBER() == number) {
