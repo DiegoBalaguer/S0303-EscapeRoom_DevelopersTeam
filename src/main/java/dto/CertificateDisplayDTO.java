@@ -13,7 +13,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RewardDisplayDTO {
+public class CertificateDisplayDTO {
     private int id;
     private String name;
     private String description;

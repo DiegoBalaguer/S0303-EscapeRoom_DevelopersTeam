@@ -4,11 +4,8 @@ import enums.Difficulty;
 import enums.Theme;
 import interfaces.AbstractClue;
 import interfaces.AbstractDecoration;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.List;
 @SuperBuilder
 @Getter
 @Setter
+
 public class Room extends Element {
     private int idEscapeRoom;
     private BigDecimal price;
@@ -26,7 +24,6 @@ public class Room extends Element {
     private List<AbstractClue> clues;
     private List<AbstractDecoration> decorations;
     private Boolean active;
-
 
     public Room(ElementBuilder<?, ?> builder, int idEscapeRoom, BigDecimal price, Difficulty difficulty, Theme theme,
                 List<AbstractClue> clues, List<AbstractDecoration> decorations, Boolean active) {
@@ -38,7 +35,5 @@ public class Room extends Element {
         this.clues = clues;
         this.decorations = decorations;
         this.active = active;
-
     }
-
 }

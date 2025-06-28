@@ -1,24 +1,16 @@
 package enums;
 
-public enum OptionsMenuPlayer {
-
-    CREATE(1, "Create Player"),
-    LIST_ALL(2, "List All Players"), // Nueva opción
-    READ(3, "Find Player by ID"),
-    UPDATE(4, "Update Player"),
-    SOFT_DELETE(5, "Soft delete Player"),
-    DELETE(6, "Delete Player"),
-    AWARD_CERTIFICATE_WIN(7, "Award Certificate win to player"),
-    AWARD_REWARD_WIN(8, "Award Reward win to player"),
-    SUBSCRIBE(9, "Subscribe"),
-    UNSUBSCRIBE(10, "Unsubscribe"),
-    NOTIFY(11, "Notify Player"),
+public enum OptionsMenuPlayerAward {
+    AWARD_CERTIFICATE_WIN(1, "Award Certificate win to player"),
+    AWARD_REWARD_WIN(2, "Award Reward win to player"),
+    REVOKE_CERTIFICATE_WIN(3, "Revoke Certificate win to player"),
+    REVOKE_REWARD_WIN(4, "Revoke Reward win to player"),
     EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;
     private final String DESCRIPTION;
 
-    OptionsMenuPlayer(int optionNumber, String description) {
+    OptionsMenuPlayerAward(int optionNumber, String description) {
         this.OPTION_NUMBER = optionNumber;
         this.DESCRIPTION = description;
     }
@@ -34,17 +26,16 @@ public enum OptionsMenuPlayer {
     public static void viewMenu(String title) {
         System.out.println(System.lineSeparator() + title + System.lineSeparator());
 
-        OptionsMenuPlayer[] options = OptionsMenuPlayer.values();
+        OptionsMenuPlayerAward[] options = OptionsMenuPlayerAward.values();
 
-        for (OptionsMenuPlayer optionMenu : options) {
+        for (OptionsMenuPlayerAward optionMenu : options) {
             System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
         }
         System.out.println("");
     }
 
-    // Optional
-    public static OptionsMenuPlayer getOptionByNumber(int number) {
-        for (OptionsMenuPlayer option : OptionsMenuPlayer.values()) {
+    public static OptionsMenuPlayerAward getOptionByNumber(int number) {
+        for (OptionsMenuPlayerAward option : OptionsMenuPlayerAward.values()) {
             if (option.getOPTION_NUMBER() == number) {
                 return option;
             }

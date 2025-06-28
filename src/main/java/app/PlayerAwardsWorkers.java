@@ -4,40 +4,34 @@ import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.*;
-import dto.CertificateWinDisplayDTO;
-import dto.PlayerDisplayDTO;
-import enums.OptionsMenuPlayer;
+import enums.OptionsMenuPlayerAward;
 import lombok.extern.slf4j.Slf4j;
-
-import model.Player;
-import model.Reward;
-import model.CertificateWin;
-import model.RewardWin;
-import dto.RewardWinDisplayDTO;
-
-import utils.ConsoleUtils;
-import view.PlayerView;
+import model.*;
+import view.PlayerAwardsView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 @Slf4j
-public class PlayerWorkers {
+public class PlayerAwardsWorkers {
 
-    private static PlayerWorkers appWorkersInstance;
-    private final PlayerView playerView;
+    private static PlayerAwardsWorkers playerAwardsWorkers;
+    private final PlayerAwardsView playerAwardsView;
     private final PlayerDAO playerDAO;
     private final RewardDAO rewardDAO;
+    private final CertificateDAO certificateDAO;
+    private final RoomDAO roomDAO;
     private final RewardWinDAO rewardWinDAO;
     private final CertificateWinDAO certificateWinDAO;
-    private final String LINE = System.lineSeparator();
 
-    private PlayerWorkers() {
-        this.playerView = new PlayerView();
+    private PlayerAwardsWorkers() {
+        this.playerAwardsView = new PlayerAwardsView();
         try {
+            this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
             this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
             this.rewardDAO = DAOFactory.getDAOFactory().getRewardDAO();
+            this.certificateDAO = DAOFactory.getDAOFactory().getCertificateDAO();
             this.rewardWinDAO = DAOFactory.getDAOFactory().getRewardWinDAO();
             this.certificateWinDAO = DAOFactory.getDAOFactory().getCertificateWinDAO();
         } catch (DatabaseConnectionException e) {
@@ -45,266 +39,179 @@ public class PlayerWorkers {
         }
     }
 
-    public static PlayerWorkers getInstance() {
-        if (appWorkersInstance == null) {
-            synchronized (PlayerWorkers.class) {
-                if (appWorkersInstance == null) {
-                    appWorkersInstance = new PlayerWorkers();
+    public static PlayerAwardsWorkers getInstance() {
+        if (playerAwardsWorkers == null) {
+            synchronized (PlayerAwardsWorkers.class) {
+                if (playerAwardsWorkers == null) {
+                    playerAwardsWorkers = new PlayerAwardsWorkers();
                 }
             }
         }
-        log.debug("Created PlayerWorkers Singleton");
-        return appWorkersInstance;
+        log.debug("Created PlayerAwardsWorkers Singleton");
+        return playerAwardsWorkers;
     }
 
     public void mainMenu() {
         do {
-            playerView.displayPlayerMenu("PLAYER MANAGEMENT");
-            playerView.displayMessage("Choose an option: ");
-            int answer = ConsoleUtils.readRequiredInt("");
-            OptionsMenuPlayer selectedOption = OptionsMenuPlayer.getOptionByNumber(answer);
+            playerAwardsView.displayPlayerMenu("PLAYER AWARDS MANAGEMENT");
+            playerAwardsView.displayMessage("Choose an option: ");
+            int answer = playerAwardsView.getInputOptionMenu();
+            OptionsMenuPlayerAward selectedOption = OptionsMenuPlayerAward.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            playerView.displayMessageln("Returning to Main Menu...");
+                            playerAwardsView.displayMessageln("Returning to Main Menu...");
                             return;
                         }
-                        case CREATE -> createPlayer();
-                        case LIST_ALL -> listAllPlayers();
-                        case READ -> findPlayerById();
-                        case UPDATE -> updatePlayer();
-                        case SOFT_DELETE -> softDeletePlayer();
                         case AWARD_REWARD_WIN -> addRewardWinToPlayer();
                         case AWARD_CERTIFICATE_WIN -> addCertificateWinToPlayer();
-                        case DELETE -> deletePlayer();
-                        case SUBSCRIBE -> subscribePlayer();
-                        case UNSUBSCRIBE -> unSubscribePlayer();
                     }
                 } catch (DAOException e) {
-                    playerView.displayErrorMessage("Database operation failed: " + e.getMessage());
+                    playerAwardsView.displayErrorMessage("Database operation failed: " + e.getMessage());
                 } catch (Exception e) {
-                    playerView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    playerAwardsView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
                 }
             } else {
-                playerView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+                playerAwardsView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
             }
         } while (true);
     }
 
-    private void createPlayer() throws DAOException {
-        Player newPlayer = new Player();
-        newPlayer = playerView.getPlayerDetailsCreate(new Player());
-        if (newPlayer != null) {
-            Player savedPlayer = playerDAO.create(newPlayer);
-            playerView.displayMessageln("Player created successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
-        }
-    }
-
-    private void listAllPlayers() throws DAOException {
-        playerView.displayMessageln("#### LIST ALL PLAYERS  #################");
-        listAllPayersIntern();
-    }
-
-    private void listAllPayersIntern() throws DAOException {
-        List<Player> players = playerDAO.findAll();
-        playerView.displayPlayers(players);
-    }
-
-
-    private void findPlayerById() throws DAOException {
-        playerView.displayMessageln("#### FIND PLAYER BY ID  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            Integer playerId = idOpt.get();
-            Optional<Player> player = playerDAO.findById(playerId);
-            playerView.displayPlayer(player.orElse(null));
-
-            List<RewardWinDisplayDTO> rewardWins = rewardWinDAO.findByPlayerId(playerId);
-            List<RewardWinDisplayDTO> displayRewardWinsDTOs = new ArrayList<>();
-            for (RewardWinDisplayDTO rw : rewardWins) {
-                String rewardName = "N/A";
-                try {
-                    Optional<Reward> rewardOpt = rewardDAO.findById(rw.getIdReward());
-                    if (rewardOpt.isPresent()) {
-                        rewardName = rewardOpt.get().getName();
-                    }
-                } catch (DAOException e) {
-                    log.error("Error finding Reward with ID " + rw.getIdReward(), e);
-                    rewardName = "Error fetching Reward Name";
-                }
-
-
-                displayRewardWinsDTOs.add(RewardWinDisplayDTO.builder()
-                        .id(rw.getId())
-                        .idReward(rw.getIdReward())
-                        .idPlayer(rw.getIdPlayer())
-                        .dateDelivery(rw.getDateDelivery())
-                        //.isActive(rw.isActive())
-                        .isActive(true)
-                        .rewardName(rewardName)
-                        .build());
-            }
-            playerView.displayRewardWinDTOs(displayRewardWinsDTOs);
-
-            List<CertificateWinDisplayDTO> certificateWinDisplayDTOs = certificateWinDAO.findByPlayerId(playerId);
-            playerView.displayCertificateWinDTOs(certificateWinDisplayDTOs);
-
-        }
-    }
-
-    private void updatePlayer() throws DAOException {
-        playerView.displayMessageln("#### UPDATE PLAYER  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
-            if (existingPlayerOpt.isPresent()) {
-                Player existingPlayer = existingPlayerOpt.get();
-                playerView.displayMessageln("Current Player Details:");
-                playerView.displayPlayer(existingPlayer);
-
-                playerView.displayMessageln("Enter new details:");
-                Player updatedDetails = playerView.getUpdatePlayerDetails(existingPlayer);
-
-                Player savedPlayer = playerDAO.update(updatedDetails);
-                playerView.displayMessageln("Player updated successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
-            }
-        } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot update.");
-        }
-    }
-
-    private void deletePlayer() throws DAOException {
-        playerView.displayMessageln("#### DELETE PLAYER  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            playerDAO.deleteById(idOpt.get());
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " deleted successfully (if existed).");
-        }
-    }
-
-    private void softDeletePlayer() throws DAOException {
-        playerView.displayMessageln("#### SOFT DELETE PLAYER  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
-            if (existingPlayerOpt.isPresent()) {
-                Player existingPlayer = existingPlayerOpt.get();
-                existingPlayer.setActive(false);
-                playerDAO.update(existingPlayer);
-                playerView.displayMessageln("Player soft deleted successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
-            }
-        } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot soft deleted.");
-        }
-    }
-
-    private void subscribePlayer() throws DAOException {
-        playerView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
-            if (existingPlayerOpt.isPresent()) {
-                Player existingPlayer = existingPlayerOpt.get();
-                existingPlayer.setSubscribed(true);
-                playerDAO.update(existingPlayer);
-                playerView.displayMessageln("Player subscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
-            }
-        } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot subscribed.");
-        }
-    }
-
-    private void unSubscribePlayer() throws DAOException {
-        playerView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
-        listAllPayersIntern();
-        Optional<Integer> idOpt = playerView.getPlayerId();
-        if (idOpt.isPresent()) {
-            Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
-            if (existingPlayerOpt.isPresent()) {
-                Player existingPlayer = existingPlayerOpt.get();
-                existingPlayer.setSubscribed(false);
-                playerDAO.update(existingPlayer);
-                playerView.displayMessageln("Player unsubscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
-            }
-        } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot unsubscribed.");
-        }
-    }
 
     private void addRewardWinToPlayer() throws DAOException {
-        playerView.displayMessageln("#### ADD REWARD WIN TO PLAYER #################");
-        listAllPayersIntern();
-        Optional<Integer> playerIdOpt = playerView.getPlayerId();
-        if (playerIdOpt.isEmpty()) {
-            playerView.displayErrorMessage("Player ID is required.");
-            return;
-        }
+        playerAwardsView.displayMessageln("#### ADD REWARD WIN TO PLAYER #################");
 
-        Integer playerId = playerIdOpt.get();
-        if (playerDAO.findById(playerId).isEmpty()) {
-            playerView.displayErrorMessage("Player with ID " + playerId + " not found.");
-            return;
-        }
+        int playerId = 0;
+        int rewardId = 0;
 
         try {
-            int idReward = ConsoleUtils.readRequiredInt("Enter Reward ID: ");
+            playerAwardsView.displayMessageln("List of Players");
+            playerId = getPlayerId();
 
-            RewardWin newRewardWin = RewardWin.builder()
-                    .idPlayer(playerId)
-                    .idReward(idReward)
-                    .dateDelivery(LocalDateTime.from(LocalDate.now()))
-                    .isActive(true)
-                    .build();
+            playerAwardsView.displayMessageln("List of Rewards");
+            rewardId = getRewardId();
 
+        } catch (IllegalArgumentException e) {
+            playerAwardsView.displayErrorMessage(e.getMessage());
+            return;
+        }
+
+        RewardWin newRewardWin = RewardWin.builder()
+                .idPlayer(playerId)
+                .idReward(rewardId)
+                .dateDelivery(LocalDateTime.from(LocalDate.now()))
+                .isActive(true)
+                .build();
+
+        if (newRewardWin != null) {
             RewardWin savedRewardWin = rewardWinDAO.create(newRewardWin);
-            playerView.displayMessageln("Reward Win added successfully for Player ID " + playerId + " (Reward Win ID: " + savedRewardWin.getId() + ")");
-        } catch (NumberFormatException e) {
-            playerView.displayErrorMessage("Invalid input for numeric field. Please enter a valid number.");
+            playerAwardsView.displayMessageln("Reward created successfully with ID: " + savedRewardWin.getId());
         }
     }
 
     private void addCertificateWinToPlayer() throws DAOException {
-        playerView.displayMessageln("#### ADD CERTIFICATE WIN TO PLAYER #################");
-        listAllPayersIntern();
+        playerAwardsView.displayMessageln("#### ADD CERTIFICATE WIN TO PLAYER #################");
 
-        Optional<Integer> playerIdOpt = playerView.getPlayerId();
-        if (playerIdOpt.isEmpty()) {
-            playerView.displayErrorMessage("Player ID is required.");
-            return;
-        }
-
-        Integer playerId = playerIdOpt.get();
-        if (playerDAO.findById(playerId).isEmpty()) {
-            playerView.displayErrorMessage("Player with ID " + playerId + " not found.");
-            return;
-        }
+        int playerId = 0;
+        int roomId = 0;
+        int certificateId = 0;
 
         try {
-            int idCertificate = ConsoleUtils.readRequiredInt("Enter Certificate ID: ");
-            int idRoom = ConsoleUtils.readRequiredInt("Enter Room ID (0 if not applicable): ");
-            String description = ConsoleUtils.readRequiredString("Enter Description for Certificate: ");
+            playerAwardsView.displayMessageln("List of Players");
+            playerId = getPlayerId();
 
-            CertificateWin newCertificateWin = CertificateWin.builder()
-                    .idPlayer(playerId)
-                    .idCertificate(idCertificate)
-                    .idRoom(idRoom)
-                    .description(description)
-                    .dateDelivery(LocalDateTime.from(LocalDate.now()))
-                    .isActive(true)
-                    .build();
+            playerAwardsView.displayMessageln("List of Rooms");
+            roomId = getRoomId();
 
+            playerAwardsView.displayMessageln("List of Certificates");
+            certificateId = getCertificateId();
+
+        } catch (IllegalArgumentException e) {
+            playerAwardsView.displayErrorMessage(e.getMessage());
+            return;
+        }
+
+        CertificateWin newCertificateWin = CertificateWin.builder()
+                .idPlayer(playerId)
+                .idCertificate(certificateId)
+                .idRoom(roomId)
+                .dateDelivery(LocalDateTime.from(LocalDate.now()))
+                .isActive(true)
+                .build();
+
+        if (newCertificateWin != null) {
             CertificateWin savedCertificateWin = certificateWinDAO.create(newCertificateWin);
-            playerView.displayMessageln("Certificate Win added successfully for Player ID " + playerId + " (Certificate Win ID: " + savedCertificateWin.getId() + ")");
-        } catch (NumberFormatException e) {
-            playerView.displayErrorMessage("Invalid input for numeric field. Please enter a valid number.");
+            playerAwardsView.displayMessageln("Certificate Win added successfully for Player ID " + playerId + " (Certificate Win ID: " + savedCertificateWin.getId() + ")");
         }
     }
 
+    private int getPlayerId() {
+        listAllPayersIntern();
+        int playerIdOpt = playerAwardsView.getPlayerId();
+        if (playerDAO.findById(playerIdOpt).isEmpty()) {
+            String message = "Player with ID required or not found.";
+            playerAwardsView.displayErrorMessage(message);
+            log.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        return playerIdOpt;
+    }
+
+    private int getRewardId() {
+        listAllRewardsIntern();
+        int rewardIdOpt = playerAwardsView.getRewardId();
+        if (rewardDAO.findById(rewardIdOpt).isEmpty()) {
+            String message = "Reward ID required or not found.";
+            playerAwardsView.displayErrorMessage(message);
+            log.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        return rewardIdOpt;
+    }
+
+    private int getRoomId() {
+        listAllRoomsIntern();
+        int roomIdOpt = playerAwardsView.getRoomId();
+        if (roomDAO.findById(roomIdOpt).isEmpty()) {
+            String message = "Room ID required or not found.";
+            playerAwardsView.displayErrorMessage(message);
+            log.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        return roomIdOpt;
+    }
+
+    private int getCertificateId() {
+        listAllCertificatesIntern();
+        int certificateIdOpt = playerAwardsView.getCertificateId();
+        if (rewardDAO.findById(certificateIdOpt).isEmpty()) {
+            String message = "Certificate ID required or not found.";
+            playerAwardsView.displayErrorMessage(message);
+            log.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        return certificateIdOpt;
+    }
+
+    private void listAllPayersIntern() throws DAOException {
+        List<Player> players = playerDAO.findAll();
+        playerAwardsView.displayPlayers(players);
+    }
+
+    private void listAllRewardsIntern() throws DAOException {
+        List<Reward> rewards = rewardDAO.findAll();
+        playerAwardsView.displayRewards(rewards);
+    }
+
+    private void listAllCertificatesIntern() throws DAOException {
+        List<Certificate> certificates = certificateDAO.findAll();
+        playerAwardsView.displayCertificates(certificates);
+    }
+
+    private void listAllRoomsIntern() throws DAOException {
+        List<Room> rooms = roomDAO.findAll();
+        playerAwardsView.displayRooms(rooms);
+    }
 }

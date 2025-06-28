@@ -8,11 +8,8 @@ public enum OptionsMenuPlayer {
     UPDATE(4, "Update Player"),
     SOFT_DELETE(5, "Soft delete Player"),
     DELETE(6, "Delete Player"),
-    AWARD_CERTIFICATE_WIN(7, "Award Certificate win to player"),
-    AWARD_REWARD_WIN(8, "Award Reward win to player"),
-    SUBSCRIBE(9, "Subscribe"),
-    UNSUBSCRIBE(10, "Unsubscribe"),
-    NOTIFY(11, "Notify Player"),
+    AWARDS_MANAGEMENT(7, "Awards Management Player"),
+    NOTIFY_MANAGEMENT(8, "Notify Management Player"),
     EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;
@@ -42,7 +39,6 @@ public enum OptionsMenuPlayer {
         System.out.println("");
     }
 
-    // Optional
     public static OptionsMenuPlayer getOptionByNumber(int number) {
         for (OptionsMenuPlayer option : OptionsMenuPlayer.values()) {
             if (option.getOPTION_NUMBER() == number) {

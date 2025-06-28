@@ -1,17 +1,18 @@
 package dto;
 
-import model.Player;
+import model.Room;
 
-public class PlayerMapper {
-    public static PlayerDisplayDTO toDisplayDTO(Player player) {
-        return PlayerDisplayDTO.builder()
-                .id(player.getId())
-                .name(player.getName())
-                .email(player.getEmail())
-                .password(player.getPassword())
-                .registrationDate(player.getRegistrationDate())
-                .isSubscribed(player.isSubscribed())
-                .isActive(player.isActive())
+public class RoomMapper {
+    public static RoomDisplayDTO toDisplayDTO(Room room) {
+        return RoomDisplayDTO.builder()
+                .id(room.getId())
+                .idEscapeRoom(room.getIdEscapeRoom())
+                .name(room.getName())
+                .theme(room.getTheme())
+                .difficulty(room.getDifficulty())
+                .price(room.getPrice())
+                .isActive(room.isActive())
+                .description(room.getDescription())
                 .build();
     }
 }
