@@ -67,7 +67,7 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
     @Override
     public List<Decoration> findAll() throws DAOException {
         List<Decoration> decorations = new ArrayList<>();
-        String sql = "SELECT idDecoration, idRoom, name, price, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM " + nameObject + " WHERE idClue = ?;";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -147,6 +147,7 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
                 .id(rs.getInt("idDecoration"))
                 .idRoom(rs.getInt("idRoom"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description"))
                 .price(rs.getBigDecimal("price"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();

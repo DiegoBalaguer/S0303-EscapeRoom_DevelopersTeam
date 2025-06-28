@@ -21,6 +21,7 @@ public class DecorationView {
             String name = ConsoleUtils.readRequiredString("Enter decoration name: ");
             int idRoom = ConsoleUtils.readRequiredInt("Enter Room ID (existing): ");
             BigDecimal price = ConsoleUtils.readRequiredBigDecimal("Enter decoration price: ");
+            String description = ConsoleUtils.readRequiredString("Enter decoration description: ");
             boolean isActive = ConsoleUtils.readRequiredBoolean("Is the decoration active? (T/F, Y/N, S/N): ");
 
             return Decoration.builder()
@@ -81,6 +82,7 @@ public class DecorationView {
             System.out.println("\n=== EDIT DECORATION ===");
             String name = ConsoleUtils.readOptionalString("Current Name: " + currentDecoration.getName() + ". New Name: ").orElse(currentDecoration.getName());
             BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentDecoration.getPrice() + ". New Price: ").orElse(currentDecoration.getPrice());
+            String description = ConsoleUtils.readOptionalString("Current Description: " + currentDecoration.getDescription() + ". New Description: ").orElse(currentDecoration.getDescription());
             boolean isActive = ConsoleUtils.readOptionalBoolean("Current Active Status: " + (currentDecoration.isActive() ? "Yes" : "No") + ". New Status (true/false): ").orElse(currentDecoration.isActive());
 
             return Decoration.builder()
@@ -88,6 +90,7 @@ public class DecorationView {
                     .name(name)
                     .idRoom(currentDecoration.getIdRoom())
                     .price(price)
+                    .description(description)
                     .isActive(isActive)
                     .build();
 
