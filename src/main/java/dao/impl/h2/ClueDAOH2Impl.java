@@ -181,7 +181,7 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
                 }
             }
         } catch (SQLException e) {
-            String errorMessage = "Error al obtener el precio total de las Clues para Room con ID: " + roomId;
+            String errorMessage = "Error getting total price of Clues for Room with ID: " + roomId;
             log.error(errorMessage, e);
             throw new DAOException(errorMessage, e);
         }

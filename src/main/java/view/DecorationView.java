@@ -1,20 +1,20 @@
 package view;
-import enums.Theme;
+
 import enums.Difficulty;
 import enums.OptionsMenuCrud;
+import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
 import model.Room;
 import utils.ConsoleUtils;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j // Para logging
-public class RoomView {
+public class DecorationView {
 
     public void displayRoomMenu(String title) {
-        OptionsMenuCrud.viewMenuCrud(title);
+        OptionsMenuCrud.viewMenuCrud(title); // Menú de CRUD adaptado para gestionar Rooms
     }
 
     public Room getRoomDetails(boolean forUpdate) {

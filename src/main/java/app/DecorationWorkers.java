@@ -7,24 +7,24 @@ import dao.interfaces.ClueDAO;
 import dao.interfaces.DecorationDAO;
 import dao.interfaces.RoomDAO;
 import enums.OptionsMenuCrud;
+import lombok.extern.slf4j.Slf4j;
 import model.Room;
 import utils.ConsoleUtils;
 import view.RoomView;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RoomWorkers {
+public class DecorationWorkers {
 
-    private static RoomWorkers roomWorkersInstance;
+    private static DecorationWorkers roomWorkersInstance;
     private final RoomView roomView;
     private final RoomDAO roomDAO;
     private final ClueDAO clueDAO;
     private final DecorationDAO decorationDAO;
 
-    private RoomWorkers() {
+    private DecorationWorkers() {
         this.roomView = new RoomView();
         try {
             this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
@@ -35,11 +35,11 @@ public class RoomWorkers {
         }
     }
 
-    public static RoomWorkers getInstance() {
+    public static DecorationWorkers getInstance() {
         if (roomWorkersInstance == null) {
-            synchronized (RoomWorkers.class) {
+            synchronized (DecorationWorkers.class) {
                 if (roomWorkersInstance == null) {
-                    roomWorkersInstance = new RoomWorkers();
+                    roomWorkersInstance = new DecorationWorkers();
                 }
             }
         }
@@ -66,15 +66,19 @@ public class RoomWorkers {
                         case REMOVE -> deleteRoomById();
                         case UPDATE -> updateRoom();
                         case CALCULATE -> calculateTotalValue();
+
                         default -> roomView.displayErrorMessage("Unknown option selected.");
                     }
                 } catch (DAOException e) {
                     roomView.displayErrorMessage("Database operation failed: " + e.getMessage());
+                    //log.error("DAO Error in PlayerWorkers: {}", e.getMessage(), e);
                 } catch (Exception e) {
                     roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    //log.error("Unexpected error in PlayerWorkers: {}", e.getMessage(), e);
                 }
             } else {
                 roomView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+                //log.warn("Error: The value {} is wrong in player management menu.", answer);
             }
         } while (true);
     }
