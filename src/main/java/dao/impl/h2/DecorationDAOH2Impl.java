@@ -48,7 +48,7 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
 
     @Override
     public Optional<Decoration> findById(Integer id) throws DAOException {
-        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM " + nameObject + " WHERE idClue = ?;";
+        String sql = "SELECT idDecoration, idRoom, name, price, isActive FROM " + nameObject + " WHERE idDecoration = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -84,7 +84,7 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
 
     @Override
     public Decoration update(Decoration decoration) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idClue = ?;";
+        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idDecoration = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, decoration.getIdRoom());
@@ -147,7 +147,6 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
                 .id(rs.getInt("idDecoration"))
                 .idRoom(rs.getInt("idRoom"))
                 .name(rs.getString("name"))
-                .description(rs.getString("description"))
                 .price(rs.getBigDecimal("price"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();

@@ -1,4 +1,3 @@
-
 package view;
 
 import enums.OptionsMenuItem;
@@ -21,14 +20,12 @@ public class ClueView {
             String name = ConsoleUtils.readRequiredString("Enter clue name: ");
             int idRoom = ConsoleUtils.readRequiredInt("Enter Room ID (existing): ");
             BigDecimal price = ConsoleUtils.readRequiredBigDecimal("Enter clue price: ");
-            String description = ConsoleUtils.readRequiredString("Enter clue description: "); // Solicitar descripción
             boolean isActive = ConsoleUtils.readRequiredBoolean("Is the clue active? (T/F, Y/N, S/N): ");
 
             return Clue.builder()
                     .name(name)
                     .idRoom(idRoom)
                     .price(price)
-                    .description(description) // Asignar descripción
                     .isActive(isActive)
                     .build();
 
@@ -83,7 +80,6 @@ public class ClueView {
             System.out.println("\n=== EDIT CLUE ===");
             String name = ConsoleUtils.readOptionalString("Current Name: " + currentClue.getName() + ". New Name: ").orElse(currentClue.getName());
             BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentClue.getPrice() + ". New Price: ").orElse(currentClue.getPrice());
-            String description = ConsoleUtils.readOptionalString("Current Description: " + currentClue.getDescription() + ". New Description: ").orElse(currentClue.getDescription()); // Editar descripción
             boolean isActive = ConsoleUtils.readOptionalBoolean("Current Active Status: " + (currentClue.isActive() ? "Yes" : "No") + ". New Status (true/false): ").orElse(currentClue.isActive());
 
             return Clue.builder()
@@ -91,7 +87,6 @@ public class ClueView {
                     .name(name)
                     .idRoom(currentClue.getIdRoom())
                     .price(price)
-                    .description(description) // Asignar descripción actualizada
                     .isActive(isActive)
                     .build();
 
@@ -100,6 +95,5 @@ public class ClueView {
             return null;
         }
     }
-
 
 }

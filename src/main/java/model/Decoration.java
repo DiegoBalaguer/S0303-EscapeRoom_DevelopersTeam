@@ -10,6 +10,5 @@ import java.math.BigDecimal;
 public class Decoration extends Element {
     private int idRoom;
     private BigDecimal price;
-    private String description;
 
 }

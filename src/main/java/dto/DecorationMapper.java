@@ -11,8 +11,6 @@ public class DecorationMapper {
                 .price(decoration.getPrice())
                 .idRoom(decoration.getIdRoom())
                 .isActive(decoration.isActive())
-                .description(decoration.getDescription())
-
                 .build();
     }
 }
