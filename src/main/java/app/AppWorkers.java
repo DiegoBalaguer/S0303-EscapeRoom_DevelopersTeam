@@ -35,7 +35,7 @@ public class AppWorkers {
                     case TICKET_MANAGEMENT -> SaleWorkers.getInstance().mainMenu();
                     case ROOM_MANAGEMENT ->   RoomWorkers.getInstance().mainMenu();
                     case PLAYER_MANAGEMENT -> PlayerWorkers.getInstance().mainMenu();
-                    case ESCAPE_ROOM_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
+                    case ESCAPE_ROOM_MANAGEMENT -> EscapeRoomWorkers.getInstance().mainMenu();
                     case FINANCIAL_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " +idMenu.getDESCRIPTION());
 
                     default -> log.warn("Error: The value {} is wrong.", idMenu);

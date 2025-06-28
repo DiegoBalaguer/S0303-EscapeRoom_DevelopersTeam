@@ -274,6 +274,35 @@ public class ConsoleUtils {
         }
         return Optional.of(input); // Devuelve el valor opcional si hay entrada
     }
+    public static Optional<BigDecimal> readOptionalBigDecimal(String message) {
+        System.out.print(message); // Mostrar mensaje al usuario
+        String input = sc.nextLine().trim(); // Leer entrada del usuario y eliminar espacios en blanco
+
+        if (input.isEmpty()) {
+            return Optional.empty(); // Si la entrada está vacía, devolver Optional vacío
+        }
+        try {
+            return Optional.of(new BigDecimal(input)); // Si es un número válido, devolverlo como Optional
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid number format. Please enter a valid decimal value.");
+            return Optional.empty(); // Si el formato es inválido, devolver Optional vacío
+        }
+    }
+    public static Optional<Boolean> readOptionalBoolean(String message) {
+            System.out.print(message); // Mostrar mensaje al usuario
+            String input = sc.nextLine().trim().toUpperCase(); // Leer entrada del usuario, eliminando espacios y convirtiendo a mayúsculas
+
+            if (input.isEmpty()) {
+                return Optional.empty(); // Si la entrada está vacía, devolvemos Optional vacío
+            }
+            try {
+                return Optional.of(calculateValueBoolean(input.charAt(0))); // Llamamos a calculateValueBoolean para validar la entrada
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error: Only 'T', 'F', 'S', 'Y' or 'N' are allowed."); // Si la entrada es inválida
+                return Optional.empty(); // Devolvemos Optional vacío
+            }
+    }
+
 
 
 }
