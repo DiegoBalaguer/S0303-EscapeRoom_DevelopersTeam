@@ -25,19 +25,28 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Clue create(Clue clue) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (idRoom, name, description, price, isActive) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (idRoom, name, description, price, isActive) VALUES (?, ?, ?, ?, ?);"; // Agregamos description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription());
+            stmt.setString(3, clue.getDescription()); // Descripción incluida
             stmt.setBigDecimal(4, clue.getPrice());
             stmt.setBoolean(5, clue.isActive());
-            stmt.executeUpdate();
-            ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) {
-                clue.setId(keys.getInt(1));
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DAOException("Creating clue failed, no rows affected.");
             }
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    clue.setId(keys.getInt(1)); // Recuperar la clave generada
+                } else {
+                    throw new DAOException("Creating clue failed, no ID obtained.");
+                }
+            }
+
             return clue;
         } catch (Exception e) {
             String messageError = "Error creating " + nameObject + ": ";
@@ -48,7 +57,7 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Optional<Clue> findById(Integer id) throws DAOException {
-        String sql = "SELECT idClue, idRoom, name, price, isActive FROM " + nameObject + " WHERE idClue = ?;";
+        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM " + nameObject + " WHERE idClue = ?;"; // Incluir description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -63,6 +72,7 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
             throw new DAOException(messageError, e);
         }
     }
+
 
     @Override
     public List<Clue> findAll() throws DAOException {
@@ -84,12 +94,12 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Clue update(Clue clue) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idClue = ?;";
+        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idClue = ?;"; // Update description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription());
+            stmt.setString(3, clue.getDescription()); // Actualizar descripción
             stmt.setBigDecimal(4, clue.getPrice());
             stmt.setBoolean(5, clue.isActive());
             stmt.setInt(6, clue.getId());
@@ -107,7 +117,6 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
             throw new DAOException(messageError, e);
         }
     }
-
     @Override
     public void deleteById(Integer id) throws DAOException {
         String sql = "DELETE FROM " + nameObject + " WHERE idClue = ?;";
@@ -144,32 +153,35 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     private Clue mapResultSetToClue(ResultSet rs) throws SQLException {
         return Clue.builder()
-                .id(rs.getInt("idClue"))
+                .id(rs.getInt("idClue")) // Confirmar que el ID está siendo correctamente leído
                 .idRoom(rs.getInt("idRoom"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description")) // Asegurar que la descripción sea mapeada
                 .price(rs.getBigDecimal("price"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+
     @Override
     public List<Clue> findCluesByRoomId(Integer roomId) throws DAOException {
-        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM clue WHERE idRoom = ? AND isActive = TRUE;";
-        List<Clue> clues = new ArrayList<>();
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, roomId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                clues.add(mapResultSetToClue(rs));
-            }
-        } catch (Exception e) {
-            String messageError = "Error retrieving clues for room ID: " + roomId;
-            log.error(messageError, e);
-            throw new DAOException(messageError, e);
+    String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM clue WHERE idRoom = ? AND isActive = TRUE;";
+    List<Clue> clues = new ArrayList<>();
+    try (Connection connection = connectionDAO.getConnection();
+         PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, roomId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            clues.add(mapResultSetToClue(rs)); // Mapea usando el método actualizado
         }
-        return clues;
+    } catch (Exception e) {
+        String messageError = "Error retrieving clues for room ID: " + roomId;
+        log.error(messageError, e);
+        throw new DAOException(messageError, e);
     }
-    @Override
+    return clues;
+    }
+
+@Override
     public BigDecimal findPriceByRoomId(Integer roomId) throws DAOException {
         String sql = "SELECT COALESCE(SUM(price), 0) AS totalPrice FROM clue WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();

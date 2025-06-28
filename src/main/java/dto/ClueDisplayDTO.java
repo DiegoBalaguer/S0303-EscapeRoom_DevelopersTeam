@@ -1,11 +1,15 @@
 package dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ClueDisplayDTO {
     private int id;
@@ -13,4 +17,5 @@ public class ClueDisplayDTO {
     private BigDecimal price;
     private int idRoom;
     private boolean isActive;
+    private String description;
 }

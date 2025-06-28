@@ -11,6 +11,7 @@ public class ClueMapper {
                 .price(clue.getPrice())
                 .idRoom(clue.getIdRoom())
                 .isActive(clue.isActive())
+                .description(clue.getDescription())
                 .build();
     }
 }
