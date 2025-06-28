@@ -1,6 +1,6 @@
 package view;
 
-import enums.OptionsMenuClue;
+import enums.OptionsMenuItem;
 import lombok.extern.slf4j.Slf4j;
 import model.Clue;
 import utils.ConsoleUtils;
@@ -12,7 +12,7 @@ import java.util.Optional;
 public class ClueView {
 
     public void displayClueMenu(String title) {
-        OptionsMenuClue.viewMenuClue(title);
+        OptionsMenuItem.viewMenuItem(title);
     }
 
     public Clue getClueDetails() {

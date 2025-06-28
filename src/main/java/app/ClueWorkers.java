@@ -4,7 +4,7 @@ import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.ClueDAO;
-import enums.OptionsMenuClue;
+import enums.OptionsMenuItem;
 import lombok.extern.slf4j.Slf4j;
 import model.Clue;
 import utils.ConsoleUtils;
@@ -48,7 +48,7 @@ public class ClueWorkers {
             clueView.displayClueMenu("=== CLUE MANAGEMENT MENU ===");
             clueView.displayMessage("Choose an option: ");
             int answer = ConsoleUtils.readRequiredInt("");
-            OptionsMenuClue selectedOption = OptionsMenuClue.getOptionByNumber(answer);
+            OptionsMenuItem selectedOption = OptionsMenuItem.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
