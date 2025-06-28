@@ -14,7 +14,7 @@ import java.util.Optional;
 public class RoomView {
 
     public void displayRoomMenu(String title) {
-        OptionsMenuCrud.viewMenuCrud(title); // Menú de CRUD adaptado para gestionar Rooms
+        OptionsMenuCrud.viewMenuCrud(title);
     }
 
     public Room getRoomDetails(boolean forUpdate) {

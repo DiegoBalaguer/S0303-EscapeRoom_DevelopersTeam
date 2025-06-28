@@ -26,29 +26,23 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Room create(Room room) throws DAOException {
-        String sql = "INSERT INTO room (idEscapeRoom, name, description, price, idDifficulty, idTheme, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + nameObject + " (idEscapeRoom, name, description, idTheme, idDifficulty, price, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            // Asignación de valores
             stmt.setInt(1, room.getIdEscapeRoom());
             stmt.setString(2, room.getName());
             stmt.setString(3, room.getDescription());
-            stmt.setBigDecimal(4, room.getPrice());
-            stmt.setInt(5, room.getDifficulty().ordinal());
-
-            // Validar que Theme no sea null
             if (room.getTheme() == null) {
                 throw new DAOException("Theme in Room cannot be null.");
             }
-            stmt.setInt(6, room.getTheme().ordinal());
+            stmt.setInt(4, room.getTheme().ordinal());
+            stmt.setInt(5, room.getDifficulty().ordinal());
+            stmt.setBigDecimal(6, room.getPrice());
             stmt.setBoolean(7, room.isActive());
-
-            // Ejecutar consulta
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
-                room.setId(keys.getInt(1)); // Generar el ID basado en la BD
+                room.setId(keys.getInt(1));
             }
             return room;
 
@@ -60,7 +54,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Optional<Room> findById(Integer id) throws DAOException {
-        String sql = "SELECT idRoom, name, idDifficulty, price, idTheme, isActive FROM " + nameObject + " WHERE idRoom = ?;";
+        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + nameObject + " WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -79,7 +73,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     @Override
     public List<Room> findAll() throws DAOException {
         List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT idRoom, name, idDifficulty, price, idTheme, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -205,11 +199,13 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     private Room mapResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
+                .idEscapeRoom(rs.getInt("idEscapeRoom"))
                 .name(rs.getString("name"))
+                .theme(Theme.values()[rs.getInt("idTheme")])
                 .difficulty(Difficulty.values()[rs.getInt("idDifficulty")])
                 .price(rs.getBigDecimal("price"))
-                .theme(Theme.values()[rs.getInt("idTheme")])
+                .active(rs.getBoolean("isActive"))
+                .description(rs.getString("description"))
                 .build();
     }
-
 }

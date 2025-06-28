@@ -45,7 +45,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
 
     @Override
     public Optional<Reward> findById(Integer id) throws DAOException {
-        String sql = "SELECT idReward, name, isActive FROM " + nameObject + " WHERE idReward = ?;";
+        String sql = "SELECT idReward, name, isActive, description FROM " + nameObject + " WHERE idReward = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -64,7 +64,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
     @Override
     public List<Reward> findAll() throws DAOException {
         List<Reward> rewards = new ArrayList<>();
-        String sql = "SELECT idReward, name, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idReward, name, isActive, description FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -141,6 +141,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
         return Reward.builder()
                 .id(rs.getInt("idReward"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }

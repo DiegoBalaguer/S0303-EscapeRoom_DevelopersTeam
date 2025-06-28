@@ -19,8 +19,8 @@ public class PlayerNotifyView {
         OptionsMenuPlayerNotify.viewMenu(LoadConfigApp.getAppName());
     }
 
-    public int getInputOptionMenu() {
-        return ConsoleUtils.readRequiredInt("");
+    public int getInputOptionMenu(String message) {
+        return ConsoleUtils.readRequiredInt(message);
     }
 
     public int getPlayerId() {

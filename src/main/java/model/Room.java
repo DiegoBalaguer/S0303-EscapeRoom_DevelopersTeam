@@ -10,11 +10,10 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 
 public class Room extends Element {
     private int idEscapeRoom;
@@ -24,7 +23,7 @@ public class Room extends Element {
     private List<AbstractClue> clues;
     private List<AbstractDecoration> decorations;
     private Boolean active;
-
+/*
     public Room(ElementBuilder<?, ?> builder, int idEscapeRoom, BigDecimal price, Difficulty difficulty, Theme theme,
                 List<AbstractClue> clues, List<AbstractDecoration> decorations, Boolean active) {
         super(builder);
@@ -35,5 +34,5 @@ public class Room extends Element {
         this.clues = clues;
         this.decorations = decorations;
         this.active = active;
-    }
+    }*/
 }

@@ -25,8 +25,8 @@ public class PlayerView {
         OptionsMenuPlayer.viewMenu(LoadConfigApp.getAppName());
     }
 
-    public int getInputOptionMenu() {
-        return ConsoleUtils.readRequiredInt("");
+    public int getInputOptionMenu(String message) {
+        return ConsoleUtils.readRequiredInt(message);
     }
 
     public Optional<Integer> getPlayerId() {

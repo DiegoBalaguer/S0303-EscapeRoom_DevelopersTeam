@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import utils.PairTextLength;
 import utils.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -25,32 +25,32 @@ public class PlayerDisplayDTO {
     private boolean isActive;
 
     private int getLong(int position) {
-        return List.of(8, 25, 35, 25, 24, 8, 8).get(position);
+        return List.of(8, 25, 35, 25, 24, 10, 10).get(position);
     }
 
-    public Map<String, Integer> toListHead() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toListHead() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put("ID", getLong(position++));
-        dataMap.put("NAME", getLong(position++));
-        dataMap.put("EMAIL", getLong(position++));
-        dataMap.put("PASSWORD", getLong(position++));
-        dataMap.put("REG.DATE", getLong(position++));
-        dataMap.put("SUBSCRIBE", getLong(position++));
-        dataMap.put("ACTIVE", getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength("ID", getLong(position++)));
+        listValues.add(new PairTextLength("NAME", getLong(position++)));
+        listValues.add(new PairTextLength("EMAIL", getLong(position++)));
+        listValues.add(new PairTextLength("PASSWORD", getLong(position++)));
+        listValues.add(new PairTextLength("REG.DATE", getLong(position++)));
+        listValues.add(new PairTextLength("SUBSCRIBE", getLong(position++)));
+        listValues.add(new PairTextLength("ACTIVE", getLong(position++)));
+        return listValues;
     }
 
-    public Map<String, Integer> toList() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toList() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put(String.valueOf(id), getLong(position++));
-        dataMap.put(name, getLong(position++));
-        dataMap.put(email, getLong(position++));
-        dataMap.put(password, getLong(position++));
-        dataMap.put(StringUtils.getDateFormatUSA(registrationDate), getLong(position++));
-        dataMap.put(isSubscribed ? "Yes" : "No", getLong(position++));
-        dataMap.put(isActive ? "Yes" : "No", getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength(String.valueOf(id), getLong(position++)));
+        listValues.add(new PairTextLength(name, getLong(position++)));
+        listValues.add(new PairTextLength(email, getLong(position++)));
+        listValues.add(new PairTextLength(password, getLong(position++)));
+        listValues.add(new PairTextLength(StringUtils.getDateFormatUSA(registrationDate), getLong(position++)));
+        listValues.add(new PairTextLength(isSubscribed ? "Yes" : "No", getLong(position++)));
+        listValues.add(new PairTextLength(isActive ? "Yes" : "No", getLong(position++)));
+        return listValues;
     }
 }

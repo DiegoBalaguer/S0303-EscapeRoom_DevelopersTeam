@@ -50,7 +50,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
 
     @Override
     public Optional<RewardWin> findById(Integer id) throws DAOException {
-        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM " + nameObject + " WHERE idRewardWin = ?;";
+        String sql = "SELECT idRewardWin, idReward, idPlayer, dateDelivery, isActive, description FROM " + nameObject + " WHERE idRewardWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -69,7 +69,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
     @Override
     public List<RewardWin> findAll() throws DAOException {
         List<RewardWin> rewardWins = new ArrayList<>();
-        String sql = "SELECT idRewardWin, idReward, idPlayer, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idRewardWin, idReward, idPlayer, dateDelivery, isActive, description FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -174,8 +174,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
                 .idReward(rs.getInt("idReward"))
                 .idPlayer(rs.getInt("idPlayer"))
                 .description(rs.getString("description"))
-
-                .dateDelivery(LocalDateTime.from(rs.getDate("dateDelivery").toLocalDate()))
+                .dateDelivery(rs.getTimestamp("dateDelivery").toLocalDateTime())
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }

@@ -50,7 +50,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public Optional<CertificateWin> findById(Integer id) throws DAOException {
-        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, isActive FROM " + nameObject + " WHERE idCertificateWin = ?;";
+        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + nameObject + " WHERE idCertificateWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -69,7 +69,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
     @Override
     public List<CertificateWin> findAll() throws DAOException {
         List<CertificateWin> certificateWins = new ArrayList<>();
-        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 /**
  * PROGRAM: StringUtils
@@ -61,11 +58,10 @@ public class StringUtils {
             return String.format("%-" + lengthString + "s", text); // Fill with spaces if it is short.
         }
     }
-    public static String makeLineToList(Map<String, Integer> dataLine) {
+    public static String makeLineToList(List<PairTextLength>  dataLine) {
         StringBuilder resultado = new StringBuilder();
-        dataLine.forEach((k, v) -> {
-            resultado.append(formatToChars(k, v));
-        });
+        dataLine.forEach(par ->
+            resultado.append(formatToChars(par.getText(), par.getLength())));
         return resultado.toString();
     }
 

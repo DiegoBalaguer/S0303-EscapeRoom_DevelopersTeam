@@ -1,14 +1,13 @@
 package model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
-@AllArgsConstructor
+@SuperBuilder
+@NoArgsConstructor
 public class CertificateWin {
     private int id;
     private int idCertificate;
