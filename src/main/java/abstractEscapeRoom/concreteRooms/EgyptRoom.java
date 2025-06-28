@@ -1,9 +1,9 @@
 package abstractEscapeRoom.concreteRooms;
 
 import interfaces.AbstractFactory;
-import model.Clue;
-import model.Decoration;
-import model.Element;
+import mvc.model.Clue;
+import mvc.model.Decoration;
+import mvc.model.Element;
 
 import java.math.BigDecimal;
 

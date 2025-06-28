@@ -5,7 +5,7 @@ import crud.*;
 import enums.Difficulty;
 import interfaces.AbstractFactory;
 import interfaces.Command;
-import model.Element;
+import mvc.model.Element;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

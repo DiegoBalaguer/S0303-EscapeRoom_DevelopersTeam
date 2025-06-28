@@ -1,8 +1,8 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import dto.CertificateWinDisplayDTO;
-import model.CertificateWin;
+import mvc.dto.CertificateWinDisplayDTO;
+import mvc.model.CertificateWin;
 
 import java.util.List;
 

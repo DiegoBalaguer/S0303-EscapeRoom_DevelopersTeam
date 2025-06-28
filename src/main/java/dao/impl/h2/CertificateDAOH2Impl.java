@@ -5,7 +5,7 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.CertificateDAO;
 import dao.interfaces.ConnectionDAO;
 import lombok.extern.slf4j.Slf4j;
-import model.Certificate;
+import mvc.model.Certificate;
 
 import java.sql.*;
 import java.util.ArrayList;

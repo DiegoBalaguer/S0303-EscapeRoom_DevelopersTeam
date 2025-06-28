@@ -7,7 +7,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import dao.connection.SSHSessionManager; // Importa SSHSessionManager
 import dao.exceptions.DatabaseConnectionException;
-import dao.loadConfigDB.LoadConfigDB;
+import config.loadConfigDB.LoadConfigDB;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;

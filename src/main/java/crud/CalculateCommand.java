@@ -1,8 +1,7 @@
 package crud;
 
 import interfaces.Command;
-import model.Element;
-import model.Room;
+import mvc.model.Room;
 
 import java.math.BigDecimal;
 import java.util.List;

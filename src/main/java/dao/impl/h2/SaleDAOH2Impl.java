@@ -5,9 +5,9 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.SaleDAO;
 import lombok.extern.slf4j.Slf4j;
-import model.Player;
-import model.Sale;
-import model.Ticket;
+import mvc.model.Player;
+import mvc.model.Sale;
+import mvc.model.Ticket;
 
 import java.sql.*;
 import java.util.ArrayList;

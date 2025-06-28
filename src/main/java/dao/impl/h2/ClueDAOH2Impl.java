@@ -5,7 +5,7 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ClueDAO;
 import dao.interfaces.ConnectionDAO;
 import lombok.extern.slf4j.Slf4j;
-import model.Clue;
+import mvc.model.Clue;
 
 import java.math.BigDecimal;
 import java.sql.*;

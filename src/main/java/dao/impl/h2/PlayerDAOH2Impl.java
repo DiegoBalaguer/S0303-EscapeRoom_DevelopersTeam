@@ -4,9 +4,8 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.PlayerDAO;
-import dto.PlayerDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
-import model.Player;
+import mvc.model.Player;
 
 import java.sql.*;
 import java.util.ArrayList;

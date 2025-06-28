@@ -1,6 +1,6 @@
 package service;
 
-import model.Element;
+import mvc.model.Element;
 
 import java.util.ArrayList;
 import java.util.List;

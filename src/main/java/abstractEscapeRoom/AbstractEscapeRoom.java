@@ -2,7 +2,10 @@ package abstractEscapeRoom;
 
 import enums.Difficulty;
 import interfaces.AbstractFactory;
-import model.*;
+import mvc.model.Clue;
+import mvc.model.Decoration;
+import mvc.model.Element;
+import mvc.model.Room;
 
 import java.math.BigDecimal;
 

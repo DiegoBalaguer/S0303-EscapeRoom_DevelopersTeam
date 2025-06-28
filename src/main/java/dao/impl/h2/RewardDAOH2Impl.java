@@ -5,7 +5,7 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.RewardDAO;
 import lombok.extern.slf4j.Slf4j;
-import model.Reward;
+import mvc.model.Reward;
 
 import java.sql.*;
 import java.util.ArrayList;

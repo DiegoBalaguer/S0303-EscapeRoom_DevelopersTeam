@@ -2,7 +2,7 @@ package dao.connection;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import dao.loadConfigDB.LoadConfigDB;
+import config.loadConfigDB.LoadConfigDB;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
