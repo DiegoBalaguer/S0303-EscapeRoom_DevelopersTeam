@@ -25,7 +25,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player create(Player player) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate, isActive) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate) VALUES (?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, player.getName());
@@ -33,7 +33,6 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             stmt.setString(3, player.getPassword());
             stmt.setBoolean(4, player.isSubscribed());
             stmt.setObject(5, player.getRegistrationDate());
-            stmt.setBoolean(6, player.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {

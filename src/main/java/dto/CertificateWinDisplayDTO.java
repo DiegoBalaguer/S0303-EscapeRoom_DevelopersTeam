@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import utils.PairTextLength;
 import utils.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -27,30 +27,30 @@ public class CertificateWinDisplayDTO {
     private String roomName;
 
     private int getLong(int position) {
-        return List.of(6, 30, 35, 25, 10, 40).get(position);
+        return List.of(6, 30, 35, 25, 10, 100).get(position);
     }
 
-    public Map<String, Integer> toListHead() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toListHead() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put("ID", getLong(position++));
-        dataMap.put("CERTIFICATE", getLong(position++));
-        dataMap.put("ROOM", getLong(position++));
-        dataMap.put("DATE DELIVERY", getLong(position++));
-        dataMap.put("ACTIVE", getLong(position++));
-        dataMap.put("DESCRIPTION", getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength("ID", getLong(position++)));
+        listValues.add(new PairTextLength("CERTIFICATE", getLong(position++)));
+        listValues.add(new PairTextLength("ROOM", getLong(position++)));
+        listValues.add(new PairTextLength("DATE DELIVERY", getLong(position++)));
+        listValues.add(new PairTextLength("ACTIVE", getLong(position++)));
+        listValues.add(new PairTextLength("DESCRIPTION", getLong(position++)));
+        return listValues;
     }
 
-    public Map<String, Integer> toList() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toList() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put(String.valueOf(id), getLong(position++));
-        dataMap.put("0" + idCertificate + ".-" + certificateName, getLong(position++));
-        dataMap.put("0" + idRoom + ".-" + roomName, getLong(position++));
-        dataMap.put(StringUtils.getDateFormatUSA(dateDelivery), getLong(position++));
-        dataMap.put(isActive ? "Yes" : "No", getLong(position++));
-        dataMap.put(description, getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength(String.valueOf(id), getLong(position++)));
+        listValues.add(new PairTextLength("0" + idCertificate + ".-" + certificateName, getLong(position++)));
+        listValues.add(new PairTextLength("0" + idRoom + ".-" + roomName, getLong(position++)));
+        listValues.add(new PairTextLength(StringUtils.getDateFormatUSA(dateDelivery), getLong(position++)));
+        listValues.add(new PairTextLength(isActive ? "Yes" : "No", getLong(position++)));
+        listValues.add(new PairTextLength(description, getLong(position++)));
+        return listValues;
     }
 }

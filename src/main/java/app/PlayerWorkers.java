@@ -51,8 +51,7 @@ public class PlayerWorkers {
     public void mainMenu() {
         do {
             playerView.displayPlayerMenu("PLAYER MANAGEMENT");
-            playerView.displayMessage("Choose an option: ");
-            int answer = playerView.getInputOptionMenu();
+            int answer = playerView.getInputOptionMenu("Choose an option: ");
             OptionsMenuPlayer selectedOption = OptionsMenuPlayer.getOptionByNumber(answer);
 
             if (selectedOption != null) {

@@ -43,8 +43,7 @@ public class PlayerNotifyWorkers {
     public void mainMenu() {
         do {
             playerNotifyView.displayPlayerMenu("PLAYER NOTIFY MANAGEMENT");
-            playerNotifyView.displayMessage("Choose an option: ");
-            int answer = playerNotifyView.getInputOptionMenu();
+            int answer = playerNotifyView.getInputOptionMenu("Choose an option: ");
             OptionsMenuPlayerNotify selectedOption = OptionsMenuPlayerNotify.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -70,10 +69,8 @@ public class PlayerNotifyWorkers {
 
     private void subscribePlayer() throws DAOException {
         playerNotifyView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
-        listAllPayersIntern();
-        int idOpt = playerNotifyView.getPlayerId();
 
-        Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt);
+        Optional<Player> existingPlayerOpt = playerDAO.findById(getPlayerId());
         if (existingPlayerOpt.isPresent()) {
             Player existingPlayer = existingPlayerOpt.get();
             existingPlayer.setSubscribed(true);
@@ -84,10 +81,8 @@ public class PlayerNotifyWorkers {
 
     private void unSubscribePlayer() throws DAOException {
         playerNotifyView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
-        listAllPayersIntern();
-        int idOpt = playerNotifyView.getPlayerId();
 
-        Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt);
+        Optional<Player> existingPlayerOpt = playerDAO.findById(getPlayerId());
         if (existingPlayerOpt.isPresent()) {
             Player existingPlayer = existingPlayerOpt.get();
             existingPlayer.setSubscribed(false);
@@ -99,5 +94,10 @@ public class PlayerNotifyWorkers {
     private void listAllPayersIntern() throws DAOException {
         List<Player> players = playerDAO.findAll();
         playerNotifyView.displayPlayers(players);
+    }
+
+    private int getPlayerId() throws DAOException {
+        listAllPayersIntern();
+        return playerNotifyView.getPlayerId();
     }
 }

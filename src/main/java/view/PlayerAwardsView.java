@@ -19,24 +19,12 @@ public class PlayerAwardsView {
         OptionsMenuPlayerAward.viewMenu(LoadConfigApp.getAppName());
     }
 
-    public int getInputOptionMenu() {
-        return ConsoleUtils.readRequiredInt("");
+    public int getInputRequiredInt(String message) {
+        return ConsoleUtils.readRequiredInt(message);
     }
 
-    public int getPlayerId() {
-        return ConsoleUtils.readRequiredInt("Enter player ID: ");
-    }
-
-    public int getRewardId() {
-        return ConsoleUtils.readRequiredInt("Enter Reward ID: ");
-    }
-
-    public int getCertificateId() {
-        return ConsoleUtils.readRequiredInt("Enter Certificate ID: ");
-    }
-
-    public int getRoomId() {
-        return ConsoleUtils.readRequiredInt("Enter room ID: ");
+    public String getInputRequiredString(String message) {
+        return ConsoleUtils.readRequiredString(message);
     }
 
     public void displayPlayers(List<Player> players) {
@@ -65,6 +53,19 @@ public class PlayerAwardsView {
         System.out.println("-------------------");
     }
 
+    public void displayRewardWin(List<RewardWinDisplayDTO> rewardWinDisplayDTOS) {
+        if (rewardWinDisplayDTOS.isEmpty()) {
+            System.out.println("No Reward wins found for player.");
+            return;
+        }
+        System.out.println(
+                StringUtils.makeLineToList(rewardWinDisplayDTOS.getFirst().toListHead()));
+
+        rewardWinDisplayDTOS.forEach(rewardWins -> System.out.println(
+                StringUtils.makeLineToList(rewardWins.toList())));
+        System.out.println("-------------------");
+    }
+
     public void displayCertificates(List<Certificate> certificates) {
         if (certificates.isEmpty()) {
             System.out.println("No Certificate found.");
@@ -75,6 +76,19 @@ public class PlayerAwardsView {
 
         certificates.forEach(certificate -> System.out.println(
                 StringUtils.makeLineToList(CertificateMapper.toDisplayDTO(certificate).toList())));
+        System.out.println("-------------------");
+    }
+
+    public void displayCertificateWin(List<CertificateWinDisplayDTO> certificateWinDisplayDTOS) {
+        if (certificateWinDisplayDTOS.isEmpty()) {
+            System.out.println("No Certificate found for player.");
+            return;
+        }
+        System.out.println(
+                StringUtils.makeLineToList(certificateWinDisplayDTOS.getFirst().toListHead()));
+
+        certificateWinDisplayDTOS.forEach(certificateWins -> System.out.println(
+                StringUtils.makeLineToList(certificateWins.toList())));
         System.out.println("-------------------");
     }
 

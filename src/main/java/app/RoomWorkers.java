@@ -50,8 +50,7 @@ public class RoomWorkers {
     public void mainMenu() {
         do {
             roomView.displayRoomMenu("=== ROOM MANAGEMENT MENU ===");
-            roomView.displayMessage("Choose an option: ");
-            int answer = ConsoleUtils.readRequiredInt("");
+            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
             OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
 
             if (selectedOption != null) {

@@ -3,6 +3,7 @@ package model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Sale {
         private int id;
         private int idTicket;
@@ -20,9 +22,4 @@ public class Sale {
         private int completion;
         private LocalDate dateSale;
         private boolean isActive;
-
-
-        public Sale() {
-
-        }
 }

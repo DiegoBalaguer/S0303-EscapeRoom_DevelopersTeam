@@ -45,7 +45,7 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
 
     @Override
     public Optional<Certificate> findById(Integer id) throws DAOException {
-        String sql = "SELECT idCertificate, name, isActive FROM " + nameObject + " WHERE idCertificate = ?;";
+        String sql = "SELECT idCertificate, name, isActive, description FROM " + nameObject + " WHERE idCertificate = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -64,7 +64,7 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
     @Override
     public List<Certificate> findAll() throws DAOException {
         List<Certificate> certificates = new ArrayList<>();
-        String sql = "SELECT idCertificate, name, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idCertificate, name, isActive, description FROM " + nameObject + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -174,6 +174,7 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
         return Certificate.builder()
                 .id(rs.getInt("idCertificate"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }

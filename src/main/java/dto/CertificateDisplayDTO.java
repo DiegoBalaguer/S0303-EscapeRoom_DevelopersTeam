@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import utils.PairTextLength;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -20,26 +20,26 @@ public class CertificateDisplayDTO {
     private boolean isActive;
 
     private int getLong(int position) {
-        return List.of(8, 25, 8, 40).get(position);
+        return List.of(8, 25, 8, 100).get(position);
     }
 
-    public Map<String, Integer> toListHead() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toListHead() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put("ID", getLong(position++));
-        dataMap.put("NAME", getLong(position++));
-        dataMap.put("ACTIVE", getLong(position++));
-        dataMap.put("DESCRIPTION", getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength("ID", getLong(position++)));
+        listValues.add(new PairTextLength("NAME", getLong(position++)));
+        listValues.add(new PairTextLength("ACTIVE", getLong(position++)));
+        listValues.add(new PairTextLength("DESCRIPTION", getLong(position++)));
+        return listValues;
     }
 
-    public Map<String, Integer> toList() {
-        Map<String, Integer> dataMap = new LinkedHashMap<>();
+    public List<PairTextLength> toList() {
+        List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        dataMap.put(String.valueOf(id), getLong(position++));
-        dataMap.put(name, getLong(position++));
-        dataMap.put(isActive ? "Yes" : "No", getLong(position++));
-        dataMap.put(description, getLong(position++));
-        return dataMap;
+        listValues.add(new PairTextLength(String.valueOf(id), getLong(position++)));
+        listValues.add(new PairTextLength(name, getLong(position++)));
+        listValues.add(new PairTextLength(isActive ? "Yes" : "No", getLong(position++)));
+        listValues.add(new PairTextLength(description, getLong(position++)));
+        return listValues;
     }
 }
