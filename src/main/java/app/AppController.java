@@ -1,13 +1,10 @@
 package app;
 
-import dao.factory.DAOFactory;
 import dao.interfaces.EscapeRoomDAO;
 import dao.loadConfigDB.LoadConfigDB;
-import enums.OptionsMenuMain;
 
 import loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
-import model.EscapeRoom;
 import utils.ConsoleUtils;
 
 
@@ -22,27 +19,27 @@ public class AppController {
             synchronized (AppController.class) {
                 if (appControllerInstance == null) {
                     appControllerInstance = new AppController();
-                    }
                 }
             }
+        }
         log.debug("Created AppController Singleton");
         return appControllerInstance;
-        }
+    }
 
-      public void startApp() {
+    public void startApp() {
         LoadConfigApp.initialitze();
         LoadConfigDB.initialitze();
         log.debug("Database Type: {}", LoadConfigDB.getDbType());
         log.debug("run has started successfully.");
         AppWorkers.getInstance().mainMenu();
         ConsoleUtils.closeScanner();
-          if (escapeRoomDAO != null) {
-              try {
-                  escapeRoomDAO.closeConnection();
-                  log.info("Database connection closed via DAOFactory.");
-              } catch (Exception e) {
-                  log.error("Error closing database connection via DAOFactory: {}", e.getMessage());
-              }
-          }
+        if (escapeRoomDAO != null) {
+            try {
+                escapeRoomDAO.closeConnection();
+                log.info("Database connection closed via DAOFactory.");
+            } catch (Exception e) {
+                log.error("Error closing database connection via DAOFactory: {}", e.getMessage());
+            }
+        }
     }
 }

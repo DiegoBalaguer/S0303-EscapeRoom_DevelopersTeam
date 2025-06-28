@@ -15,22 +15,17 @@ import model.Ticket;
 import utils.ConsoleUtils;
 import view.SaleView;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.security.Timestamp;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 public class SaleWorkers {
-    private static volatile SaleWorkers appWorkersInstance; // Volatile para asegurar concurrencia en singleton
-    private final SaleView saleView; // Vista para la gestión de ventas
+    private static volatile SaleWorkers saleWorkersInstance;
+    private final SaleView saleView;
     private final SaleDAO saleDAO;
     private final TicketDAO ticketDAO;
-    private final PlayerDAO playerDAO; // DAOs desacoplados mediante interfaces
+    private final PlayerDAO playerDAO;
 
-    // Constructor
-    // Constructor
     private SaleWorkers() {
         this.saleView = new SaleView(); // Inicialización de la vista
 
@@ -63,14 +58,14 @@ public class SaleWorkers {
 
     // Patrón Singleton (thread-safe)
     public static SaleWorkers getInstance() {
-        if (appWorkersInstance == null) {
+        if (saleWorkersInstance == null) {
             synchronized (SaleWorkers.class) {
-                if (appWorkersInstance == null) {
-                    appWorkersInstance = new SaleWorkers();
+                if (saleWorkersInstance == null) {
+                    saleWorkersInstance = new SaleWorkers();
                 }
             }
         }
-        return appWorkersInstance;
+        return saleWorkersInstance;
     }
 
     // Menú principal

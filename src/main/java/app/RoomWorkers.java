@@ -7,7 +7,6 @@ import dao.interfaces.ClueDAO;
 import dao.interfaces.DecorationDAO;
 import dao.interfaces.RoomDAO;
 import enums.OptionsMenuCrud;
-import enums.OptionsMenuPlayer;
 import model.Room;
 import utils.ConsoleUtils;
 import view.RoomView;
@@ -19,11 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoomWorkers {
 
-    private static RoomWorkers appWorkersInstance;
-    private final RoomView roomView; // View for user interaction
-    private final RoomDAO roomDAO;   // DAO for room database interactions
-    private final ClueDAO clueDAO;  // DAO for clues
-    private final DecorationDAO decorationDAO; // DAO for decorations
+    private static RoomWorkers roomWorkersInstance;
+    private final RoomView roomView;
+    private final RoomDAO roomDAO;
+    private final ClueDAO clueDAO;
+    private final DecorationDAO decorationDAO;
 
     private RoomWorkers() {
         this.roomView = new RoomView();
@@ -37,15 +36,15 @@ public class RoomWorkers {
     }
 
     public static RoomWorkers getInstance() {
-        if (appWorkersInstance == null) {
+        if (roomWorkersInstance == null) {
             synchronized (RoomWorkers.class) {
-                if (appWorkersInstance == null) {
-                    appWorkersInstance = new RoomWorkers();
+                if (roomWorkersInstance == null) {
+                    roomWorkersInstance = new RoomWorkers();
                 }
             }
         }
         log.debug("Created RoomWorkers Singleton");
-        return appWorkersInstance;
+        return roomWorkersInstance;
     }
 
     public void mainMenu() {
