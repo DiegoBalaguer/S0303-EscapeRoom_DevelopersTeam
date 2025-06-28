@@ -1,0 +1,775 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+' https://plantuml.com/es/class-diagram
+
+title Relationships - UML EscapeRoomA
+
+package eRoom {
+
+package enums {
+
+enum Difficulty {
+    EASY
+    MEDIUM
+    EXPERT
+}
+Difficulty -right-> Room
+
+enum Theme {
+   EGYPT
+   SPACE
+   GANGSTERS
+}
+Theme -right-> Room
+
+}
+
+class Element implements Command{
+    '.. Fields ..
+    -id: integer
+    -name: String
+    -description: String
+    -isActive: boolean
+}
+
+
+class EscapeRoom <<Singleton>> implements Observable {
+    '.. Fields ..
+    -id: integer
+    -name: String
+    -{static} escapeRoom: EscapeRoom
+    -ticketPrice: BigDecimal
+    -rooms: Room[]
+    -users: Player[]
+    '.. Methods ..
+    -constructor()
+    +{static} getInstance(): EscapeRoom
+    +notifyObservers()
+
+}
+Actions ..> EscapeRoom: uses getInstance()
+Command <|.. AddCommand
+Command <|.. RemoveCommand
+Command <|.. ShowCommand
+Command <|.. CalculateCommand
+Actions ..> Command: executes
+
+EscapeRoom -> EscapeRoom : getInstance()
+note left of EscapeRoom::instance
+    private static EscapeRoom instance;
+end note
+
+
+
+class Player implements Command, Observer {
+   '.. Fields ..
+   -id: integer
+   -name: String
+   -email: String
+   -password: String
+   -isSubscribed: boolean
+   -isActive: boolean
+   -certificateWin[]: CertificateWin
+   -rewardWin[]: RewardWin
+   '.. Methods ..
+   +constructor()
+   +isSubscribed()
+   +setSubscribed()
+   +toString()
+   +update()
+}
+Player -down-> EscapeRoom
+
+class Room extends Element implements Inventory {
+   '.. Fields ..
+    -idEscapeRoom: integer
+    -price: bigdecimal
+    -difficulty: Difficulty
+    -theme: Theme
+    -inventoryItems: Inventory []
+   '.. Methods ..
+    +constructor()
+    +addInventoryItem()
+    +removeInventoryItem()
+    +calculateValue()
+    +showInventory
+}
+Room -down-> EscapeRoom
+
+class Clue extends Element implements Inventory  {
+   '.. Fields ..
+    -idRoom: integer
+    -price: bigdecimal
+   '.. Methods ..
+    +constructor()
+}
+Clue -down-> Room
+
+
+class Decoration extends Element implements Inventory{
+   '.. Fields ..
+    -idRoom: integer
+    -price: bigdecimal
+   '.. Methods ..
+    +constructor()
+}
+Decoration -down-> Room
+
+class Certificate extends Element {
+
+}
+
+class Reward extends Element implements TimeReward, EscapeRoomsReward, CluesReward {
+
+}
+
+class Ticket extends Element {
+   '.. Fields ..
+    -price: bigdecimal
+   '.. Methods ..
+    +constructor()
+}
+
+class Sale {
+   '.. Fields ..
+    -id: integer
+    -idTcket: integer
+    -idPlayer: integer
+    -idRoom: integer
+    -players: integer
+    -completion: integer
+    -dateSale: datetime
+    -isActive: boolean
+   '.. Methods ..
+    +constructor()
+}
+
+class CertificateWin {
+   '.. Fields ..
+    -id: integer
+    -idCertificate: integer
+    -idPlayer: integer
+    -idRoom: integer
+    -description: String
+    -dateDelivery: datetime
+    -isActive: boolean
+   '.. Methods ..
+    +constructor()
+}
+
+class RewardWin {
+   '.. Fields ..
+    -id: integer
+    -idReward: integer
+    -idPlayer: integer
+    -description: String
+    -dateDelivery: datetime
+    -isActive: boolean
+   '.. Methods ..
+    +constructor()
+}
+
+class Actions {
+    +executeCommand(command: Command, element: T)
+    +undoCommand(command: Command, element: T)
+}
+
+
+interface Observer {
+    +update(): void {Player user, String message}
+
+}
+
+interface Observable {
+    +notifyObservers()
+
+}
+
+interface TimeReward {
+    +default void generateRewardsRecordTime(user)
+
+}
+
+interface EscapeRoomsReward {
+    +default void generateRewardsTenEscapeRooms(user)
+
+}
+interface CluesReward {
+    +default void generateRewardsCluesResolved(user)
+
+}
+
+
+
+interface Command<T> {
+    +execute(T execute)
+    +undo(T undo)
+    }
+
+class AddCommand<T extends Element, Player> implements Command<T> {
+    -list List<T> (final)
+    +AddCommand
+    }
+
+class UpdateCommand<T extends Element, Player> implements Command<T> {
+    -list List<T> (final)
+    +UpdateCommand
+    }
+
+class RemoveCommand<T extends Element, Player> implements Command<T>{
+    -list List<T> (final)
+    +RemoveCommand
+    }
+
+class ShowCommand<T extends Element, Player> implements Command<T> {
+     -list List<T> (final)
+     +ShowCommand
+    }
+
+class CalculateCommand<T extends Element> implements Command<T> {
+      -list List<T> (final)
+      +CalculateCommand
+     }
+
+
+interface Inventory {
+    +calculateValue()
+    +showInventory()
+}
+
+enum Menu {
+    .. Fields ..
+    -DESCRIPTION: String
+    EXIT
+    ROOM_CREATE
+    ROOM_DELETE
+    (Enum) ...
+
+    .. Methods ..
+    +Constructor() {String title}
+    +viewMenu()
+}
+Menu -right->AppController
+
+
+class Main {
+    .. Fields ..
+    -AppController {static} appController
+    .. Methods ..
+    -Main(): ()
+}
+Main -down-> AppController
+
+
+class AppController {
+    '.. Fields ..
+    -{static} escapeRoom: EscapeRoom
+    -{static} appWorkers: AppWorkers
+    .. Methods ..
+    +loadInits()
+    +run()
+    +getEscapeRoom()
+    -menu()
+    -menuWithoutRooms(optionMenu)
+    -menuWithRooms(optionMenu)
+}
+AppController -down-> EscapeRoom
+
+
+
+
+' ABSTRACT FACTORY
+
+interface AbstractFactory {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteEgypt {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteSpace {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+class ConcreteGangster {
+    +createClue(): AbstractClue
+    +createDecoration(): AbstractDecoration
+}
+
+
+interface AbstractClue {
+    +operation(): void
+}
+
+
+interface AbstractDecoration {
+    +operation(): void
+}
+
+
+class ConcreteClue1 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration1 {
+    +operation(): void
+}
+
+
+class ConcreteClue2 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration2 {
+    +operation(): void
+}
+
+class ConcreteClue3 {
+    +operation(): void
+}
+
+
+class ConcreteDecoration3 {
+    +operation(): void
+}
+
+AbstractFactory <|.. ConcreteEgypt
+AbstractFactory <|.. ConcreteSpace
+AbstractFactory <|.. ConcreteGangster
+AbstractClue <|..up- ConcreteClue1
+AbstractDecoration <|..up- ConcreteDecoration1
+AbstractClue <|..up- ConcreteClue2
+AbstractDecoration <|..up- ConcreteDecoration2
+AbstractClue <|..up- ConcreteClue3
+AbstractDecoration <|..up- ConcreteDecoration3
+ConcreteEgypt ..> ConcreteClue1
+ConcreteEgypt ..> ConcreteDecoration1
+ConcreteSpace ..> ConcreteClue2
+ConcreteSpace ..> ConcreteDecoration2
+ConcreteGangster ..> ConcreteClue3
+ConcreteGangster ..> ConcreteDecoration3
+
+AbstractFactory <-up- Room : operation()
+AbstractClue <-up- Room : operation()
+AbstractDecoration <-up- Room : operation()
+
+' DATABASE
+
+package dao <<Database>> {
+
+interface ScapeRoomDAO {
+    +addScapeRoom(String: name)
+    +updateScapeRoom(String: name)
+}
+
+package loadConfigDB {
+
+class LoadConfigDB {
+    '.. Fields ..
+    -INPUT_FILE_WITH_PATH: path
+    -properties: Properties
+    '.. Methods ..
+    -LoadConfigDB()
+    +initialitze()
+    +getString(String key): String
+    +getBoolean(String key): boolean
+    +getInt(String key): int
+    '// Database general configuration
+    +getDbType(): String
+    +getSshEnable(): boolean
+    '// Database MySql configuration
+    +getMysqlUrl(): String
+    +getMysqlHost(): String
+    +getMysqlPort(): int
+    +getMysqlSchema(): String
+    +getMysqlUser(): String
+    +getMysqlPassword(): String
+    '// Database H2 configuration
+    +getH2Url() String
+    +getH2Driver(): String
+    +getH2File(): String
+    +getH2Schema(): int
+    +getH2User(): String
+    +getH2Password(): String
+    '// SSH optional
+    +getSshHost(): String
+    +getSshPort(): int
+    +getSshUser(): String
+    +getSshPassword(): String
+    +getSshLocalPort(): int
+    +getSshRemoteHost(): String
+    +getSshRemotePort(): int
+}
+}
+
+package interfaces {
+
+interface BaseDAO {
+    '.. Fields ..
+    '.. Methods ..
+    +create(T entity): T
+    +findById(int id): Optional<T>
+    +findAll(): List<T>
+    +update(T entity): T
+    +deleteById(ID id)
+    +isExistsById(ID id): boolean
+}
+
+interface CertificateDAO extends BaseDAO<Certificate, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+    +findByPlayerId(Int idPlayer): List<Certificate>
+    +findByRoomId(Int idRoom): List<Certificate>
+}
+
+interface CertificateWinDAO extends BaseDAO<CertificateWin, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface ClueDAO extends BaseDAO<Clue, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface ConnectionDAO {
+    '.. Fields ..
+    '.. Methods ..
+    +closeConnection()
+}
+
+interface ConnectionDAOSql {
+    '.. Fields ..
+    '.. Methods ..
+    +beginTransaction()
+    +commitTransaction()
+    +rollbackTransaction()
+}
+
+interface DecorationDAO extends BaseDAO<Decoration, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface EscapeRoomDAO {
+    '.. Fields ..
+    '.. Methods ..
+    +getConnectionDAO(): ConnectionDAO
+    +getPlayerDAO(): PlayerDAO
+    +getRoomDAO(): RoomDAO
+    +getClueDAO(): ClueDAO
+    +getDecorationDAO(): DecorationDAO
+    +getCertificateDAO(): CertificateDAO
+    +getRewardDAO(): RewardDAO
+    +getTicketDAO(): TicketDAO
+    +getSaleDAO(): SaleDAO
+    +getCertificateWinDAO(): CertificateWinDAO
+    +getRewardWinDAO(): RewardWinDAO
+}
+
+interface PlayerDAO extends BaseDAO<Player, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+    +findTopPlayers(int limit); List<Player>
+}
+
+interface RewardDAO extends BaseDAO<Reward, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface RewardWinDAO extends BaseDAO<RewardWin, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface RoomDAO extends BaseDAO<Room, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+    +calculateTotalRoomValue(): double
+    +addClueToRoom(Integer roomId, Integer clueId)
+    +addDecorationToRoom(Integer roomId, Integer decorationId)
+}
+
+interface SaleDAO extends BaseDAO<Sale, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+
+interface TicketDAO extends BaseDAO<Ticket, Integer> {
+    '.. Fields ..
+    '.. Methods ..
+}
+}
+
+package factory {
+
+class DAOFactory {
+    '.. Fields ..
+    -factoryType: String
+    '.. Methods ..
+    -Constructor()
+    +getDAOFactory(): EscapeRoomDAO
+}
+
+class EscapeRoomH2 implements eRoom.dao.interfaces.EscapeRoomDAO {
+    '.. Fields ..
+    '.. Methods ..
+}
+}
+
+package impl {
+
+package H2 {
+
+class CertificateDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.CertificateDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class CertificateWinDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.CertificateWinDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class ClueDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.ClueDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class DecorationDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.DecorationDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class PlayerDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.PlayerDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class RewardDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.RewardDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class RewardWinDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.RewardWinDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class RoomDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.RoomDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class SaleDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.SaleDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+class TicketDAOH2Impl implements eRoom.dao.interfaces.BaseDAO, eRoom.dao.interfaces.TicketDAO {
+    '.. Fields ..
+    -connection: Connection
+    -nameObject: String
+    '.. Methods ..
+    +Constructor()
+}
+
+
+
+class ConnectionDAOH2Impl implements eRoom.dao.interfaces.ConnectionDAO, eRoom.dao.interfaces.ConnectionDAOsql {
+     '.. Fields ..
+    -instance: ConnectionDAOH2Impl
+    -connection: Connection
+    -INPUT_FILE_WITH_PATH: Path
+    -URL: String
+    -USERNAME: String
+    -PASSWORD: String
+    '.. Methods ..
+    -ConnectionDAOH2Impl()
+    +getInstance(): ConnectionDAOH2Impl
+    +getConnection(): Connection
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+interface UserDAO {
+    +addUser(User: user)
+    +getUserById(int: id): Player
+    +getAllUsers(): List<Player>
+    +updateUser(User: user)
+    +deleteUser(int: id)
+    +getUserCertificates(int: id): List<Certificate>
+    +getUserRewards(int: id): List<Reward>
+}
+
+class UserDAOImpl implements UserDAO {
+
+}
+
+interface RoomDAO {
+    +addRoom(Room: room)
+    +getRoomById(int: id): Room
+    +getAllRooms(): List<Room>
+    +updateRoom(Room: room)
+    +deleteRoom(Room: room)
+    +getRoomClues(int: idRoom): List<Clues>
+    +getRoomDecorations(int: idRoom): List<Decorations>
+}
+
+class RoomDAOImpl implements RoomDAO {
+
+}
+
+interface ClueDAO {
+    +addClue(Clue: clue)
+    +getClueById(int: id): Clue
+    +getAllClues(): List<Clue>
+    +updateClue(Clue: clue)
+    +deleteClue(Clue: clue)
+    +getCluesByRoom(int: idRoom): List<Clue>
+}
+
+
+
+class ClueDAOImpl implements ClueDAO {
+
+}
+
+
+
+
+interface DecorationDAO {
+    +addDecoration(Decoration: decoration)
+    +getDecorationById(int: id): Decoration
+    +getAllDecorations(): List<Decoration>
+    +updateDecoration(Decoration: decoration)
+    +deleteDecoration(Decoration: decoration)
+    +getDecorationsByRoom(int: idRoom): List<Decoration>
+}
+
+class DecorationDAOImpl implements DecorationDAO {
+
+}
+
+
+class ScapeRoomDAOImpl implements ScapeRoomDAO {
+
+}
+
+}
+
+
+
+
+package Database <<Database>> {
+
+class dataConnection {
+    -name: String
+    -driver: String
+    -server: String
+    -port: String
+    -user: String
+    -Password: String
+    +constructor()
+
+}
+
+}
+}
+@enduml
