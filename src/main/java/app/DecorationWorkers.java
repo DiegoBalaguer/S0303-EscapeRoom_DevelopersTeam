@@ -3,32 +3,29 @@ package app;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
-import dao.interfaces.ClueDAO;
 import dao.interfaces.DecorationDAO;
-import dao.interfaces.RoomDAO;
-import enums.OptionsMenuCrud;
+import enums.OptionsMenuItem;
 import lombok.extern.slf4j.Slf4j;
-import model.Room;
+import model.Decoration;
 import utils.ConsoleUtils;
+import view.DecorationView;
 import view.RoomView;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 public class DecorationWorkers {
 
-    private static DecorationWorkers roomWorkersInstance;
+    private static DecorationWorkers decorationWorkersInstance;
+    private final DecorationView decorationView;
     private final RoomView roomView;
-    private final RoomDAO roomDAO;
-    private final ClueDAO clueDAO;
     private final DecorationDAO decorationDAO;
 
     private DecorationWorkers() {
-        this.roomView = new RoomView();
+        this.decorationView = new DecorationView();
         try {
-            this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
-            this.clueDAO = DAOFactory.getDAOFactory().getClueDAO();
+            this.roomView = new RoomView();
             this.decorationDAO = DAOFactory.getDAOFactory().getDecorationDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
@@ -36,180 +33,133 @@ public class DecorationWorkers {
     }
 
     public static DecorationWorkers getInstance() {
-        if (roomWorkersInstance == null) {
+        if (decorationWorkersInstance == null) {
             synchronized (DecorationWorkers.class) {
-                if (roomWorkersInstance == null) {
-                    roomWorkersInstance = new DecorationWorkers();
+                if (decorationWorkersInstance == null) {
+                    decorationWorkersInstance = new DecorationWorkers();
                 }
             }
         }
-        log.debug("Created RoomWorkers Singleton");
-        return roomWorkersInstance;
+        log.debug("Created DecorationWorkers Singleton");
+        return decorationWorkersInstance;
     }
 
     public void mainMenu() {
         do {
-            roomView.displayRoomMenu("=== ROOM MANAGEMENT MENU ===");
-            roomView.displayMessage("Choose an option: ");
+            decorationView.displayItemMenu("=== DECORATION MANAGEMENT MENU ===");
+            decorationView.displayMessage("Choose an option: ");
             int answer = ConsoleUtils.readRequiredInt("");
-            OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
+            OptionsMenuItem selectedOption = OptionsMenuItem.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            roomView.displayMessage("Returning to Main Menu...");
+                            decorationView.displayMessage("Returning to Main Menu...");
                             return;
                         }
-                        case ADD -> createRoom();
-                        case SHOW -> getRoomById();
-                        case REMOVE -> deleteRoomById();
-                        case UPDATE -> updateRoom();
-                        case CALCULATE -> calculateTotalValue();
-
-                        default -> roomView.displayErrorMessage("Unknown option selected.");
+                        case ADD -> createDecoration();
+                        case SHOW -> listDecorationsByRoom();
+                        case REMOVE -> deleteDecorationById();
+                        case UPDATE -> updateDecoration();
+                        default -> decorationView.displayErrorMessage("Unknown option selected.");
                     }
                 } catch (DAOException e) {
-                    roomView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                    //log.error("DAO Error in PlayerWorkers: {}", e.getMessage(), e);
+                    decorationView.displayErrorMessage("Database operation failed: " + e.getMessage());
                 } catch (Exception e) {
-                    roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-                    //log.error("Unexpected error in PlayerWorkers: {}", e.getMessage(), e);
+                    decorationView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
                 }
             } else {
-                roomView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
-                //log.warn("Error: The value {} is wrong in player management menu.", answer);
+                decorationView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
             }
         } while (true);
     }
 
-    private void createRoom() {
+    private void createDecoration() {
         try {
-            roomView.displayMessage("\n=== CREATE ROOM ===");
-            Room newRoom = roomView.getRoomDetails(false);
-            if (newRoom == null) {
-                return; // Cancel if invalid input
+            decorationView.displayMessage("\n=== CREATE DECORATION ===");
+            Decoration newDecoration = decorationView.getDecorationDetails(); // Collect decoration details from the user.
+            if (newDecoration == null || newDecoration.getIdRoom() == 0) {
+                decorationView.displayErrorMessage("Invalid input. Operation canceled.");
+                return;
             }
-            Room createdRoom = roomDAO.create(newRoom);
-            roomView.displayMessage("Room successfully created:\n" + createdRoom);
+            Decoration createdDecoration = decorationDAO.create(newDecoration); // Save decoration to database.
+            decorationView.displayMessage("Decoration successfully created:\n" + createdDecoration);
         } catch (Exception e) {
-            roomView.displayErrorMessage("Error creating the room: " + e.getMessage());
+            decorationView.displayErrorMessage("Error creating the decoration: " + e.getMessage());
         }
     }
 
-    private void getRoomById() {
+    private void deleteDecorationById() {
         try {
-            roomView.displayMessage("\n=== GET ROOM BY ID ===");
-            Optional<Integer> id = roomView.getRoomId();
+            decorationView.displayMessage("\n=== DELETE DECORATION ===");
+            Optional<Integer> id = decorationView.getDecorationId();
             if (id.isEmpty()) {
                 return; // Cancel if invalid input
             }
 
-            Optional<Room> optionalRoom = roomDAO.findById(id.get());
-            if (optionalRoom.isPresent()) {
-                roomView.displayRoom(optionalRoom.get());
+            if (decorationDAO.isExistsById(id.get())) {
+                decorationDAO.deleteById(id.get());
+                decorationView.displayMessage("Decoration successfully deleted with ID: " + id.get());
             } else {
-                roomView.displayMessage("No room found with the provided ID.");
+                decorationView.displayMessage("No decoration found with the provided ID.");
             }
         } catch (DAOException e) {
-            roomView.displayErrorMessage("Error querying the room: " + e.getMessage());
+            decorationView.displayErrorMessage("Error deleting the decoration: " + e.getMessage());
         }
     }
 
-    private void deleteRoomById() {
+    private void updateDecoration() {
         try {
-            roomView.displayMessage("\n=== DELETE ROOM ===");
-            Optional<Integer> id = roomView.getRoomId();
+            decorationView.displayMessage("\n=== UPDATE DECORATION ===");
+            Optional<Integer> id = decorationView.getDecorationId();
             if (id.isEmpty()) {
-                return; // Cancel if invalid input
-            }
-
-            if (roomDAO.isExistsById(id.get())) {
-                roomDAO.deleteById(id.get());
-                roomView.displayMessage("Room successfully deleted with ID: " + id.get());
-            } else {
-                roomView.displayMessage("No room found with the provided ID.");
-            }
-        } catch (DAOException e) {
-            roomView.displayErrorMessage("Error deleting the room: " + e.getMessage());
-        }
-    }
-
-    private void updateRoom() {
-        try {
-            roomView.displayMessage("\n=== UPDATE ROOM ===");
-            Optional<Integer> id = roomView.getRoomId(); // Solicitamos el ID de la Room
-            if (id.isEmpty()) {
-                roomView.displayMessage("No ID provided. Canceling update operation.");
-                return; // Cancelar si no hay ID proporcionado
-            }
-
-            Optional<Room> optionalRoom = roomDAO.findById(id.get());
-            if (optionalRoom.isEmpty()) {
-                roomView.displayMessage("No room found with the provided ID.");
+                decorationView.displayMessage("No ID provided. Canceling update operation.");
                 return;
             }
 
-            Room existingRoom = optionalRoom.get();
-            roomView.displayMessage("\n=== Current Room Data ===");
-            roomView.displayRoom(existingRoom); // Mostramos la información actual de la Room
-
-            // Solicitamos los nuevos datos permitiendo que algunos campos sean dejados vacíos
-            Room updatedRoom = roomView.getRoomDetailsWithDefaults(existingRoom);
-            if (updatedRoom == null) {
-                return; // Cancelar si el usuario decide salir
+            Optional<Decoration> optionalDecoration = decorationDAO.findById(id.get());
+            if (optionalDecoration.isEmpty()) {
+                decorationView.displayMessage("No decoration found with the provided ID.");
+                return;
             }
 
-            // Actualizar la room en la base de datos
-            roomDAO.update(updatedRoom);
-            roomView.displayMessage("Room successfully updated:\n" + updatedRoom);
+            Decoration existingDecoration = optionalDecoration.get();
+            decorationView.displayMessage("\n=== Current Decoration Data ===");
+            decorationView.displayDecoration(existingDecoration);
+
+            Decoration updatedDecoration = decorationView.editDecoration(existingDecoration); // Allow user to modify details.
+            if (updatedDecoration == null) {
+                return; // Cancel if user decides not to proceed.
+            }
+
+            decorationDAO.update(updatedDecoration);
+            decorationView.displayMessage("Decoration successfully updated:\n" + updatedDecoration);
 
         } catch (DAOException e) {
-            roomView.displayErrorMessage("Error updating the room: " + e.getMessage());
+            decorationView.displayErrorMessage("Error updating the decoration: " + e.getMessage());
         } catch (Exception e) {
-            roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+            decorationView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
             log.error("Unexpected error: ", e);
         }
     }
 
-    private void calculateTotalValue() {
+    private void listDecorationsByRoom() {
         try {
-            roomView.displayMessage("\n=== CALCULATE TOTAL ROOM VALUE ===");
-            Optional<Integer> id = roomView.getRoomId();
-            if (id.isEmpty()) {
+            decorationView.displayMessage("\n=== LIST DECORATIONS BY ROOM ===");
+            Optional<Integer> idRoom = roomView.getRoomId();
+            if (idRoom.isEmpty()) {
                 return; // Cancel if invalid input
             }
 
-            Optional<Room> optionalRoom = roomDAO.findById(id.get());
-            if (optionalRoom.isEmpty()) {
-                roomView.displayMessage("No room found with the provided ID.");
-                return;
+            List<Decoration> decorations = decorationDAO.findDecorationsByRoomId(idRoom.get());
+            if (decorations.isEmpty()) {
+                decorationView.displayMessage("No decorations found for the provided Room ID.");
+            } else {
+                decorationView.displayDecorations(decorations);
             }
-
-            Room room = optionalRoom.get();
-            BigDecimal roomPrice = room.getPrice();
-
-            // Retrieve prices
-            BigDecimal cluePrice = clueDAO.findPriceByRoomId(room.getId());
-            BigDecimal decorationPrice = decorationDAO.findPriceByRoomId(room.getId());
-            BigDecimal totalValue = roomPrice.add(cluePrice).add(decorationPrice);
-
-            roomView.displayMessage("\n====== TOTAL VALUES ======\n" +
-                    "Room: $" + roomPrice + "\n" +
-                    "Clue: $" + cluePrice + "\n" +
-                    "Decoration: $" + decorationPrice + "\n" +
-                    "Total Value: $" + totalValue);
-        } catch (Exception e) {
-            roomView.displayErrorMessage("Error calculating total value: " + e.getMessage());
+        } catch (DAOException e) {
+            decorationView.displayErrorMessage("Error retrieving decorations: " + e.getMessage());
         }
-    }
-
-    private OptionsMenuCrud getOptionByOrdinal(int ordinal) {
-        for (OptionsMenuCrud option : OptionsMenuCrud.values()) {
-            if (option.ordinal() == ordinal) {
-                return option;
-            }
-        }
-        return null;
     }
 }

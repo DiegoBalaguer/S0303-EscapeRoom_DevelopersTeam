@@ -1,6 +1,6 @@
 package enums;
 
-public enum OptionsMenuClue {
+public enum OptionsMenuItem {
         ADD (1,"Create"),
         SHOW(2,"Show"),
         REMOVE(3,"Delete"),
@@ -11,7 +11,7 @@ public enum OptionsMenuClue {
         private final int OPTION_NUMBER;
 
 
-        OptionsMenuClue(int optionNumber, String description) {
+        OptionsMenuItem(int optionNumber, String description) {
             this.OPTION_NUMBER = optionNumber;
             this.DESCRIPTION = description;
         }
@@ -25,16 +25,16 @@ public enum OptionsMenuClue {
             return OPTION_NUMBER;
         }
 
-        public static void viewMenuClue(String title) {
+        public static void viewMenuItem(String title) {
             System.out.println(System.lineSeparator() + title + System.lineSeparator());
-            for (enums.OptionsMenuClue optionMenu : enums.OptionsMenuClue.values()) {
+            for (OptionsMenuItem optionMenu : OptionsMenuItem.values()) {
                 System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
             }
             //System.out.println("0. Return to main menu");
         }
 
-        public static enums.OptionsMenuClue getOptionByNumber(int number) {
-            for (enums.OptionsMenuClue option : enums.OptionsMenuClue.values()) {
+        public static OptionsMenuItem getOptionByNumber(int number) {
+            for (OptionsMenuItem option : OptionsMenuItem.values()) {
                 if (option.getOPTION_NUMBER() == number) {
                     return option;
                 }
