@@ -25,15 +25,16 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Clue create(Clue clue) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (idRoom, name, description, price, isActive) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + nameObject + " (idRoom, name, description, price, isActive) VALUES (?, ?, ?, ?, ?);"; // Agregamos description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription());
+            stmt.setString(3, clue.getDescription()); // Nuevo campo
             stmt.setBigDecimal(4, clue.getPrice());
             stmt.setBoolean(5, clue.isActive());
             stmt.executeUpdate();
+
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
                 clue.setId(keys.getInt(1));
@@ -46,9 +47,10 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
         }
     }
 
+
     @Override
     public Optional<Clue> findById(Integer id) throws DAOException {
-        String sql = "SELECT idClue, idRoom, name, price, isActive FROM " + nameObject + " WHERE idClue = ?;";
+        String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM " + nameObject + " WHERE idClue = ?;"; // Incluir description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -63,6 +65,7 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
             throw new DAOException(messageError, e);
         }
     }
+
 
     @Override
     public List<Clue> findAll() throws DAOException {
@@ -84,12 +87,12 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Clue update(Clue clue) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idClue = ?;";
+        String sql = "UPDATE " + nameObject + " SET idRoom = ?, name = ?, description = ?, price = ?, isActive = ? WHERE idClue = ?;"; // Update description
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription());
+            stmt.setString(3, clue.getDescription()); // Actualizar descripción
             stmt.setBigDecimal(4, clue.getPrice());
             stmt.setBoolean(5, clue.isActive());
             stmt.setInt(6, clue.getId());
@@ -147,10 +150,12 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
                 .id(rs.getInt("idClue"))
                 .idRoom(rs.getInt("idRoom"))
                 .name(rs.getString("name"))
+                .description(rs.getString("description")) // Mapeo de descripción
                 .price(rs.getBigDecimal("price"))
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+
     @Override
     public List<Clue> findCluesByRoomId(Integer roomId) throws DAOException {
         String sql = "SELECT idClue, idRoom, name, description, price, isActive FROM clue WHERE idRoom = ? AND isActive = TRUE;";

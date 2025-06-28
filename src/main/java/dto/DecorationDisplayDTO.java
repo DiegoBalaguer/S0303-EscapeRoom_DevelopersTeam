@@ -13,4 +13,6 @@ public class DecorationDisplayDTO {
     private BigDecimal price;
     private int idRoom;
     private boolean isActive;
+    private String description;
+
 }
