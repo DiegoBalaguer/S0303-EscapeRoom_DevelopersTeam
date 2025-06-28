@@ -1,7 +1,7 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import model.Certificate;
+import mvc.model.Certificate;
 
 import java.util.List;
 

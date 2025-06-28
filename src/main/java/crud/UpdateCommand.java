@@ -1,6 +1,6 @@
 package crud;
 import interfaces.Command;
-import model.Element;
+import mvc.model.Element;
 
 import java.util.List;
 import java.util.Optional;

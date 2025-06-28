@@ -1,9 +1,9 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import model.Player;
-import model.Sale;
-import model.Ticket;
+import mvc.model.Player;
+import mvc.model.Sale;
+import mvc.model.Ticket;
 
 import java.util.Optional;
 

@@ -1,8 +1,8 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import dto.RewardWinDisplayDTO;
-import model.RewardWin;
+import mvc.dto.RewardWinDisplayDTO;
+import mvc.model.RewardWin;
 
 import java.util.List;
 

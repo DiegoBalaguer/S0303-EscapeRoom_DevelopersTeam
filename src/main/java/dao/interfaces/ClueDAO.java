@@ -1,7 +1,7 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import model.Clue;
+import mvc.model.Clue;
 
 import java.math.BigDecimal;
 import java.util.List;

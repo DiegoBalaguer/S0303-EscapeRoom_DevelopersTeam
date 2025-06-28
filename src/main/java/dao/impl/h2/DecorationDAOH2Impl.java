@@ -5,7 +5,7 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.DecorationDAO;
 import lombok.extern.slf4j.Slf4j;
-import model.Decoration;
+import mvc.model.Decoration;
 
 import java.math.BigDecimal;
 import java.sql.*;

@@ -4,7 +4,7 @@ import dao.connection.SSHSessionManager;
 import dao.exceptions.DatabaseConnectionException;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.ConnectionDAOsql;
-import dao.loadConfigDB.LoadConfigDB;
+import config.loadConfigDB.LoadConfigDB;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Path;

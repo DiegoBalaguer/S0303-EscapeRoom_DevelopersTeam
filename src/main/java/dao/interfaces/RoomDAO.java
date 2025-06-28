@@ -1,7 +1,7 @@
 package dao.interfaces;
 
 import dao.exceptions.DAOException;
-import model.Room;
+import mvc.model.Room;
 
 
 public interface RoomDAO extends BaseDAO<Room, Integer> {

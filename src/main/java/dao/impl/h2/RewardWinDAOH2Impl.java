@@ -4,13 +4,11 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.RewardWinDAO;
-import dto.RewardWinDisplayDTO;
+import mvc.dto.RewardWinDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
-import model.RewardWin;
+import mvc.model.RewardWin;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

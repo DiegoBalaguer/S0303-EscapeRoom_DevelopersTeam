@@ -16,9 +16,9 @@ import enums.Theme;
 import interfaces.AbstractClue;
 import interfaces.AbstractDecoration;
 import interfaces.AbstractFactory;
-import model.Clue;
-import model.Decoration;
-import model.Room;
+import mvc.model.Clue;
+import mvc.model.Decoration;
+import mvc.model.Room;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,6 +1,6 @@
 package dao.interfaces;
 
-import model.Reward;
+import mvc.model.Reward;
 
 public interface RewardDAO  extends BaseDAO<Reward, Integer> {
 }

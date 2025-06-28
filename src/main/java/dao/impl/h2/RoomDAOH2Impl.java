@@ -7,7 +7,7 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
-import model.Room;
+import mvc.model.Room;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;

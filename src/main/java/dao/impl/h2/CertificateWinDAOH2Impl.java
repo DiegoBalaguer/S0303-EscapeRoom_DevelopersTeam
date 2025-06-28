@@ -4,10 +4,9 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.CertificateWinDAO;
 import dao.interfaces.ConnectionDAO;
-import dto.CertificateWinDisplayDTO;
+import mvc.dto.CertificateWinDisplayDTO;
 import lombok.extern.slf4j.Slf4j;
-import model.CertificateWin;
-import utils.StringUtils;
+import mvc.model.CertificateWin;
 
 import java.sql.*;
 import java.util.ArrayList;
