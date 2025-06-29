@@ -58,7 +58,9 @@ public class PlayerNotifyController {
                         }
                         case SUBSCRIBE -> subscribePlayer();
                         case UNSUBSCRIBE -> unSubscribePlayer();
+                       // case NOTIFY -> showNotifications();
                     }
+
                 } catch (DAOException e) {
                     baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
                 } catch (Exception e) {

@@ -31,7 +31,7 @@ public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
         initializeConnection();
     }
 
-    private void initializeConnection() throws DatabaseConnectionException {
+        private void initializeConnection() throws DatabaseConnectionException {
         try {
             Class.forName(DRIVER);
 

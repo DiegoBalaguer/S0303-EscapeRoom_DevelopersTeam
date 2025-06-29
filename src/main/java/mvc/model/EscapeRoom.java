@@ -3,17 +3,37 @@ package mvc.model;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import mvc.model.*;
 import java.util.ArrayList;
 import java.util.List;
+import interfaces.Observer;
+import interfaces.Observable;
+import dao.impl.h2.*;
+import dao.interfaces.PlayerDAO;
+import dao.impl.h2.PlayerDAOH2Impl;
+import dao.impl.h2.ConnectionDAOH2Impl;
+import dao.exceptions.DatabaseConnectionException;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EscapeRoom {
+public class EscapeRoom implements Observable {
     private int id;
     private static EscapeRoom escapeRoom;
     private List<Room> rooms;
     private List<Player> players;
+    private final List<Observer> observers = new ArrayList<>();
+    private PlayerDAO playerDAO;
+
+
+    private void initialize() {
+        try {
+            this.playerDAO = new PlayerDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+        } catch (DatabaseConnectionException e) {
+            log.error("Error initializing PlayerDAO: {}", e.getMessage());
+            throw new RuntimeException("Failed to initialize EscapeRoom due to database connection issues.", e);
+        }
+        rooms = new ArrayList<>();
+    }
 
     public static EscapeRoom getInstance() {
         if (escapeRoom == null) {
@@ -24,10 +44,58 @@ public class EscapeRoom {
     }
 
     public boolean isEmptyRooms() {
-        return rooms.isEmpty();
+        return rooms == null || rooms.isEmpty();
     }
 
-    private void initialize() {
-        rooms = new ArrayList<>();
+    @Override
+    public void addObserver(Observer observer) {
+        throw new UnsupportedOperationException("Observers are managed dynamically using the database.");
     }
+
+
+    @Override
+    public void removeObserver(Observer observer) {
+        throw new UnsupportedOperationException("Observers are managed dynamically using the database.");
+    }
+
+    @Override
+    public void notifyObservers(String message) {
+        try {
+            List<Player> subscribedPlayers = playerDAO.findSubscribedPlayers();
+            if (subscribedPlayers.isEmpty()) {
+                log.info("No subscribed players found to notify.");
+                return;
+            }
+
+            for (Player player : subscribedPlayers) {
+                player.update(message);
+            }
+
+            log.info("Notifications sent to all subscribed players.");
+
+        } catch (Exception e) {
+            log.error("Error notifying players: {}", e.getMessage());
+        }
+    }
+
+    public void notifyRoomCreated(Room room) {
+        String message = "New room created: " + room.getName();
+        notifyObservers(message);
+    }
+
+
+    public void notifyItemAdded(String itemType, String roomName) {
+        String message = "New " + itemType + " added to room: " + roomName;
+        notifyObservers(message);
+    }
+
 }
+
+
+/*public void notifyCertificateReceived(CertificateWin certificateWin) {
+        notifyObservers("Congratulations! You received a certificate: " + certificateWin.getDescription());
+    }
+    public void notifyRewardReceived(RewardWin rewardWin) {
+        notifyObservers("Congratulations! You received a reward: " + rewardWin.getDescription());
+    }
+}*/

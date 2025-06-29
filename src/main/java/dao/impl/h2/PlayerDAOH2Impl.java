@@ -153,5 +153,25 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+    public List<Player> findSubscribedPlayers() {
+        List<Player> subscribedPlayers = new ArrayList<>(); // Lista para almacenar el resultado
+        String query = "SELECT * FROM Player WHERE subscribed = true";
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Player player = listResultSetToPlayer(rs); // Método que transforma ResultSet en un objeto Player
+                subscribedPlayers.add(player);
+            }
+        } catch (SQLException e) {
+            log.error("Error retrieving subscribed players: {}", e.getMessage());
+        }
+
+        return subscribedPlayers;
+    }
+
+
 }
 
