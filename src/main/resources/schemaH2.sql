@@ -114,6 +114,13 @@ CREATE TABLE rewardwin (
     isActive BOOLEAN DEFAULT TRUE
 );
 
+CREATE TABLE notifications (
+     idNotification INT AUTO_INCREMENT PRIMARY KEY,
+     idPlayer INT NOT NULL,
+     message TEXT NOT NULL,
+     dateTimeSent TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (idPlayer) REFERENCES player(idPlayer)
+);
 
 -- Insert data test
 

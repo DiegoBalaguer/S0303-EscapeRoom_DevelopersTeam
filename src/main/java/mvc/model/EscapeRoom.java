@@ -1,5 +1,6 @@
 package mvc.model;
 
+import dao.interfaces.NotificationDAO;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +70,14 @@ public class EscapeRoom implements Observable {
 
             for (Player player : subscribedPlayers) {
                 player.update(message);
+
+                // Registrar la notificación en la base de datos.
+                Notification notification = Notification.builder()
+                        .idPlayer(player.getId())
+                        .message(message)
+                        .build();
+                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+                notificationDAO.saveNotification(notification);
             }
 
             log.info("Notifications sent to all subscribed players.");
