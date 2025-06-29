@@ -20,6 +20,10 @@ public class NotificationDAOH2Impl implements NotificationDAO {
 
     @Override
     public void saveNotification(Notification notification) {
+        if (notification == null || notification.getMessage() == null) {
+            throw new IllegalArgumentException("Invalid notification: missing required fields");
+        }
+
         String sql = "INSERT INTO notifications (idPlayer, message) VALUES (?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -31,7 +35,6 @@ public class NotificationDAOH2Impl implements NotificationDAO {
             throw new DAOException("Failed to save notification.", e);
         }
     }
-
     @Override
     public List<Notification> findNotificationsByPlayerId(int playerId) {
         String sql = "SELECT * FROM notifications WHERE idPlayer = ? ORDER BY dateTimeSent DESC;";

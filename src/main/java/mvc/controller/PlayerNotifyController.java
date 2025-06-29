@@ -62,7 +62,7 @@ public class PlayerNotifyController {
                         }
                         case SUBSCRIBE -> subscribePlayer();
                         case UNSUBSCRIBE -> unSubscribePlayer();
-                        case NOTIFY -> showAllNotifications();
+                        case NOTIFICATIONS -> showAllNotifications();
                     }
 
                 } catch (DAOException e) {
