@@ -3,9 +3,13 @@ package mvc.controller;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
+import dao.impl.h2.ConnectionDAOH2Impl;
+import dao.impl.h2.NotificationDAOH2Impl;
+import dao.interfaces.NotificationDAO;
 import dao.interfaces.PlayerDAO;
 import mvc.enumsMenu.OptionsMenuPlayerNotify;
 import lombok.extern.slf4j.Slf4j;
+import mvc.model.Notification;
 import mvc.model.Player;
 import mvc.view.BaseView;
 import mvc.view.PlayerNotifyView;
@@ -58,7 +62,7 @@ public class PlayerNotifyController {
                         }
                         case SUBSCRIBE -> subscribePlayer();
                         case UNSUBSCRIBE -> unSubscribePlayer();
-                       // case NOTIFY -> showNotifications();
+                        case NOTIFICATIONS -> showAllNotifications();
                     }
 
                 } catch (DAOException e) {
@@ -104,5 +108,23 @@ public class PlayerNotifyController {
     private int getPlayerId() throws DAOException {
         listAllPayersIntern();
         return playerNotifyView.getPlayerId();
+    }
+    private void showAllNotifications() throws DAOException, DatabaseConnectionException {
+        NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+        List<Notification> notifications = notificationDAO.findAllNotifications();
+
+        baseView.displayMessageln("#### NOTIFICATIONS SENT #################");
+        if (notifications.isEmpty()) {
+            baseView.displayMessageln("No notifications found.");
+            return;
+        }
+
+        for (Notification notification : notifications) {
+            baseView.displayMessageln(
+                    "Player ID: " + notification.getIdPlayer() +
+                            " | Message: " + notification.getMessage() +
+                            " | Date: " + notification.getDateTimeSent()
+            );
+        }
     }
 }
