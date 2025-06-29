@@ -51,7 +51,7 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToCertificate(rs));
+                return Optional.of(listResultSetToCertificate(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                certificates.add(mapResultSetToCertificate(rs));
+                certificates.add(listResultSetToCertificate(rs));
             }
             return certificates;
         } catch (SQLException e) {
@@ -149,28 +149,8 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
         return certificates;
 
     }
-    /*
 
-    public List<Certificate> findByPlayerId(Integer playerId) throws DAOException {
-        log.debug("Finding certificates by player id: {}", playerId);
-        return entities.values().stream()
-                .filter(cert -> cert.getPlayer().getId() == playerId)
-                .toList();
-    }
-
-    @Override
-    public List<Certificate> findByRoomId(Integer roomId) throws DAOException {
-        log.debug("Finding certificates by room id: {}", roomId);
-
-        final String roomIdStr = String.valueOf(roomId);
-
-        return entities.values().stream()
-                .filter(cert -> cert.getRoomName() != null && cert.getRoomName().contains(roomIdStr))
-                .toList();
-    }
-    */
-
-    private Certificate mapResultSetToCertificate(ResultSet rs) throws SQLException {
+    private Certificate listResultSetToCertificate(ResultSet rs) throws SQLException {
         return Certificate.builder()
                 .id(rs.getInt("idCertificate"))
                 .name(rs.getString("name"))

@@ -54,7 +54,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToRewardWin(rs));
+                return Optional.of(listResultSetToRewardWin(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -72,7 +72,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                rewardWins.add(mapResultSetToRewardWin(rs));
+                rewardWins.add(listResultSetToRewardWin(rs));
             }
             return rewardWins;
         } catch (SQLException e) {
@@ -156,7 +156,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
             stmt.setInt(1, playerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                rewardWinsDisplayDTO.add(mapResultSetToRewardWinDisplayDTO(rs));
+                rewardWinsDisplayDTO.add(listResultSetToRewardWinDisplayDTO(rs));
             }
         } catch (SQLException e) {
             String messageError = "Error retrieving reward wins for player ID: " + playerId;
@@ -166,7 +166,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
         return rewardWinsDisplayDTO;
     }
 
-    private RewardWin mapResultSetToRewardWin(ResultSet rs) throws SQLException {
+    private RewardWin listResultSetToRewardWin(ResultSet rs) throws SQLException {
         return RewardWin.builder()
                 .id(rs.getInt("idRewardWin"))
                 .idReward(rs.getInt("idReward"))
@@ -177,7 +177,7 @@ public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWi
                 .build();
     }
 
-    private RewardWinDisplayDTO mapResultSetToRewardWinDisplayDTO(ResultSet rs) throws SQLException {
+    private RewardWinDisplayDTO listResultSetToRewardWinDisplayDTO(ResultSet rs) throws SQLException {
         return RewardWinDisplayDTO.builder()
                 .id(rs.getInt("idRewardWin"))
                 .idReward(rs.getInt("idReward"))

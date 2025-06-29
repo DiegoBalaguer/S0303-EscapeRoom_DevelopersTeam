@@ -53,7 +53,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToPlayer(rs));
+                return Optional.of(listResultSetToPlayer(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                players.add(mapResultSetToPlayer(rs));
+                players.add(listResultSetToPlayer(rs));
             }
             return players;
         } catch (SQLException e) {
@@ -142,7 +142,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
         }
     }
 
-    private Player mapResultSetToPlayer(ResultSet rs) throws SQLException {
+    private Player listResultSetToPlayer(ResultSet rs) throws SQLException {
         return Player.builder()
                 .id(rs.getInt("idPlayer"))
                 .name(rs.getString("name"))

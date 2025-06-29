@@ -3,14 +3,18 @@ package mvc.controller;
 import mvc.enumsMenu.OptionsMenuEscapeRoom;
 import config.loadConfigApp.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
-import utils.ConsoleUtils;
+import mvc.view.BaseView;
+
 
 @Slf4j
 public class EscapeRoomController {
 
+    private static BaseView baseView;
+
     private static EscapeRoomController escapeRoomControllerInstance;
 
     public static EscapeRoomController getInstance() {
+        baseView = new BaseView();
             if (escapeRoomControllerInstance == null) {
                 synchronized (EscapeRoomController.class) {
                     if (escapeRoomControllerInstance == null) {
@@ -26,7 +30,7 @@ public class EscapeRoomController {
     public void mainMenu() {
         do {
             OptionsMenuEscapeRoom.viewMenu(LoadConfigApp.getAppName());
-            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
+            int answer = baseView.getInputRequiredInt("Choose an option: ");
             try {
                 OptionsMenuEscapeRoom idMenu = OptionsMenuEscapeRoom.getOptionByNumber(answer);
                 switch (idMenu) {

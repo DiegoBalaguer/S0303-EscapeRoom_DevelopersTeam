@@ -8,10 +8,11 @@ import dao.interfaces.DecorationDAO;
 import dao.interfaces.RoomDAO;
 import mvc.enumsMenu.OptionsMenuCrud;
 import mvc.model.Room;
-import utils.ConsoleUtils;
+import mvc.view.BaseView;
 import mvc.view.RoomView;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +24,11 @@ public class RoomController {
     private final RoomDAO roomDAO;
     private final ClueDAO clueDAO;
     private final DecorationDAO decorationDAO;
+    private final BaseView baseView;
+     
 
     private RoomController() {
+        baseView = new BaseView();
         this.roomView = new RoomView();
         try {
             this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
@@ -50,14 +54,14 @@ public class RoomController {
     public void mainMenu() {
         do {
             roomView.displayRoomMenu("=== ROOM MANAGEMENT MENU ===");
-            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
+            int answer = baseView.getInputRequiredInt("Choose an option: ");
             OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            roomView.displayMessage("Returning to Main Menu...");
+                            baseView.displayMessageln("Returning to Main Menu...");
                             return;
                         }
                         case ADD -> createRoom();
@@ -65,55 +69,55 @@ public class RoomController {
                         case REMOVE -> deleteRoomById();
                         case UPDATE -> updateRoom();
                         case CALCULATE -> calculateTotalValue();
-                        default -> roomView.displayErrorMessage("Unknown option selected.");
+                        default -> baseView.displayErrorMessage("Unknown option selected.");
                     }
                 } catch (DAOException e) {
-                    roomView.displayErrorMessage("Database operation failed: " + e.getMessage());
+                    baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
                 } catch (Exception e) {
-                    roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
                 }
             } else {
-                roomView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+                baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
             }
         } while (true);
     }
 
     private void createRoom() {
         try {
-            roomView.displayMessage("\n=== CREATE ROOM ===");
+            baseView.displayMessageln("\n=== CREATE ROOM ===");
             Room newRoom = roomView.getRoomDetails(false);
             if (newRoom == null) {
                 return; // Cancel if invalid input
             }
             Room createdRoom = roomDAO.create(newRoom);
-            roomView.displayMessage("Room successfully created:\n" + createdRoom);
+            baseView.displayMessageln("Room successfully created:\n" + createdRoom);
         } catch (Exception e) {
-            roomView.displayErrorMessage("Error creating the room: " + e.getMessage());
+            baseView.displayErrorMessage("Error creating the room: " + e.getMessage());
         }
     }
 
     private void getRoomById() {
         try {
-            roomView.displayMessage("\n=== GET ROOM BY ID ===");
+            baseView.displayMessageln("\n=== GET ROOM BY ID ===");
             Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
-                return; // Cancel if invalid input
+                return;
             }
 
-            Optional<Room> optionalRoom = roomDAO.findById(id.get());
+            Optional<Room> optionalRoom = findRoomById(id.get());
             if (optionalRoom.isPresent()) {
                 roomView.displayRoom(optionalRoom.get());
             } else {
-                roomView.displayMessage("No room found with the provided ID.");
+                baseView.displayMessageln("No room found with the provided ID.");
             }
         } catch (DAOException e) {
-            roomView.displayErrorMessage("Error querying the room: " + e.getMessage());
+            baseView.displayErrorMessage("Error querying the room: " + e.getMessage());
         }
     }
 
     private void deleteRoomById() {
         try {
-            roomView.displayMessage("\n=== DELETE ROOM ===");
+            baseView.displayMessageln("\n=== DELETE ROOM ===");
             Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
                 return; // Cancel if invalid input
@@ -121,32 +125,32 @@ public class RoomController {
 
             if (roomDAO.isExistsById(id.get())) {
                 roomDAO.deleteById(id.get());
-                roomView.displayMessage("Room successfully deleted with ID: " + id.get());
+                baseView.displayMessageln("Room successfully deleted with ID: " + id.get());
             } else {
-                roomView.displayMessage("No room found with the provided ID.");
+                baseView.displayMessageln("No room found with the provided ID.");
             }
         } catch (DAOException e) {
-            roomView.displayErrorMessage("Error deleting the room: " + e.getMessage());
+            baseView.displayErrorMessage("Error deleting the room: " + e.getMessage());
         }
     }
 
     private void updateRoom() {
         try {
-            roomView.displayMessage("\n=== UPDATE ROOM ===");
+            baseView.displayMessageln("\n=== UPDATE ROOM ===");
             Optional<Integer> id = roomView.getRoomId(); // Solicitamos el ID de la Room
             if (id.isEmpty()) {
-                roomView.displayMessage("No ID provided. Canceling update operation.");
+                baseView.displayMessageln("No ID provided. Canceling update operation.");
                 return; // Cancelar si no hay ID proporcionado
             }
 
             Optional<Room> optionalRoom = roomDAO.findById(id.get());
             if (optionalRoom.isEmpty()) {
-                roomView.displayMessage("No room found with the provided ID.");
+                baseView.displayMessageln("No room found with the provided ID.");
                 return;
             }
 
             Room existingRoom = optionalRoom.get();
-            roomView.displayMessage("\n=== Current Room Data ===");
+            baseView.displayMessageln("\n=== Current Room Data ===");
             roomView.displayRoom(existingRoom); // Mostramos la información actual de la Room
 
             // Solicitamos los nuevos datos permitiendo que algunos campos sean dejados vacíos
@@ -157,19 +161,19 @@ public class RoomController {
 
             // Actualizar la room en la base de datos
             roomDAO.update(updatedRoom);
-            roomView.displayMessage("Room successfully updated:\n" + updatedRoom);
+            baseView.displayMessageln("Room successfully updated:\n" + updatedRoom);
 
         } catch (DAOException e) {
-            roomView.displayErrorMessage("Error updating the room: " + e.getMessage());
+            baseView.displayErrorMessage("Error updating the room: " + e.getMessage());
         } catch (Exception e) {
-            roomView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+            baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
             log.error("Unexpected error: ", e);
         }
     }
 
     private void calculateTotalValue() {
         try {
-            roomView.displayMessage("\n=== CALCULATE TOTAL ROOM VALUE ===");
+            baseView.displayMessageln("\n=== CALCULATE TOTAL ROOM VALUE ===");
             Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
                 return; // Cancel if invalid input
@@ -177,7 +181,7 @@ public class RoomController {
 
             Optional<Room> optionalRoom = roomDAO.findById(id.get());
             if (optionalRoom.isEmpty()) {
-                roomView.displayMessage("No room found with the provided ID.");
+                baseView.displayMessageln("No room found with the provided ID.");
                 return;
             }
 
@@ -189,13 +193,13 @@ public class RoomController {
             BigDecimal decorationPrice = decorationDAO.findPriceByRoomId(room.getId());
             BigDecimal totalValue = roomPrice.add(cluePrice).add(decorationPrice);
 
-            roomView.displayMessage("\n====== TOTAL VALUES ======\n" +
+            baseView.displayMessageln("\n====== TOTAL VALUES ======\n" +
                     "Room: $" + roomPrice + "\n" +
                     "Clue: $" + cluePrice + "\n" +
                     "Decoration: $" + decorationPrice + "\n" +
                     "Total Value: $" + totalValue);
         } catch (Exception e) {
-            roomView.displayErrorMessage("Error calculating total value: " + e.getMessage());
+            baseView.displayErrorMessage("Error calculating total value: " + e.getMessage());
         }
     }
 
@@ -207,4 +211,27 @@ public class RoomController {
         }
         return null;
     }
+
+    public Optional<Room> findRoomById(int roomId) {
+        return roomDAO.findById(roomId);
+    }
+
+    public int getRoomId() throws DAOException, IllegalArgumentException {
+            listAllRoomsDetail();
+            Optional<Integer> roomIdOpt = roomView.getRoomId();
+            Optional<Room> roomSearch = roomDAO.findById(roomIdOpt.get());
+            if (roomSearch.isEmpty()) {
+                String message = "Room ID required or not found.";
+                baseView.displayErrorMessage(message);
+                throw new IllegalArgumentException(message);
+            }
+            return roomIdOpt.get();
+    }
+
+    private void listAllRoomsDetail() throws DAOException {
+        List<Room> rooms = roomDAO.findAll();
+        roomView.displayRoomsList(rooms);
+    }
+
+
 }

@@ -55,7 +55,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToCertificateWin(rs));
+                return Optional.of(listResultSetToCertificateWin(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                certificateWins.add(mapResultSetToCertificateWin(rs));
+                certificateWins.add(listResultSetToCertificateWin(rs));
             }
             return certificateWins;
         } catch (SQLException e) {
@@ -160,7 +160,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             stmt.setInt(1, playerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                certificateWinsDisplayDTO.add(mapResultSetToCertificateWinDisplayDTO(rs));
+                certificateWinsDisplayDTO.add(listResultSetToCertificateWinDisplayDTO(rs));
             }
         } catch (SQLException e) {
             String messageError = "Error retrieving certificate wins for player ID: " + playerId;
@@ -170,7 +170,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
         return certificateWinsDisplayDTO;
     }
 
-    private CertificateWin mapResultSetToCertificateWin(ResultSet rs) throws SQLException {
+    private CertificateWin listResultSetToCertificateWin(ResultSet rs) throws SQLException {
         return CertificateWin.builder()
                 .id(rs.getInt("idCertificateWin"))
                 .idCertificate(rs.getInt("idCertificate"))
@@ -182,7 +182,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
                 .build();
     }
 
-    private CertificateWinDisplayDTO mapResultSetToCertificateWinDisplayDTO(ResultSet rs) throws SQLException {
+    private CertificateWinDisplayDTO listResultSetToCertificateWinDisplayDTO(ResultSet rs) throws SQLException {
         return CertificateWinDisplayDTO.builder()
                 .id(rs.getInt("idCertificateWin"))
                 .idCertificate(rs.getInt("idCertificate"))

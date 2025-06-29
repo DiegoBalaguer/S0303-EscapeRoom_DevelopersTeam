@@ -51,7 +51,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToReward(rs));
+                return Optional.of(listResultSetToReward(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                rewards.add(mapResultSetToReward(rs));
+                rewards.add(listResultSetToReward(rs));
             }
             return rewards;
         } catch (SQLException e) {
@@ -137,7 +137,7 @@ public class RewardDAOH2Impl implements BaseDAO<Reward, Integer>, RewardDAO {
         }
     }
 
-    private Reward mapResultSetToReward(ResultSet rs) throws SQLException {
+    private Reward listResultSetToReward(ResultSet rs) throws SQLException {
         return Reward.builder()
                 .id(rs.getInt("idReward"))
                 .name(rs.getString("name"))

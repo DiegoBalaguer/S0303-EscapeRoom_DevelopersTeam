@@ -5,7 +5,6 @@ import mvc.dto.PlayerDisplayDTO;
 import mvc.dto.PlayerMapper;
 import mvc.dto.RewardWinDisplayDTO;
 import mvc.enumsMenu.OptionsMenuPlayer;
-import config.loadConfigApp.LoadConfigApp;
 import mvc.model.Player;
 import lombok.extern.slf4j.Slf4j;
 import utils.ConsoleUtils;
@@ -19,14 +18,10 @@ import java.util.Optional;
 @Slf4j
 public class PlayerView {
 
-    private final String LINE = System.lineSeparator();
+    private final BaseView baseView = new BaseView();
 
     public void displayPlayerMenu(String title) {
-        OptionsMenuPlayer.viewMenu(LoadConfigApp.getAppName());
-    }
-
-    public int getInputOptionMenu(String message) {
-        return ConsoleUtils.readRequiredInt(message);
+        OptionsMenuPlayer.viewMenu(title);
     }
 
     public Optional<Integer> getPlayerId() {
@@ -34,7 +29,7 @@ public class PlayerView {
             int id = ConsoleUtils.readRequiredInt("Enter player ID: ");
             return Optional.of(id);
         } catch (NumberFormatException e) {
-            displayErrorMessage("Invalid ID. Please enter a number.");
+            baseView.displayErrorMessage("Invalid ID. Please enter a number.");
             return Optional.empty();
         }
     }
@@ -51,23 +46,23 @@ public class PlayerView {
     }
 
     private String getInputName() {
-        return ConsoleUtils.readRequiredString("Enter player name: ");
+        return ConsoleUtils.readRequiredString("Enter name: ");
     }
 
     private String getInputPassword() {
-        return ConsoleUtils.readRequiredString("Enter player password: ");
+        return ConsoleUtils.readRequiredString("Enter password: ");
     }
 
     private boolean getInputIsSubscribed() {
-        return ConsoleUtils.readRequiredBoolean("Enter player subscribed ('Y' or 'N'): ");
+        return ConsoleUtils.readRequiredBoolean("Enter is subscribed ('Y' or 'N'): ");
     }
 
     private String getInputEmail() {
         String email = "";
         do {
-            email = ConsoleUtils.readRequiredString("Enter player email: ");
+            email = ConsoleUtils.readRequiredString("Enter email: ");
             if (!StringUtils.isValidEmail(email)) {
-                displayErrorMessage("Invalid email format. Retype email.");
+                baseView.displayErrorMessage("Invalid email format. Retype email.");
             }
         } while (!StringUtils.isValidEmail(email));
         return email;
@@ -83,72 +78,74 @@ public class PlayerView {
     }
 
     private String getUpdateName(String oldValue) {
-        return ConsoleUtils.readStringWithDefault("Enter player name: ", Optional.of(oldValue)).get();
+        return ConsoleUtils.readStringWithDefault("Enter name: ", Optional.of(oldValue)).get();
     }
 
     private String getUpdatePassword(String oldValue) {
-        return ConsoleUtils.readStringWithDefault("Enter player password: ", Optional.of(oldValue)).get();
+        return ConsoleUtils.readStringWithDefault("Enter password: ", Optional.of(oldValue)).get();
     }
 
     private Boolean getUpdateIsSubscribed(boolean oldValue) {
-        return ConsoleUtils.readBooleanWithDefault("Enter player subscribed ('Y' or 'N'): ", Optional.of(oldValue)).get();
+        return ConsoleUtils.readBooleanWithDefault("Enter subscribed ('Y' or 'N'): ", Optional.of(oldValue)).get();
     }
 
     private Boolean getUpdateIsActive(boolean oldValue) {
-        return ConsoleUtils.readBooleanWithDefault("Enter player is active ('Y' or 'N'): ", Optional.of(oldValue)).get();
+        return ConsoleUtils.readBooleanWithDefault("Enter is active ('Y' or 'N'): ", Optional.of(oldValue)).get();
     }
 
     private String getUpdateEmail(String oldValue) {
         String email = "";
         do {
-            email = ConsoleUtils.readStringWithDefault("Enter player email: ", Optional.of(oldValue)).get();
+            email = ConsoleUtils.readStringWithDefault("Enter email: ", Optional.of(oldValue)).get();
             if (!StringUtils.isValidEmail(email)) {
-                displayErrorMessage("Invalid email format. Retype email.");
+                baseView.displayErrorMessage("Invalid email format. Retype email.");
             }
         } while (!StringUtils.isValidEmail(email));
         return email;
     }
 
     public void displayPlayer(Player player) {
+        String message = "";
         if (player != null) {
-            System.out.println("--- Player Details ---");
-            System.out.println("ID: " + player.getId());
-            System.out.println("Name: " + player.getName());
-            System.out.println("Email: " + player.getEmail());
-            System.out.println("Password: " + player.getPassword());
-            System.out.println("Registration Date: " + player.getRegistrationDate());
-            System.out.println("Subscribed: " + player.isSubscribed());
-            System.out.println("Active: " + player.isActive());
-            System.out.println("----------------------");
+            message += "--- Player Details ---" + baseView.LINE;
+            message += "ID: " + player.getId() + baseView.LINE;
+            message += "Name: " + player.getName() + baseView.LINE;
+            message += "Email: " + player.getEmail() + baseView.LINE;
+            message += "Password: " + player.getPassword() + baseView.LINE;
+            message += "Registration Date: " + player.getRegistrationDate() + baseView.LINE;
+            message += "Subscribed: " + player.isSubscribed() + baseView.LINE;
+            message += "Active: " + player.isActive() + baseView.LINE;
+            message += "----------------------" + baseView.LINE;
         } else {
-            System.out.println("Player not found.");
+            message = "Player not found.";
         }
+        baseView.displayMessageln(message);
     }
 
     public void displayRewardWinDTOs(List<RewardWinDisplayDTO> rewardWinsData) {
         if (rewardWinsData.isEmpty()) {
-            System.out.println("No reward wins found for this player.");
+            baseView.displayMessageln("No reward wins found for this player.");
             return;
         }
-        System.out.println("\n--- Player Reward Wins ---");
-        System.out.println(StringUtils.makeLineToList(rewardWinsData.getFirst().toListHead()));
-        rewardWinsData.forEach(dto -> System.out.println(
+        baseView.displayMessage2ln(baseView.LINE + "--- Player Reward Wins ---");
+        baseView.displayMessage2ln(StringUtils.makeLineToList(rewardWinsData.getFirst().toListHead()));
+        rewardWinsData.forEach(dto -> baseView.displayMessageln(
                 StringUtils.makeLineToList(dto.toList())
         ));
-        System.out.println("--------------------------");
+        baseView.displayMessage2ln("--------------------------");
     }
 
     public void displayCertificateWinDTOs(List<CertificateWinDisplayDTO> certificateWinsData) {
         if (certificateWinsData.isEmpty()) {
-            System.out.println("No certificate wins found for this player.");
+            baseView.displayMessageln("No certificate wins found for this player.");
             return;
         }
-        System.out.println("\n--- Player Certificate Wins ---");
-        System.out.println(StringUtils.makeLineToList(certificateWinsData.getFirst().toListHead()));
-        certificateWinsData.forEach(dto -> System.out.println(
+        baseView.displayMessageln(baseView.LINE + "--- Player Certificate Wins ---");
+        baseView.displayMessageln(StringUtils.makeLineToList(certificateWinsData.getFirst().toListHead()));
+        certificateWinsData.forEach(dto -> baseView.displayMessageln(
                 StringUtils.makeLineToList(dto.toList())
         ));
-        System.out.println("-----------------------------");
+        baseView.displayMessage2ln("-----------------------------");
     }
 
     public void displayPlayers(List<Player> players) {
@@ -156,26 +153,14 @@ public class PlayerView {
             System.out.println("No players found.");
             return;
         }
-        System.out.println(StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(players.getFirst()).toListHead()));
+        baseView.displayMessageln(StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(players.getFirst()).toListHead()));
 
         players.stream()
                 .map(PlayerMapper::toDisplayDTO)
                 .map(PlayerDisplayDTO::toList)
                 .map(StringUtils::makeLineToList)
-                .forEach(System.out::println);
+                .forEach(baseView::displayMessageln);
 
-        System.out.println("-------------------");
-    }
-
-    public void displayMessageln(String message) {
-        System.out.println(LINE + message + LINE);
-    }
-
-    public void displayMessage(String message) {
-        System.out.print(message);
-    }
-
-    public void displayErrorMessage(String message) {
-        System.err.println(LINE + "ERROR: " + message + LINE);
+        baseView.displayMessage2ln("-------------------");
     }
 }
