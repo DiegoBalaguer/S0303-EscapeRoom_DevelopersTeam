@@ -3,11 +3,13 @@ package mvc.model;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import model.*;
+import mvc.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import interfaces.Observer;
 import interfaces.Observable;
+import dao.impl.h2.*;
+import dao.interfaces.PlayerDAO;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,6 +18,8 @@ public class EscapeRoom implements Observable {
     private static EscapeRoom escapeRoom;
     private List<Room> rooms;
     private List<Player> players;
+    private final List<Observer> observers = new ArrayList<>();
+    private PlayerDAO playerDAO;
 
     public static EscapeRoom getInstance() {
         if (escapeRoom == null) {
@@ -26,7 +30,7 @@ public class EscapeRoom implements Observable {
     }
 
     public boolean isEmptyRooms() {
-        return rooms.isEmpty();
+        return rooms == null || rooms.isEmpty();
     }
 
     private void initialize() {
@@ -35,22 +39,24 @@ public class EscapeRoom implements Observable {
 
     @Override
     public void addObserver(Observer observer) {
-        if (observer instanceof Player) {
-            observers.add(observer);
-        }
+        throw new UnsupportedOperationException("Observers are managed dynamically using the database.");
     }
+
 
     @Override
     public void removeObserver(Observer observer) {
-        observers.remove(observer);
+        throw new UnsupportedOperationException("Observers are managed dynamically using the database.");
     }
 
     @Override
     public void notifyObservers(String message) {
-        for (Observer observer : observers) {
-            if (observer instanceof Player player && player.isSubscribed()) {
+        try {
+            List<Player> subscribedPlayers = playerDAO.findSubscribedPlayers();
+            for (Player player : subscribedPlayers) {
                 player.update(message);
             }
+        } catch (Exception e) {
+            System.err.println("Error notifying observers: " + e.getMessage());
         }
     }
 
@@ -61,11 +67,13 @@ public class EscapeRoom implements Observable {
     public void notifyItemAdded(String itemType, String roomName) {
         notifyObservers("New " + itemType + " added to room: " + roomName);
     }
+}
 
-    public void notifyCertificateReceived(CertificateWin certificateWin) {
+
+/*public void notifyCertificateReceived(CertificateWin certificateWin) {
         notifyObservers("Congratulations! You received a certificate: " + certificateWin.getDescription());
     }
     public void notifyRewardReceived(RewardWin rewardWin) {
         notifyObservers("Congratulations! You received a reward: " + rewardWin.getDescription());
     }
-}
+}*/
