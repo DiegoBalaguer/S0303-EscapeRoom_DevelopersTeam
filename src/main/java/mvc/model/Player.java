@@ -24,6 +24,13 @@ public class Player implements Observer {
     private List<RewardWin> rewardsWin;
     private boolean isActive;
 
+    public Player(int id, String name, String email, boolean isSubscribed) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.isSubscribed = isSubscribed;
+    }
+
     @Override
     public void update(String message) {
         if (isSubscribed) {
