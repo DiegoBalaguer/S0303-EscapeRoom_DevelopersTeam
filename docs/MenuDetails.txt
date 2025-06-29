@@ -1,0 +1,98 @@
+
+MAIN MENU ESCAPE ROOM
+	│
+	├── 1. TICKET MANAGEMENT
+	│		│
+	│		├── 1. Sell Ticket
+	│		│
+	│		├── 2. Delete ticket
+	│		│
+	│		├── 3. Calculate Total Benefits
+	│		│
+	│		├── 4. Show all tickets
+	│		│
+	│		└── (0.) Back to main menu
+	│
+	├── 2. ROOM MANAGEMENT
+	│		│
+	│		├── 1. Create
+	│		│
+	│		├── 2. Show
+	│		│
+	│		├── 3. Delete
+	│		│
+	│		├── 4. Update information
+	│		│
+	│		├── 5. Calcuate item budget
+	│		│
+	│		└── (0.) Back to main menu
+	│
+	├── 3. PLAYER MANAGEMENT
+	│		│
+	│		├── (1.) Create Player
+	│		│
+	│		├── (2.) List All Players
+	│		│
+	│		├── (3.) Find Player by ID
+	│		│
+	│		├── (4.) Update Player
+	│		│
+	│		├── (5.) Soft delete Player
+	│		│
+	│		├── (6.) Delete Player
+	│		│
+	│		├── (7.) Awards Management Player
+	│		│		│
+	│		│		├── (1.) Award Certificate win to Player
+	│		│		│
+	│		│		├── (2.) Awards Reward win to player
+	│		│		│
+	│		│		├── (3.) Rewoke Certificate win to player
+	│		│		│
+	│		│		├── (4.) Revoke Reward win to player
+	│		│		│
+	│		│		└── (0.) Back to main menu
+	│		│
+	│		├── 8. Notify Management Player
+	│		│		│
+	│		│		├── (1.) Subscribe Player
+	│		│		│
+	│		│		├── (2.) Unsubscribe Player
+	│		│		│
+	│		│		├── 3. Notify Player
+	│		│		│
+	│		│		└── (0.) Back to main menu
+	│		│
+	│		└── (0.) Back to main menu
+	│
+	│
+	├── 4. ESCAPE ROOM MANAGEMENT
+	│		│
+	│		├── 1. Clue management
+	│		│		│
+	│		│		├── 1. Create
+	│		│		│
+	│		│		├── 2. Show
+	│		│		│
+	│		│		├── 3. Delete
+	│		│		│
+	│		│		├── 4. Update information
+	│		│		│
+	│		│		└── (0.) Back to main menu
+	│		│
+	│		└── 2. Decoration management
+	│				│
+	│				├── 1. Create
+	│				│
+	│				├── 2. Show
+	│				│
+	│				├── 3. Delete
+	│				│
+	│				├── 4. Update information
+	│				│
+	│				└── (0.) Back to main menu
+	│
+	├── 5. FINANCIAL MANAGEMENT  (Falta entero)
+	│
+	└── (0.) EXIT
+

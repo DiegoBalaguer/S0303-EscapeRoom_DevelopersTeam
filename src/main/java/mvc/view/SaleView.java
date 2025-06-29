@@ -11,6 +11,8 @@ import java.util.Optional;
 @Slf4j
 public class SaleView {
 
+    private final BaseView baseView = new BaseView();
+
     public void displaySaleMenu(String title) {
         OptionsMenuSale.viewMenu(LoadConfigApp.getAppName());
     }
@@ -20,29 +22,21 @@ public class SaleView {
             int id = ConsoleUtils.readRequiredInt("Enter sale ID: ");
             return Optional.of(id);
         } catch (NumberFormatException e) {
-            displayErrorMessage("Invalid ID. Please enter a number.");
+            baseView.displayErrorMessage("Invalid ID. Please enter a number.");
             return Optional.empty();
         }
     }
 
     public void displaySales(List<Sale> sales) {
         if (sales.isEmpty()) {
-            System.out.println("No sales found.");
+            baseView.displayMessageln("No sales found.");
             return;
         }
-        System.out.println("\n--- All Sales ---");
-        sales.forEach(sale -> System.out.println(
+        baseView.displayMessageln("--- All Sales ---");
+        sales.forEach(sale -> baseView.displayMessage(
                 "ID: " + sale.getId() +
                         ", Reg. Date: " + sale.getDateSale()
         ));
-        System.out.println("-------------------");
-    }
-
-    public void displayMessage(String message) {
-        System.out.println(System.lineSeparator() + message + System.lineSeparator());
-    }
-
-    public void displayErrorMessage(String message) {
-        System.err.println(System.lineSeparator() + "ERROR: " + message + System.lineSeparator());
+        baseView.displayMessage2ln("-------------------");
     }
 }

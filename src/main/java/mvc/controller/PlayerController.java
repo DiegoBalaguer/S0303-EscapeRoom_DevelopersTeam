@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import mvc.model.Player;
 import mvc.dto.RewardWinDisplayDTO;
 
+import mvc.view.BaseView;
 import mvc.view.PlayerView;
 
 import java.util.*;
@@ -19,13 +20,14 @@ import java.util.*;
 public class PlayerController {
 
     private static PlayerController playerControllerInstance;
+    private final BaseView baseView;
     private final PlayerView playerView;
     private final PlayerDAO playerDAO;
     private final RewardWinDAO rewardWinDAO;
     private final CertificateWinDAO certificateWinDAO;
-    private final String LINE = System.lineSeparator();
 
     private PlayerController() {
+        this.baseView = new BaseView();
         this.playerView = new PlayerView();
         try {
             this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
@@ -51,14 +53,14 @@ public class PlayerController {
     public void mainMenu() {
         do {
             playerView.displayPlayerMenu("PLAYER MANAGEMENT");
-            int answer = playerView.getInputOptionMenu("Choose an option: ");
+            int answer = baseView.getInputRequiredInt("Choose an option: ");
             OptionsMenuPlayer selectedOption = OptionsMenuPlayer.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            playerView.displayMessageln("Returning to Main Menu...");
+                            baseView.displayMessage2ln("Returning to Main Menu...");
                             return;
                         }
                         case CREATE -> createPlayer();
@@ -71,12 +73,12 @@ public class PlayerController {
                         case NOTIFY_MANAGEMENT -> PlayerNotifyController.getInstance().mainMenu();
                     }
                 } catch (DAOException e) {
-                    playerView.displayErrorMessage("Database operation failed: " + e.getMessage());
+                    baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
                 } catch (Exception e) {
-                    playerView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
                 }
             } else {
-                playerView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+                baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
             }
         } while (true);
     }
@@ -85,18 +87,18 @@ public class PlayerController {
        Player newPlayer = playerView.getPlayerDetailsCreate();
         if (newPlayer != null) {
             Player savedPlayer = playerDAO.create(newPlayer);
-            playerView.displayMessageln("Player created successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
+            baseView.displayMessage2ln("Player created successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
         }
     }
 
     private void listAllPlayers() throws DAOException {
-        playerView.displayMessageln("#### LIST ALL PLAYERS  #################");
-        listAllPayersIntern();
+        baseView.displayMessage2ln("#### LIST ALL PLAYERS  #################");
+        listAllPayersDetail();
     }
 
     private void findPlayerById() throws DAOException {
-        playerView.displayMessageln("#### FIND PLAYER BY ID  #################");
-        listAllPayersIntern();
+        baseView.displayMessage2ln("#### FIND PLAYER BY ID  #################");
+        listAllPayersDetail();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             Integer playerId = idOpt.get();
@@ -112,40 +114,40 @@ public class PlayerController {
     }
 
     private void updatePlayer() throws DAOException {
-        playerView.displayMessageln("#### UPDATE PLAYER  #################");
-        listAllPayersIntern();
+        baseView.displayMessage2ln("#### UPDATE PLAYER  #################");
+        listAllPayersDetail();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
             if (existingPlayerOpt.isPresent()) {
                 Player existingPlayer = existingPlayerOpt.get();
-                playerView.displayMessageln("Current Player Details:");
+                baseView.displayMessage2ln("Current Player Details:");
                 playerView.displayPlayer(existingPlayer);
 
-                playerView.displayMessageln("Enter new details:");
+                baseView.displayMessage2ln("Enter new details:");
                 Player updatedDetails = playerView.getUpdatePlayerDetails(existingPlayer);
 
                 Player savedPlayer = playerDAO.update(updatedDetails);
-                playerView.displayMessageln("Player updated successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
+                baseView.displayMessage2ln("Player updated successfully: " + savedPlayer.getName() + " (ID: " + savedPlayer.getId() + ")");
             }
         } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot update.");
+            baseView.displayMessage2ln("Player with ID " + idOpt.get() + " not found. Cannot update.");
         }
     }
 
     private void deletePlayer() throws DAOException {
-        playerView.displayMessageln("#### DELETE PLAYER  #################");
-        listAllPayersIntern();
+        baseView.displayMessage2ln("#### DELETE PLAYER  #################");
+        listAllPayersDetail();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             playerDAO.deleteById(idOpt.get());
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " deleted successfully (if existed).");
+            baseView.displayMessage2ln("Player with ID " + idOpt.get() + " deleted successfully (if existed).");
         }
     }
 
     private void softDeletePlayer() throws DAOException {
-        playerView.displayMessageln("#### SOFT DELETE PLAYER  #################");
-        listAllPayersIntern();
+        baseView.displayMessage2ln("#### SOFT DELETE PLAYER  #################");
+        listAllPayersDetail();
         Optional<Integer> idOpt = playerView.getPlayerId();
         if (idOpt.isPresent()) {
             Optional<Player> existingPlayerOpt = playerDAO.findById(idOpt.get());
@@ -153,14 +155,14 @@ public class PlayerController {
                 Player existingPlayer = existingPlayerOpt.get();
                 existingPlayer.setActive(false);
                 playerDAO.update(existingPlayer);
-                playerView.displayMessageln("Player soft deleted successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
+                baseView.displayMessage2ln("Player soft deleted successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
             }
         } else {
-            playerView.displayMessageln("Player with ID " + idOpt.get() + " not found. Cannot soft deleted.");
+            baseView.displayMessage2ln("Player with ID " + idOpt.get() + " not found. Cannot soft deleted.");
         }
     }
 
-    private void listAllPayersIntern() throws DAOException {
+    private void listAllPayersDetail() throws DAOException {
         List<Player> players = playerDAO.findAll();
         playerView.displayPlayers(players);
     }

@@ -1,40 +1,54 @@
 package mvc.view;
 
+import mvc.dto.*;
 import mvc.enumsMenu.OptionsMenuItem;
 import lombok.extern.slf4j.Slf4j;
+import mvc.model.Certificate;
 import mvc.model.Clue;
+import mvc.model.Player;
+import mvc.model.Room;
 import utils.ConsoleUtils;
+import utils.StringUtils;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 public class ClueView {
 
+    private static BaseView baseView =  new BaseView();
+    
     public void displayClueMenu(String title) {
         OptionsMenuItem.viewMenuItem(title);
     }
 
-    public Clue getClueDetails() {
+    public Clue getClueDetailsCreate(int roomId) {
         try {
-            String name = ConsoleUtils.readRequiredString("Enter clue name: ");
-            int idRoom = ConsoleUtils.readRequiredInt("Enter Room ID (existing): ");
-            BigDecimal price = ConsoleUtils.readRequiredBigDecimal("Enter clue price: ");
-            String description = ConsoleUtils.readRequiredString("Enter clue description: "); // Solicitar descripción
-            boolean isActive = ConsoleUtils.readRequiredBoolean("Is the clue active? (T/F, Y/N, S/N): ");
-
             return Clue.builder()
-                    .name(name)
-                    .idRoom(idRoom)
-                    .price(price)
-                    .description(description) // Asignar descripción
-                    .isActive(isActive)
+                    .name(getInputName())
+                    .idRoom(roomId)
+                    .price(getInputPrice())
+                    .description(getInputDescription())
+                    .isActive(true)
                     .build();
-
         } catch (Exception e) {
-            displayErrorMessage("Error collecting clue details: " + e.getMessage());
+            baseView.displayErrorMessage("Error collecting clue details: " + e.getMessage());
             return null;
         }
+    }
+
+    private String getInputName() {
+        return ConsoleUtils.readRequiredString("Enter name: ");
+    }
+
+    private String getInputDescription() {
+        return ConsoleUtils.readRequiredString("Enter description: ");
+    }
+
+    private BigDecimal getInputPrice() {
+        return ConsoleUtils.readRequiredBigDecimal("Enter price: ");
     }
 
 
@@ -43,44 +57,30 @@ public class ClueView {
             int id = ConsoleUtils.readRequiredInt("Enter clue ID: ");
             return Optional.of(id);
         } catch (NumberFormatException e) {
-            displayErrorMessage("Invalid ID. Please enter a valid number.");
+            baseView.displayErrorMessage("Invalid ID. Please enter a valid number.");
             return Optional.empty();
         }
     }
 
     public void displayClue(Clue clue) {
+        String message = "";
         if (clue != null) {
-            System.out.println("\n--- Clue Details ---");
-            System.out.println("ID: " + clue.getId());
-            System.out.println("Name: " + clue.getName());
-            System.out.println("Price: $" + clue.getPrice());
-            System.out.println("Room ID: " + clue.getIdRoom());
-            System.out.println("Is Active: " + (clue.isActive() ? "Yes" : "No"));
-            System.out.println("-------------------------");
+            message += baseView.LINE + "--- Clue Details ---" + baseView.LINE;
+            message += "ID: " + clue.getId() + baseView.LINE;
+            message += "Name: " + clue.getName() + baseView.LINE;
+            message += "Price: $" + clue.getPrice() + baseView.LINE;
+            message += "Room ID: " + clue.getIdRoom() + baseView.LINE;
+            message += "Is Active: " + (clue.isActive() ? "Yes" : "No") + baseView.LINE;
+            message += "-------------------------" + baseView.LINE;
         } else {
-            System.out.println("Clue not found.");
+            message = "Clue not found.";
         }
-    }
-
-    public void displayClues(List<Clue> clues) {
-        System.out.println("\n--- List of Clues ---");
-        for (Clue clue : clues) {
-            displayClue(clue);
-        }
-        System.out.println("-------------------------");
-    }
-
-    public void displayMessage(String message) {
-        System.out.println("\n" + message + "\n");
-    }
-
-    public void displayErrorMessage(String message) {
-        System.err.println("\nERROR: " + message + "\n");
+        baseView.displayMessageln(message);
     }
 
     public Clue editClue(Clue currentClue) {
         try {
-            System.out.println("\n=== EDIT CLUE ===");
+            baseView.displayMessageln(baseView.LINE + "=== EDIT CLUE ===");
             String name = ConsoleUtils.readOptionalString("Current Name: " + currentClue.getName() + ". New Name: ").orElse(currentClue.getName());
             BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentClue.getPrice() + ". New Price: ").orElse(currentClue.getPrice());
             String description = ConsoleUtils.readOptionalString("Current Description: " + currentClue.getDescription() + ". New Description: ").orElse(currentClue.getDescription()); // Editar descripción
@@ -96,9 +96,35 @@ public class ClueView {
                     .build();
 
         } catch (Exception e) {
-            displayErrorMessage("Error editing clue: " + e.getMessage());
+            baseView.displayErrorMessage("Error editing clue: " + e.getMessage());
             return null;
         }
+    }
+
+    public void displayClueList(List<ClueDisplayDTO> clueDisplayDTOS) {
+        if (clueDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No clues found.");
+            return;
+        }
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(clueDisplayDTOS.getFirst().toListHead()));
+
+        clueDisplayDTOS.forEach(rewardWins -> baseView.displayMessageln(
+                StringUtils.makeLineToList(rewardWins.toList())));
+        baseView.displayMessage2ln("-------------------");
+    }
+
+    public void displayClues(List<Clue> clues) {
+        if (clues.isEmpty()) {
+            baseView.displayMessageln("No Clues found.");
+            return;
+        }
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(ClueMapper.toDisplayDTO(clues.getFirst()).toListHead()));
+
+        clues.forEach(clue -> baseView.displayMessageln(
+                StringUtils.makeLineToList(ClueMapper.toDisplayDTO(clue).toList())));
+        baseView.displayMessage2ln("-------------------");
     }
 
 }

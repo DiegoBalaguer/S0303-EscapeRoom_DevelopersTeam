@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import mvc.model.Player;
 import mvc.model.Sale;
 import mvc.model.Ticket;
+import mvc.view.BaseView;
 import utils.ConsoleUtils;
 import mvc.view.SaleView;
 import java.math.BigDecimal;
@@ -26,8 +27,11 @@ public class SaleController {
     private final TicketDAO ticketDAO;
     private final PlayerDAO playerDAO;
 
+    private static BaseView baseView;
+
     private SaleController() {
-        this.saleView = new SaleView(); // Inicialización de la vista
+        baseView = new BaseView();
+        this.saleView = new SaleView();
 
         try {
             // Inicializamos los DAOs desde la fábrica
@@ -72,15 +76,15 @@ public class SaleController {
     public void mainMenu() {
         boolean running = true;
         while (running) {
-            saleView.displaySaleMenu("SALE MANAGEMENT"); // Mostramos el menú al usuario
-            int answer = ConsoleUtils.readRequiredInt("Choose an option: ");
+            saleView.displaySaleMenu("SALE MANAGEMENT");
+            int answer = baseView.getInputRequiredInt("Choose an option: ");
             OptionsMenuSale selectedOption = OptionsMenuSale.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {
                     switch (selectedOption) {
                         case EXIT -> {
-                            saleView.displayMessage("Returning to Main Menu...");
+                            baseView.displayMessageln("Returning to Main Menu...");
                             running = false; // Salimos del bucle
                         }
                         case SELL -> createSale();
@@ -88,7 +92,7 @@ public class SaleController {
                         case CALCULATE_TOTAL_BENEFITS -> calculateTotalBenefits();
                         case SHOW_ALL_TICKETS -> listAllSales();
 
-                        default -> saleView.displayErrorMessage("Unknown option selected.");
+                        default -> baseView.displayErrorMessage("Unknown option selected.");
                     }
                 } catch (DAOException e) {
                     handleError("Database operation failed: ", e);
@@ -96,7 +100,7 @@ public class SaleController {
                     handleError("An unexpected error occurred: ", e);
                 }
             } else {
-                saleView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+                baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
                 log.warn("Error: The value {} is invalid in the sale management menu.", answer);
             }
         }
@@ -108,7 +112,7 @@ public class SaleController {
             Optional<Ticket> ticketOptional = ticketDAO.findByName(ticketName);
 
             if (ticketOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale failed: Ticket with name '" + ticketName + "' does not exist.");
+                baseView.displayErrorMessage("Sale failed: Ticket with name '" + ticketName + "' does not exist.");
                 return;
             }
 
@@ -117,14 +121,14 @@ public class SaleController {
             Optional<Player> playerOptional = playerDAO.findByEmail(playerEmail);
 
             if (playerOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale failed: Player with email '" + playerEmail + "' does not exist.");
+                baseView.displayErrorMessage("Sale failed: Player with email '" + playerEmail + "' does not exist.");
                 return;
             }
 
             // Solicitar el número de jugadores
             int playersCount = ConsoleUtils.readRequiredInt("Enter the number of players: ");
             if (playersCount <= 0) {
-                saleView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
+                baseView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
                 return;
             }
 
@@ -148,16 +152,16 @@ public class SaleController {
             // Guardar la venta en la base de datos
             Sale savedSale = saleDAO.create(newSale);
             if (savedSale == null || savedSale.getId() == 0) {
-                saleView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
+                baseView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
                 return;
             }
 
             // Mostrar mensaje de éxito
-            saleView.displayMessage("Sale created successfully! Sale ID: " + savedSale.getId());
+            baseView.displayMessageln("Sale created successfully! Sale ID: " + savedSale.getId());
         } catch (DAOException e) {
             handleError("An error occurred while creating the sale: ", e);
         } catch (NumberFormatException e) {
-            saleView.displayErrorMessage("Invalid input. Please enter valid data.");
+            baseView.displayErrorMessage("Invalid input. Please enter valid data.");
         }
     }*/
   private void createSale() {
@@ -167,7 +171,7 @@ public class SaleController {
             Optional<Ticket> ticketOptional = saleDAO.findTicketById(ticketId);
 
             if (ticketOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale failed: Ticket with ID " + ticketId + " does not exist.");
+                baseView.displayErrorMessage("Sale failed: Ticket with ID " + ticketId + " does not exist.");
                 return;
             }
 
@@ -176,14 +180,14 @@ public class SaleController {
             Optional<Player> playerOptional = saleDAO.findPlayerById(playerId);
 
             if (playerOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale failed: Player with ID " + playerId + " does not exist.");
+                baseView.displayErrorMessage("Sale failed: Player with ID " + playerId + " does not exist.");
                 return;
             }
 
             // Solicitar número de jugadores
             int playersCount = ConsoleUtils.readRequiredInt("Enter the number of players: ");
             if (playersCount <= 0) {
-                saleView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
+                baseView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
                 return;
             }
 
@@ -207,57 +211,27 @@ public class SaleController {
             // Guardar la venta en la base de datos
             Sale savedSale = saleDAO.create(newSale);
             if (savedSale == null || savedSale.getId() == 0) {
-                saleView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
+                baseView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
                 return;
             }
 
             // Mostrar mensaje de éxito
-            saleView.displayMessage("Sale created successfully! Sale ID: " + savedSale.getId());
+            baseView.displayMessageln("Sale created successfully! Sale ID: " + savedSale.getId());
         } catch (DAOException e) {
             handleError("An error occurred while creating the sale: ", e);
         } catch (NumberFormatException e) {
-            saleView.displayErrorMessage("Invalid input. Please enter a valid number.");
+            baseView.displayErrorMessage("Invalid input. Please enter a valid number.");
         }
   }
-    // --- Métodos CRUD que actúan como la lógica del controlador ---
-    /* private void createSale() {
-        try {
-            SaleDetailsDTO saleDetailsDTO = getSaleDetailsForOperation(false); // 'false' indica operación de creación
-            if (saleDetailsDTO == null) return;
-
-            Sale newSale = new Sale();
-            newSale.setIdTicket(saleDetailsDTO.getTicketId());
-            newSale.setPrice(saleDetailsDTO.getPrice());
-
-            Optional<Player> playerOptional = playerDAO.findByName(saleDetailsDTO.getPlayerName());
-            if (playerOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale creation failed: Player not found with name: " + saleDetailsDTO.getPlayerName());
-                return;
-            }
-
-            newSale.setIdPlayer(playerOptional.get().getId());
-            Sale savedSale = saleDAO.create(newSale);
-
-            if (savedSale == null || savedSale.getId() == 0) {
-                saleView.displayErrorMessage("Sale creation failed: Unable to save sale to the database.");
-                log.error("Failed to save sale: {}", newSale);
-                return;
-            }
-
-            saleView.displayMessage("Sale created successfully: (ID: " + savedSale.getId() + ")");
-        } catch (DAOException e) {
-            handleError("An error occurred while creating the sale: ", e);
-        }
-    }*/
 
     private void deleteSale() {
         try {
             Optional<Integer> idOpt = saleView.getSaleId();
             if (idOpt.isPresent()) {
                 saleDAO.deleteById(idOpt.get());
-                saleView.displayMessage("Sale with ID " + idOpt.get() + " deleted successfully (if existed).");
+                baseView.displayMessageln("Sale with ID " + idOpt.get() + " deleted successfully (if existed).");
             } else {
-                saleView.displayErrorMessage("Sale ID is required to delete a sale.");
+                baseView.displayErrorMessage("Sale ID is required to delete a sale.");
             }
         } catch (DAOException e) {
             handleError("An error occurred while deleting the sale: ", e);
@@ -270,7 +244,7 @@ public class SaleController {
             double totalBenefits = sales.stream()
                     .mapToDouble(sale -> sale.getPrice().doubleValue())
                     .sum();
-            saleView.displayMessage("Total Benefits from sales: $" + totalBenefits);
+            baseView.displayMessageln("Total Benefits from sales: $" + totalBenefits);
         } catch (DAOException e) {
             handleError("An error occurred while calculating total benefits: ", e);
         }
@@ -290,14 +264,14 @@ public class SaleController {
             // Solicitar el ID de la venta (saleId) al usuario
             int saleId = ConsoleUtils.readRequiredInt("Enter sale ID: ");
             if (saleId <= 0) {
-                saleView.displayErrorMessage("Invalid Sale ID. Operation canceled.");
+                baseView.displayErrorMessage("Invalid Sale ID. Operation canceled.");
                 return null;
             }
 
             // Buscar la venta en la base de datos
             Optional<Sale> saleOptional = saleDAO.findById(saleId);
             if (saleOptional.isEmpty()) {
-                saleView.displayErrorMessage("Sale not found with ID: " + saleId);
+                baseView.displayErrorMessage("Sale not found with ID: " + saleId);
                 return null;
             }
 
@@ -307,7 +281,7 @@ public class SaleController {
             // Buscar el Player relacionado a la venta
             Optional<Player> playerOptional = playerDAO.findById(sale.getIdPlayer());
             if (playerOptional.isEmpty()) {
-                saleView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
+                baseView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
                 return null;
             }
 
@@ -319,7 +293,7 @@ public class SaleController {
             if (forUpdate) {
                 price = ConsoleUtils.readRequiredBigDecimal("Enter new sale price: ");
                 if (price.compareTo(BigDecimal.ZERO) <= 0) {
-                    saleView.displayErrorMessage("Invalid price. Price must be greater than zero.");
+                    baseView.displayErrorMessage("Invalid price. Price must be greater than zero.");
                     return null;
                 }
             }
@@ -330,7 +304,7 @@ public class SaleController {
             handleError("Error while retrieving sale details: ", e);
             return null;
         } catch (NumberFormatException e) {
-            saleView.displayErrorMessage("Invalid input. Please enter valid numeric data.");
+            baseView.displayErrorMessage("Invalid input. Please enter valid numeric data.");
             return null;
         }
     }
@@ -339,7 +313,7 @@ public class SaleController {
         try {
             return ConsoleUtils.readRequiredInt("Enter sale ID: ");
         } catch (NumberFormatException e) {
-            saleView.displayErrorMessage("Invalid input. Sale ID must be a number.");
+            baseView.displayErrorMessage("Invalid input. Sale ID must be a number.");
             return -1;
         }
     }
@@ -347,14 +321,14 @@ public class SaleController {
     private Optional<SaleDetailsDTO> validateAndRetrieveSaleDetails(int saleId, boolean forUpdate) {
         Optional<Sale> saleOptional = saleDAO.findById(saleId);
         if (saleOptional.isEmpty()) {
-            saleView.displayErrorMessage("Sale not found with ID: " + saleId);
+            baseView.displayErrorMessage("Sale not found with ID: " + saleId);
             return Optional.empty();
         }
 
         Sale sale = saleOptional.get();
         Optional<Player> playerOptional = playerDAO.findById(sale.getIdPlayer());
         if (playerOptional.isEmpty()) {
-            saleView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
+            baseView.displayErrorMessage("Player not found with ID: " + sale.getIdPlayer());
             return Optional.empty();
         }
 
@@ -363,7 +337,7 @@ public class SaleController {
             try {
                 price = ConsoleUtils.readRequiredBigDecimal("Enter new sale price: ");
             } catch (NumberFormatException e) {
-                saleView.displayErrorMessage("Invalid price entered. Operation canceled.");
+                baseView.displayErrorMessage("Invalid price entered. Operation canceled.");
                 return Optional.empty();
             }
         }
@@ -372,7 +346,7 @@ public class SaleController {
     }
 
     private void handleError(String message, Exception e) {
-        saleView.displayErrorMessage(message + e.getMessage());
+        baseView.displayErrorMessage(message + e.getMessage());
         log.error(message, e);
     }
 }

@@ -4,8 +4,11 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ClueDAO;
 import dao.interfaces.ConnectionDAO;
+import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.dto.ClueDisplayDTO;
 import mvc.model.Clue;
+import mvc.model.Player;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -25,16 +28,15 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
 
     @Override
     public Clue create(Clue clue) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (idRoom, name, description, price, isActive) VALUES (?, ?, ?, ?, ?);"; // Agregamos description
+        String sql = "INSERT INTO " + nameObject + " (idRoom, name, price, isActive, description) VALUES (?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription()); // Nuevo campo
-            stmt.setBigDecimal(4, clue.getPrice());
-            stmt.setBoolean(5, clue.isActive());
+            stmt.setBigDecimal(3, clue.getPrice());
+            stmt.setBoolean(4, clue.isActive());
+            stmt.setString(5, clue.getDescription());
             stmt.executeUpdate();
-
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
                 clue.setId(keys.getInt(1));
@@ -46,7 +48,6 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
             throw new DAOException(messageError, e);
         }
     }
-
 
     @Override
     public Optional<Clue> findById(Integer id) throws DAOException {
@@ -65,7 +66,6 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
             throw new DAOException(messageError, e);
         }
     }
-
 
     @Override
     public List<Clue> findAll() throws DAOException {
@@ -193,5 +193,40 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
         return BigDecimal.ZERO;
     }
 
+    @Override
+    public List<ClueDisplayDTO> findAllCluesCompleteInfo() throws DAOException {
+        List<ClueDisplayDTO> cluesDisplayDTO = new ArrayList<>();
+        String sql = "SELECT " +
+                "cu.idClue, cu.name, cu.idRoom, cu.price, cu.IsActive, cu.description, " +
+                "r.name AS roomName, r.idTheme " +
+                "FROM Clue cu " +
+                "JOIN Room r ON cu.idRoom = r.idRoom;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                cluesDisplayDTO.add(listResultSetToClueDisplayDTO(rs));
+            }
+        } catch (SQLException e) {
+            String messageError = "Error retrieving complete clues";
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return cluesDisplayDTO;
+    }
+
+    private ClueDisplayDTO listResultSetToClueDisplayDTO(ResultSet rs) throws SQLException {
+        return ClueDisplayDTO.builder()
+                .id(rs.getInt("idClue"))
+                .name(rs.getString("name"))
+                .idRoom(rs.getInt("idRoom"))
+                .room(rs.getString("roomName"))
+                .idTheme(rs.getInt("idTheme"))
+                .theme(Theme.values()[rs.getInt("idTheme")])
+                .price(rs.getBigDecimal("price"))
+                .isActive(rs.getBoolean("isActive"))
+                .description(rs.getString("description"))
+                .build();
+    }
 }
 

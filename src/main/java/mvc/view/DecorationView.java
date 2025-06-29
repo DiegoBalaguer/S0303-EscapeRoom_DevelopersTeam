@@ -12,6 +12,8 @@ import java.util.Optional;
 @Slf4j
 public class DecorationView {
 
+    private static BaseView baseView =  new BaseView();
+
     public void displayItemMenu(String title) {
         OptionsMenuItem.viewMenuItem(title);
     }
@@ -32,7 +34,7 @@ public class DecorationView {
                     .build();
 
         } catch (Exception e) {
-            displayErrorMessage("Error collecting decoration details: " + e.getMessage());
+            baseView.displayErrorMessage("Error collecting decoration details: " + e.getMessage());
             return null;
         }
     }
@@ -42,44 +44,38 @@ public class DecorationView {
             int id = ConsoleUtils.readRequiredInt("Enter decoration ID: ");
             return Optional.of(id);
         } catch (NumberFormatException e) {
-            displayErrorMessage("Invalid ID. Please enter a valid number.");
+            baseView.displayErrorMessage("Invalid ID. Please enter a valid number.");
             return Optional.empty();
         }
     }
 
     public void displayDecoration(Decoration decoration) {
+        String message = "";
         if (decoration != null) {
-            System.out.println("\n--- Decoration Details ---");
-            System.out.println("ID: " + decoration.getId());
-            System.out.println("Name: " + decoration.getName());
-            System.out.println("Price: $" + decoration.getPrice());
-            System.out.println("Room ID: " + decoration.getIdRoom());
-            System.out.println("Is Active: " + (decoration.isActive() ? "Yes" : "No"));
-            System.out.println("-------------------------");
+            message += baseView.LINE + "--- Decoration Details ---" + baseView.LINE;
+            message += "ID: " + decoration.getId() + baseView.LINE;
+            message += "Name: " + decoration.getName() + baseView.LINE;
+            message += "Price: $" + decoration.getPrice() + baseView.LINE;
+            message += "Room ID: " + decoration.getIdRoom() + baseView.LINE;
+            message += "Is Active: " + (decoration.isActive() ? "Yes" : "No") + baseView.LINE;
+            message += "-------------------------" + baseView.LINE;
         } else {
-            System.out.println("Decoration not found.");
+            message = "Decoration not found.";
         }
+        baseView.displayMessageln(message);
     }
 
     public void displayDecorations(List<Decoration> decorations) {
-        System.out.println("\n--- List of Decorations ---");
+        baseView.displayMessageln(baseView.LINE + "--- List of Decorations ---");
         for (Decoration decoration : decorations) {
             displayDecoration(decoration);
         }
-        System.out.println("-------------------------");
-    }
-
-    public void displayMessage(String message) {
-        System.out.println("\n" + message + "\n");
-    }
-
-    public void displayErrorMessage(String message) {
-        System.err.println("\nERROR: " + message + "\n");
+        baseView.displayMessage2ln("-------------------------");
     }
 
     public Decoration editDecoration(Decoration currentDecoration) {
         try {
-            System.out.println("\n=== EDIT DECORATION ===");
+            baseView.displayMessageln(baseView.LINE + "=== EDIT DECORATION ===");
             String name = ConsoleUtils.readOptionalString("Current Name: " + currentDecoration.getName() + ". New Name: ").orElse(currentDecoration.getName());
             BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentDecoration.getPrice() + ". New Price: ").orElse(currentDecoration.getPrice());
             String description = ConsoleUtils.readOptionalString("Current Description: " + currentDecoration.getDescription() + ". New Description: ").orElse(currentDecoration.getDescription());
@@ -95,7 +91,7 @@ public class DecorationView {
                     .build();
 
         } catch (Exception e) {
-            displayErrorMessage("Error editing decoration: " + e.getMessage());
+            baseView.displayErrorMessage("Error editing decoration: " + e.getMessage());
             return null;
         }
     }

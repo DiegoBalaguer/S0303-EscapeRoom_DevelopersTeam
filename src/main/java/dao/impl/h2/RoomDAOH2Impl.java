@@ -60,7 +60,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToRoom(rs));
+                return Optional.of(listResultSetToRoom(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                rooms.add(mapResultSetToRoom(rs));
+                rooms.add(listResultSetToRoom(rs));
             }
             return rooms;
         } catch (SQLException e) {
@@ -196,7 +196,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     public void addClueToRoom(Integer roomId, Integer clueId) throws DAOException {}
     public void addDecorationToRoom(Integer roomId, Integer decorationId) throws DAOException {}
 
-    private Room mapResultSetToRoom(ResultSet rs) throws SQLException {
+    private Room listResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
                 .idEscapeRoom(rs.getInt("idEscapeRoom"))

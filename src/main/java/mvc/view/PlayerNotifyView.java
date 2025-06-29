@@ -13,14 +13,10 @@ import java.util.List;
 @Slf4j
 public class PlayerNotifyView {
 
-    private final String LINE = System.lineSeparator();
+    private static BaseView baseView =  new BaseView();
 
     public void displayPlayerMenu(String title) {
         OptionsMenuPlayerNotify.viewMenu(LoadConfigApp.getAppName());
-    }
-
-    public int getInputOptionMenu(String message) {
-        return ConsoleUtils.readRequiredInt(message);
     }
 
     public int getPlayerId() {
@@ -29,26 +25,14 @@ public class PlayerNotifyView {
 
     public void displayPlayers(List<Player> players) {
         if (players.isEmpty()) {
-            System.out.println("No players found.");
+            baseView.displayMessageln("No players found.");
             return;
         }
-        System.out.println(
+        baseView.displayMessageln(
                 StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(players.getFirst()).toListHead()));
 
-        players.forEach(player -> System.out.println(
+        players.forEach(player -> baseView.displayMessageln(
                 StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(player).toList())));
-        System.out.println("-------------------");
-    }
-
-    public void displayMessageln(String message) {
-        System.out.println(LINE + message + LINE);
-    }
-
-    public void displayMessage(String message) {
-        System.out.print(message);
-    }
-
-    public void displayErrorMessage(String message) {
-        System.err.println(LINE + "ERROR: " + message + LINE);
+        baseView.displayMessage2ln("-------------------");
     }
 }
