@@ -33,7 +33,7 @@ public class RewardWinController {
     // Queries for other Classes
 
     public int getRewardWinForPlayerWithList(int playerId) {
-        ListAllCertificatesWinForPlayerDetail(playerId);
+        listAllCertificatesWinForPlayerDetail(playerId);
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
         if (searchID.isEmpty() || REWARDWIN_DAO.findByPlayerId(searchID.get()).isEmpty()) {
             String message = NAME_OBJECT + " with ID required or not found.";
@@ -43,7 +43,7 @@ public class RewardWinController {
         return searchID.get();
     }
 
-    private void ListAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
+    public void listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
         List<RewardWinDisplayDTO> rewardWinDisplayDTOS = REWARDWIN_DAO.findByPlayerId(playerId);
         rewardWinView.displayListRewardWinDTO(rewardWinDisplayDTOS);
     }
