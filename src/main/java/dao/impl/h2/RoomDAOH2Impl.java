@@ -215,26 +215,40 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     }
     @Override
     public List<InventoryDisplayDTO> findInventory() throws DAOException {
-        String sql = "SELECT i.inventory i.id, i.name, i.price FROM inventory i";
+        String sql = """
+        SELECT u.inventory, u.id, u.name, u.price
+        FROM inventory u
+        UNION ALL
+        SELECT 'TOTAL' AS inventory, 0 AS id, '' AS name, t.price
+        FROM (
+            SELECT SUM(i.price) AS price
+            FROM inventory i
+        ) t
+    """;
 
         List<InventoryDisplayDTO> inventoryList = new ArrayList<>();
+
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 InventoryDisplayDTO item = InventoryDisplayDTO.builder()
-                        .id(rs.getInt("id"))
-                        .name(rs.getString("name"))
-                        .price(rs.getBigDecimal("price"))
+                        .inventory(rs.getString("inventory")) // Tipo: room, clue, decoration o TOTAL
+                        .id(rs.getInt("id"))                 // ID, será 0 para TOTAL
+                        .name(rs.getString("name"))           // Nombre, será vacío para TOTAL
+                        .price(rs.getBigDecimal("price"))     // Precio, o suma total para TOTAL
                         .build();
                 inventoryList.add(item);
             }
+
         } catch (SQLException e) {
-            String messageError = "Error retrieving inventory items";
-            log.error(messageError, e);
+            String messageError = "Error retrieving inventory items: " + e.getMessage();
+            log.error(messageError, e); // Log detallado del error
             throw new DAOException(messageError, e);
         }
+
         return inventoryList;
     }
+
 }

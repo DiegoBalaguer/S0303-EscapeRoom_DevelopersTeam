@@ -1,6 +1,5 @@
 package mvc.dto;
 
-import enums.Theme;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,19 +15,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class InventoryDisplayDTO {
-    private int id;
-    private String name;
-    private BigDecimal price;
-    private int idRoom;
-    private boolean isActive;
-    private String room;
-    private int idTheme;
-    private Theme theme;
-    private String description;
+    private String inventory; // Tipo: 'room', 'clue', 'decoration' o 'TOTAL'
+    private int id;           // ID del inventario, será 0 para 'TOTAL'
+    private String name;      // Nombre del ítem, será vacío para 'TOTAL'
+    private BigDecimal price; // Precio del ítem o suma total en el caso de 'TOTAL'
 
-
+    // Define el ancho de cada columna
     private int getLong(int position) {
-        return List.of(12,6, 20, 35).get(position);
+        return List.of(10, 6, 20, 10).get(position); // Define los anchos de las columnas
     }
 
     public List<PairTextLength> toListHead() {
@@ -44,9 +38,19 @@ public class InventoryDisplayDTO {
     public List<PairTextLength> toList() {
         List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        listValues.add(new PairTextLength(String.valueOf(id), getLong(position++)));
-        listValues.add(new PairTextLength(name, getLong(position++)));
-        listValues.add(new PairTextLength(String.valueOf(price),  getLong(position++)));
+
+        if ("TOTAL".equalsIgnoreCase(inventory)) {
+            listValues.add(new PairTextLength(inventory, getLong(position++)));
+            listValues.add(new PairTextLength("-", getLong(position++)));
+            listValues.add(new PairTextLength("-", getLong(position++)));
+            listValues.add(new PairTextLength("$" + price.toString(), getLong(position++)));
+        } else {
+            listValues.add(new PairTextLength(inventory, getLong(position++)));
+            listValues.add(new PairTextLength(String.valueOf(id), getLong(position++)));
+            listValues.add(new PairTextLength(name, getLong(position++)));
+            listValues.add(new PairTextLength("$" + price.toString(), getLong(position++)));
+        }
+
         return listValues;
     }
 }
