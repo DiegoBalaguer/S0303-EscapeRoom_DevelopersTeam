@@ -14,10 +14,6 @@ public class DecorationView {
 
     private static BaseView baseView =  new BaseView();
 
-    public void displayItemMenu(String title) {
-        OptionsMenuItem.viewMenuItem(title);
-    }
-
     public Decoration getDecorationDetails() {
         try {
             String name = ConsoleUtils.readRequiredString("Enter decoration name: ");

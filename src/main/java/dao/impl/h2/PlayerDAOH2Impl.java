@@ -16,7 +16,7 @@ import java.util.Optional;
 public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     private final ConnectionDAO connectionDAO;
-    private static final String nameObject = "player";
+    private static final String NAME_OBJECT = "player";
 
     public PlayerDAOH2Impl(ConnectionDAO connectionDAO) {
         this.connectionDAO = connectionDAO;
@@ -24,7 +24,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player create(Player player) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (name, email, password, isSubscribed, registrationDate) VALUES (?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + NAME_OBJECT + " (name, email, password, isSubscribed, registrationDate) VALUES (?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, player.getName());
@@ -39,7 +39,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             }
             return player;
         } catch (Exception e) {
-            String messageError = "Error creating " + nameObject + ": ";
+            String messageError = "Error creating " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -47,7 +47,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Optional<Player> findById(Integer id) throws DAOException {
-        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + " WHERE idPlayer = ?;";
+        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + NAME_OBJECT + " WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -57,7 +57,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             }
             return Optional.empty();
         } catch (Exception e) {
-            String messageError = "Error finding " + nameObject + " by ID: ";
+            String messageError = "Error finding " + NAME_OBJECT + " by ID: ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -66,7 +66,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
     @Override
     public List<Player> findAll() throws DAOException {
         List<Player> players = new ArrayList<>();
-        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + nameObject + ";";
+        String sql = "SELECT idPlayer, name, email, password, isSubscribed, registrationDate, isActive FROM " + NAME_OBJECT + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -75,7 +75,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
             }
             return players;
         } catch (SQLException e) {
-            String messageError = "Error retrieving all " + nameObject + ": ";
+            String messageError = "Error retrieving all " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -83,7 +83,7 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public Player update(Player player) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET name = ?, email = ?, password = ?, isSubscribed = ?, registrationDate =?,  isActive = ? WHERE idPlayer = ?;";
+        String sql = "UPDATE " + NAME_OBJECT + " SET name = ?, email = ?, password = ?, isSubscribed = ?, registrationDate =?,  isActive = ? WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, player.getName());
@@ -96,13 +96,13 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {
-                String messageError = "No " + nameObject + " found to update with ID: " + player.getId();
+                String messageError = "No " + NAME_OBJECT + " found to update with ID: " + player.getId();
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
             return player;
         } catch (Exception e) {
-            String messageError = "Error updating " + nameObject + ": ";
+            String messageError = "Error updating " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -110,18 +110,18 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        String sql = "DELETE FROM " + nameObject + " WHERE idPlayer = ?;";
+        String sql = "DELETE FROM " + NAME_OBJECT + " WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                String messageError = "No " + nameObject + " found to delete with ID: " + id;
+                String messageError = "No " + NAME_OBJECT + " found to delete with ID: " + id;
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
         } catch (Exception e) {
-            String messageError = "Error deleting " + nameObject + " by ID: " + id;
+            String messageError = "Error deleting " + NAME_OBJECT + " by ID: " + id;
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -129,14 +129,14 @@ public class PlayerDAOH2Impl implements BaseDAO<Player, Integer>, PlayerDAO {
 
     @Override
     public boolean isExistsById(Integer id) {
-        String sql = "SELECT 1 FROM " + nameObject + " WHERE idPlayer = ?;";
+        String sql = "SELECT 1 FROM " + NAME_OBJECT + " WHERE idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            String messageError = "Error check if exist in " + nameObject + " the ID: " + id;
+            String messageError = "Error check if exist in " + NAME_OBJECT + " the ID: " + id;
             log.error(messageError, e);
             return false;
         }

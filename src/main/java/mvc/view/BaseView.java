@@ -2,18 +2,22 @@ package mvc.view;
 
 import utils.ConsoleUtils;
 
+import java.util.Optional;
+
 public class BaseView {
 
     public final String LINE = System.lineSeparator();
 
-
-
-    public int getInputRequiredInt(String message) {
+    public int getReadRequiredInt(String message) {
         return ConsoleUtils.readRequiredInt(message);
     }
 
-    public String getInputRequiredString(String message) {
+    public String getReadRequiredString(String message) {
         return ConsoleUtils.readRequiredString(message);
+    }
+
+    public Optional<Integer> getReadValueInt(String message) {
+        return ConsoleUtils.readValueInt(message);
     }
 
     public void displayMessage2ln(String message) {
@@ -32,5 +36,7 @@ public class BaseView {
         System.err.println(LINE + "ERROR: " + message + LINE);
     }
 
-
+    public void displayDebugMessage(String message) {
+        System.out.print(LINE + "DEBUG: " + message + LINE);
+    }
 }

@@ -3,63 +3,54 @@ package mvc.controller;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
-import dao.interfaces.*;
-import mvc.dto.CertificateWinDisplayDTO;
-import mvc.dto.RewardWinDisplayDTO;
+
+import dao.interfaces.CertificateWinDAO;
+import dao.interfaces.RewardWinDAO;
 import mvc.enumsMenu.OptionsMenuPlayerAward;
-import lombok.extern.slf4j.Slf4j;
-import mvc.model.*;
+import mvc.model.CertificateWin;
+import mvc.model.RewardWin;
 import mvc.view.BaseView;
 import mvc.view.PlayerAwardsView;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class PlayerAwardsController {
 
-    private static PlayerAwardsController playerAwardsController;
-    private final BaseView baseView;
-    private final PlayerAwardsView playerAwardsView;
-    private final PlayerDAO playerDAO;
-    private final RewardDAO rewardDAO;
-    private final CertificateDAO certificateDAO;
-    private final RoomDAO roomDAO;
-    private final RewardWinDAO rewardWinDAO;
-    private final CertificateWinDAO certificateWinDAO;
+    private BaseView baseView;
+    private PlayerAwardsView playerAwardsView;
+    private RewardWinDAO rewardWinDAO;
+    private CertificateWinDAO certificateWinDAO;
+    private CertificateController certificateController;
+    private RewardController rewardController;
+    private RewardWinController rewardWinController;
+    private CertificateWinController certificateWinController;
 
-    private PlayerAwardsController() {
-        this.baseView = new BaseView();
-        this.playerAwardsView = new PlayerAwardsView();
+    private static final String NAME_OBJECT = "Player Awards";
+
+    public PlayerAwardsController() {
+
         try {
-            this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
-            this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
-            this.rewardDAO = DAOFactory.getDAOFactory().getRewardDAO();
-            this.certificateDAO = DAOFactory.getDAOFactory().getCertificateDAO();
             this.rewardWinDAO = DAOFactory.getDAOFactory().getRewardWinDAO();
             this.certificateWinDAO = DAOFactory.getDAOFactory().getCertificateWinDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    public static PlayerAwardsController getInstance() {
-        if (playerAwardsController == null) {
-            synchronized (PlayerAwardsController.class) {
-                if (playerAwardsController == null) {
-                    playerAwardsController = new PlayerAwardsController();
-                }
-            }
-        }
-        log.debug("Created PlayerAwardsWorkers Singleton");
-        return playerAwardsController;
+        baseView = new BaseView();
+        baseView = new BaseView();
+        playerAwardsView = new PlayerAwardsView();
+        rewardController = new RewardController();
+        certificateController =  new CertificateController();
+        certificateWinController = new CertificateWinController();
+        rewardWinController = new RewardWinController();
+        baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
     }
 
     public void mainMenu() {
         do {
             playerAwardsView.displayPlayerMenu("PLAYER AWARDS MANAGEMENT");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuPlayerAward selectedOption = OptionsMenuPlayerAward.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -70,9 +61,9 @@ public class PlayerAwardsController {
                             return;
                         }
                         case AWARD_REWARD_WIN -> awardRewardWinToPlayer();
-                        case AWARD_CERTIFICATE_WIN -> awardCertificateWinToPlayer();
-                        case REVOKE_REWARD_WIN ->  revokeRewardWinToPlayer();
-                        case REVOKE_CERTIFICATE_WIN -> revokeCertificateWinToPlayer();
+                        case AWARD_CERTIFICATE_WIN -> addCertificateWinToPlayer();
+                        case REVOKE_REWARD_WIN ->  delRewardWinToPlayer();
+                        case REVOKE_CERTIFICATE_WIN -> delCertificateWinToPlayer();
                     }
                 } catch (DAOException e) {
                     baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
@@ -94,10 +85,10 @@ public class PlayerAwardsController {
 
         try {
             baseView.displayMessage2ln("List of Players");
-            playerId = getPlayerId();
+            playerId = PlayerController.getInstance().getPlayerIdWithList();
 
             baseView.displayMessage2ln("List of Rewards");
-            rewardId = getRewardId();
+            rewardId = rewardController.getRewardIdWithList();
 
             description = getDescription();
 
@@ -120,7 +111,7 @@ public class PlayerAwardsController {
         }
     }
 
-    private void awardCertificateWinToPlayer() throws DAOException {
+    private void addCertificateWinToPlayer() throws DAOException {
         baseView.displayMessage2ln("#### AWARD CERTIFICATE WIN TO PLAYER #################");
 
         int playerId = 0;
@@ -130,13 +121,13 @@ public class PlayerAwardsController {
 
         try {
             baseView.displayMessage2ln("List of Players");
-            playerId = getPlayerId();
+            playerId = PlayerController.getInstance().getPlayerIdWithList();
 
             baseView.displayMessage2ln("List of Rooms");
-            roomId = RoomController.getInstance().getRoomId();
+            roomId = RoomController.getInstance().getRoomIdWithList();
 
             baseView.displayMessage2ln("List of Certificates");
-            certificateId = getCertificateId();
+            certificateId = certificateController.getCertificateIdWithList();
 
             description = getDescription();
 
@@ -158,12 +149,9 @@ public class PlayerAwardsController {
             CertificateWin savedCertificateWin = certificateWinDAO.create(newCertificateWin);
             baseView.displayMessage2ln("Certificate Win added successfully for Player ID " + playerId + " (Certificate Win ID: " + savedCertificateWin.getId() + ")");
         }
-
-
-
     }
 
-    private void revokeRewardWinToPlayer() throws DAOException {
+    private void delRewardWinToPlayer() throws IllegalArgumentException, DAOException {
         baseView.displayMessage2ln("#### REVOKE REWARD WIN TO PLAYER #################");
 
         int playerId = 0;
@@ -171,10 +159,10 @@ public class PlayerAwardsController {
 
         try {
             baseView.displayMessage2ln("List of Players");
-            playerId = getPlayerId();
+            playerId = PlayerController.getInstance().getPlayerIdWithList();
 
             baseView.displayMessage2ln("List of Rewards Wins");
-            rewardWinId = getRewardWinId(playerId);
+            rewardWinId = rewardWinController.getRewardWinForPlayerWithList(playerId);
 
         } catch (IllegalArgumentException e) {
             baseView.displayErrorMessage(e.getMessage());
@@ -190,7 +178,7 @@ public class PlayerAwardsController {
         }
     }
 
-    private void revokeCertificateWinToPlayer() throws DAOException {
+    private void delCertificateWinToPlayer() throws DAOException {
         baseView.displayMessage2ln("#### REVOKE CERTIFICATE WIN TO PLAYER #################");
 
         int playerId = 0;
@@ -198,10 +186,10 @@ public class PlayerAwardsController {
 
         try {
             baseView.displayMessage2ln("List of Players");
-            playerId = getPlayerId();
+            playerId = PlayerController.getInstance().getPlayerIdWithList();
 
             baseView.displayMessage2ln("List of Certificates Wins");
-            certificateWinId = getCertificateWinId(playerId);
+            certificateWinId = certificateWinController.getCertificateWinForPlayerWithList(playerId);
 
         } catch (IllegalArgumentException e) {
             baseView.displayErrorMessage(e.getMessage());
@@ -217,94 +205,7 @@ public class PlayerAwardsController {
         }
     }
 
-    private int getPlayerId() {
-        listAllPayersIntern();
-        int playerIdOpt = baseView.getInputRequiredInt("Enter player ID: ");
-        if (playerDAO.findById(playerIdOpt).isEmpty()) {
-            String message = "Player with ID required or not found.";
-            baseView.displayErrorMessage(message);
-            log.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        return playerIdOpt;
-    }
-
-    private int getRewardId() {
-        listAllRewardsIntern();
-        int rewardIdOpt = baseView.getInputRequiredInt("Enter Reward ID: ");
-        if (rewardDAO.findById(rewardIdOpt).isEmpty()) {
-            String message = "Reward ID required or not found.";
-            baseView.displayErrorMessage(message);
-            log.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        return rewardIdOpt;
-    }
-
-
-
-    private int getCertificateId() {
-        listAllCertificatesIntern();
-        int certificateIdOpt = baseView.getInputRequiredInt("Enter Certificate ID: ");
-        if (certificateDAO.findById(certificateIdOpt).isEmpty()) {
-            String message = "Certificate ID required or not found.";
-            baseView.displayErrorMessage(message);
-            log.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        return certificateIdOpt;
-    }
-
-    private int getRewardWinId(int playerId) {
-        listAllRewardsWinsIntern(playerId);
-        int rewardWinIdOpt = baseView.getInputRequiredInt("Enter Reward win ID: ");
-        if (rewardWinDAO.findById(rewardWinIdOpt).isEmpty()) {
-            String message = "Reward ID required or not found.";
-            baseView.displayErrorMessage(message);
-            log.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        return rewardWinIdOpt;
-    }
-
-    private int getCertificateWinId(int playerId) {
-        listAllCertificatesWinsIntern(playerId);
-        int certificateIdOpt = baseView.getInputRequiredInt("Enter Certificate win ID: ");
-        if (certificateWinDAO.findById(certificateIdOpt).isEmpty()) {
-            String message = "Certificate ID required or not found.";
-            baseView.displayErrorMessage(message);
-            log.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        return certificateIdOpt;
-    }
-
     private String getDescription() {
-        return baseView.getInputRequiredString("Enter description (30 chars): ");
-    }
-
-    private void listAllPayersIntern() throws DAOException {
-        List<Player> players = playerDAO.findAll();
-        playerAwardsView.displayPlayers(players);
-    }
-
-    private void listAllRewardsIntern() throws DAOException {
-        List<Reward> rewards = rewardDAO.findAll();
-        playerAwardsView.displayRewards(rewards);
-    }
-
-    private void listAllCertificatesIntern() throws DAOException {
-        List<Certificate> certificates = certificateDAO.findAll();
-        playerAwardsView.displayCertificates(certificates);
-    }
-
-    private void listAllRewardsWinsIntern(int playerId) throws DAOException {
-        List<RewardWinDisplayDTO> rewardWinDisplayDTOS = rewardWinDAO.findByPlayerId(playerId);
-        playerAwardsView.displayRewardWin(rewardWinDisplayDTOS);
-    }
-
-    private void listAllCertificatesWinsIntern(int playerId) throws DAOException {
-        List<CertificateWinDisplayDTO> certificateWinDisplayDTOS = certificateWinDAO.findByPlayerId(playerId);
-        playerAwardsView.displayCertificateWin(certificateWinDisplayDTOS);
+        return baseView.getReadRequiredString("Enter description (30 chars): ");
     }
 }

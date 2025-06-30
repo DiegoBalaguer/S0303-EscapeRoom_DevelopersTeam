@@ -1,28 +1,20 @@
 package mvc.view;
 
 import mvc.dto.*;
-import mvc.enumsMenu.OptionsMenuItem;
-import lombok.extern.slf4j.Slf4j;
-import mvc.model.Certificate;
 import mvc.model.Clue;
+
 import mvc.model.Player;
-import mvc.model.Room;
 import utils.ConsoleUtils;
 import utils.StringUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class ClueView {
 
-    private static BaseView baseView =  new BaseView();
-    
-    public void displayClueMenu(String title) {
-        OptionsMenuItem.viewMenuItem(title);
-    }
+    private static BaseView baseView = new BaseView();
+    private static final String NAME_OBJECT = "Clue";
 
     public Clue getClueDetailsCreate(int roomId) {
         try {
@@ -51,18 +43,37 @@ public class ClueView {
         return ConsoleUtils.readRequiredBigDecimal("Enter price: ");
     }
 
-
-    public Optional<Integer> getClueId() {
+    public Clue getUpdateClueDetails(Clue clue) {
         try {
-            int id = ConsoleUtils.readRequiredInt("Enter clue ID: ");
-            return Optional.of(id);
-        } catch (NumberFormatException e) {
-            baseView.displayErrorMessage("Invalid ID. Please enter a valid number.");
-            return Optional.empty();
+            clue.setName(getUpdateName(clue.getName()));
+            clue.setDescription(getUpdateDescription(clue.getDescription()));
+            clue.setPrice(getUpdatePrice(getUpdatePrice(clue.getPrice())));
+            clue.setActive(getUpdateIsActive(clue.isActive()));
+            return clue;
+        } catch (Exception e) {
+            baseView.displayErrorMessage("Error editing clue: " + e.getMessage());
+            throw new IllegalArgumentException("Error editing " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    public void displayClue(Clue clue) {
+
+    private String getUpdateName(String oldValue) {
+        return ConsoleUtils.readStringWithDefault("Enter name: ", Optional.of(oldValue)).get();
+    }
+
+    private String getUpdateDescription(String oldValue) {
+        return ConsoleUtils.readStringWithDefault("Enter description: ", Optional.of(oldValue)).get();
+    }
+
+    private BigDecimal getUpdatePrice(BigDecimal oldValue) {
+        return ConsoleUtils.readBigDecimalWithDefault("Enter price: ", Optional.of(oldValue)).get();
+    }
+
+    private Boolean getUpdateIsActive(boolean oldValue) {
+        return ConsoleUtils.readBooleanWithDefault("Enter is active ('Y' or 'N'): ", Optional.of(oldValue)).get();
+    }
+
+    public void displayRecordClue(Clue clue) {
         String message = "";
         if (clue != null) {
             message += baseView.LINE + "--- Clue Details ---" + baseView.LINE;
@@ -78,30 +89,7 @@ public class ClueView {
         baseView.displayMessageln(message);
     }
 
-    public Clue editClue(Clue currentClue) {
-        try {
-            baseView.displayMessageln(baseView.LINE + "=== EDIT CLUE ===");
-            String name = ConsoleUtils.readOptionalString("Current Name: " + currentClue.getName() + ". New Name: ").orElse(currentClue.getName());
-            BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentClue.getPrice() + ". New Price: ").orElse(currentClue.getPrice());
-            String description = ConsoleUtils.readOptionalString("Current Description: " + currentClue.getDescription() + ". New Description: ").orElse(currentClue.getDescription()); // Editar descripción
-            boolean isActive = ConsoleUtils.readOptionalBoolean("Current Active Status: " + (currentClue.isActive() ? "Yes" : "No") + ". New Status (true/false): ").orElse(currentClue.isActive());
-
-            return Clue.builder()
-                    .id(currentClue.getId())
-                    .name(name)
-                    .idRoom(currentClue.getIdRoom())
-                    .price(price)
-                    .description(description) // Asignar descripción actualizada
-                    .isActive(isActive)
-                    .build();
-
-        } catch (Exception e) {
-            baseView.displayErrorMessage("Error editing clue: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public void displayClueList(List<ClueDisplayDTO> clueDisplayDTOS) {
+    public void displayClueListDto(List<ClueDisplayDTO> clueDisplayDTOS) {
         if (clueDisplayDTOS.isEmpty()) {
             baseView.displayMessageln("No clues found.");
             return;
@@ -114,7 +102,7 @@ public class ClueView {
         baseView.displayMessage2ln("-------------------");
     }
 
-    public void displayClues(List<Clue> clues) {
+    public void displayClueList(List<Clue> clues) {
         if (clues.isEmpty()) {
             baseView.displayMessageln("No Clues found.");
             return;

@@ -157,6 +157,22 @@ public class ConsoleUtils {
         } while (true);
     }
 
+
+    public static Optional<BigDecimal> readBigDecimalWithDefault(String message, Optional<BigDecimal> defaultValue) {
+        do {
+            String input = readValueString(message);
+
+            if (input.isEmpty()) {
+                return defaultValue;
+            }
+            try {
+                return Optional.of(BigDecimal.valueOf(Double.parseDouble(input)));
+            } catch (Exception e) {
+                System.err.println("Error: input not valid (" + e.getMessage() + ").");
+            }
+        } while (true);
+    }
+
     public static <T> Optional<T> readValueWithDefault(String message, Optional<T> defaultValue, Function<String, T> parser) {
         do {
             String input = readValueString(message);

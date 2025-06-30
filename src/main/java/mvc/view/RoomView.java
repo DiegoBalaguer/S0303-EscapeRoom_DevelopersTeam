@@ -16,10 +16,7 @@ import java.util.Optional;
 public class RoomView {
 
     private final BaseView baseView = new BaseView();
-
-    public void displayRoomMenu(String title) {
-        OptionsMenuCrud.viewMenuCrud(title);
-    }
+    private static final String NAME_OBJECT = "Room";
 
     public Room getRoomDetails(boolean forUpdate) {
         try {
@@ -58,7 +55,7 @@ public class RoomView {
                 return null;
             }
 
-            boolean isActive = ConsoleUtils.readRequiredBoolean("Is the room active? (T/F, Y/N, S/N): ");
+            boolean isActive = ConsoleUtils.readRequiredBoolean("Enter is active ('Y' or 'N'): ");
 
             return Room.builder()
                     .idEscapeRoom(forUpdate ? 0 : 1)
@@ -103,24 +100,6 @@ public class RoomView {
         }
         baseView.displayMessageln(message);
     }
-
-
-        public void displayRoomsList(List<Room> rooms) {
-            if (rooms.isEmpty()) {
-                baseView.displayMessageln("No room found.");
-                return;
-            }
-            baseView.displayMessageln(
-                    StringUtils.makeLineToList(RoomMapper.toDisplayDTO(rooms.getFirst()).toListHead()));
-
-            rooms.forEach(room -> baseView.displayMessageln(
-                    StringUtils.makeLineToList(RoomMapper.toDisplayDTO(room).toList())));
-            baseView.displayMessage2ln("-------------------");
-        }
-
-
-
-
 
 
     public Room getRoomDetailsWithDefaults(Room currentRoom) {
@@ -184,7 +163,16 @@ public class RoomView {
         }
     }
 
+    public void displayListRooms(List<Room> rooms) {
+        if (rooms.isEmpty()) {
+            baseView.displayMessageln("No " + NAME_OBJECT + " found.");
+            return;
+        }
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(RoomMapper.toDisplayDTO(rooms.getFirst()).toListHead()));
 
-
-
+        rooms.forEach(room -> baseView.displayMessageln(
+                StringUtils.makeLineToList(RoomMapper.toDisplayDTO(room).toList())));
+        baseView.displayMessage2ln("-------------------");
+    }
 }

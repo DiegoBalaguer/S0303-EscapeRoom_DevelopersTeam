@@ -5,7 +5,6 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.DecorationDAO;
 import mvc.enumsMenu.OptionsMenuItem;
-import lombok.extern.slf4j.Slf4j;
 import mvc.model.Decoration;
 import mvc.view.BaseView;
 import mvc.view.DecorationView;
@@ -14,18 +13,19 @@ import mvc.view.RoomView;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class DecorationController {
 
     private static DecorationController decorationControllerInstance;
-    private final DecorationView decorationView;
-    private final RoomView roomView;
-    private final BaseView baseView;
-    private final DecorationDAO decorationDAO;
+    private BaseView baseView;
+    private DecorationView decorationView;
+    private RoomView roomView;
+    private DecorationDAO decorationDAO;
+    private static final String NAME_OBJECT = "Decoration";
 
     private DecorationController() {
         baseView = new BaseView();
-        this.decorationView = new DecorationView();
+        baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
+        decorationView = new DecorationView();
         try {
             this.roomView = new RoomView();
             this.decorationDAO = DAOFactory.getDAOFactory().getDecorationDAO();
@@ -42,14 +42,13 @@ public class DecorationController {
                 }
             }
         }
-        log.debug("Created DecorationWorkers Singleton");
         return decorationControllerInstance;
     }
 
     public void mainMenu() {
         do {
-            decorationView.displayItemMenu("=== DECORATION MANAGEMENT MENU ===");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            baseView.displayMessageln(OptionsMenuItem.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuItem selectedOption = OptionsMenuItem.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -141,7 +140,6 @@ public class DecorationController {
             baseView.displayErrorMessage("Error updating the decoration: " + e.getMessage());
         } catch (Exception e) {
             baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-            log.error("Unexpected error: ", e);
         }
     }
 

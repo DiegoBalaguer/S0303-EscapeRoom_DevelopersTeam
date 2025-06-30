@@ -18,7 +18,7 @@ import java.util.Optional;
 public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     private final ConnectionDAO connectionDAO;
-    private static final String nameObject = "room";
+    private static final String NAME_OBJECT = "room";
 
     public RoomDAOH2Impl(ConnectionDAO connectionDAO) {
         this.connectionDAO = connectionDAO;
@@ -26,7 +26,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Room create(Room room) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (idEscapeRoom, name, description, idTheme, idDifficulty, price, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO " + NAME_OBJECT + " (idEscapeRoom, name, description, idTheme, idDifficulty, price, isActive) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, room.getIdEscapeRoom());
@@ -54,7 +54,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Optional<Room> findById(Integer id) throws DAOException {
-        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + nameObject + " WHERE idRoom = ?;";
+        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + NAME_OBJECT + " WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -64,7 +64,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             }
             return Optional.empty();
         } catch (Exception e) {
-            String messageError = "Error finding " + nameObject + " by ID: ";
+            String messageError = "Error finding " + NAME_OBJECT + " by ID: ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -73,7 +73,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     @Override
     public List<Room> findAll() throws DAOException {
         List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + nameObject + ";";
+        String sql = "SELECT idRoom, idEscapeRoom, name, idTheme, idDifficulty, price, isActive, description FROM " + NAME_OBJECT + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -82,7 +82,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             }
             return rooms;
         } catch (SQLException e) {
-            String messageError = "Error retrieving all " + nameObject + ": ";
+            String messageError = "Error retrieving all " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -93,7 +93,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
         // Primero obtenemos toda la información del registro actual
         Optional<Room> existingRoomOptional = findById(room.getId());
         if (existingRoomOptional.isEmpty()) {
-            String messageError = "No " + nameObject + " found to update with ID: " + room.getId();
+            String messageError = "No " + NAME_OBJECT + " found to update with ID: " + room.getId();
             log.error(messageError);
             throw new DAOException(messageError);
         }
@@ -109,7 +109,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
         boolean newIsActive = room.isActive() || existingRoom.isActive(); // manejar campo booleano
 
         // Actualización en la base de datos
-        String sql = "UPDATE " + nameObject + " SET name = ?, description = ?, price = ?, idDifficulty = ?, idTheme = ?, isActive = ? WHERE idRoom = ?;";
+        String sql = "UPDATE " + NAME_OBJECT + " SET name = ?, description = ?, price = ?, idDifficulty = ?, idTheme = ?, isActive = ? WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, newName);
@@ -122,7 +122,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                String messageError = "No " + nameObject + " found to update with ID: " + room.getId();
+                String messageError = "No " + NAME_OBJECT + " found to update with ID: " + room.getId();
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
@@ -135,7 +135,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
             return existingRoom;
         } catch (Exception e) {
-            String messageError = "Error updating " + nameObject + ": ";
+            String messageError = "Error updating " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -143,18 +143,18 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        String sql = "DELETE FROM " + nameObject + " WHERE idRoom = ?;";
+        String sql = "DELETE FROM " + NAME_OBJECT + " WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                String messageError = "No " + nameObject + " found to delete with ID: " + id;
+                String messageError = "No " + NAME_OBJECT + " found to delete with ID: " + id;
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
         } catch (Exception e) {
-            String messageError = "Error deleting " + nameObject + " by ID: " + id;
+            String messageError = "Error deleting " + NAME_OBJECT + " by ID: " + id;
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -162,14 +162,14 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public boolean isExistsById(Integer id) {
-        String sql = "SELECT 1 FROM " + nameObject + " WHERE idRoom = ?;";
+        String sql = "SELECT 1 FROM " + NAME_OBJECT + " WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            String messageError = "Error check if exist in " + nameObject + " the ID: " + id;
+            String messageError = "Error check if exist in " + NAME_OBJECT + " the ID: " + id;
             log.error(messageError, e);
             return false;
         }
@@ -177,7 +177,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public double calculateTotalRoomValue() throws DAOException {
-        String sql = "SELECT SUM(price) AS total FROM " + nameObject + ";";
+        String sql = "SELECT SUM(price) AS total FROM " + NAME_OBJECT + ";";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -187,7 +187,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             return 0.0;
 
         } catch (Exception e) {
-            String messageError = "Error calculating total " + nameObject + " value";
+            String messageError = "Error calculating total " + NAME_OBJECT + " value";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }

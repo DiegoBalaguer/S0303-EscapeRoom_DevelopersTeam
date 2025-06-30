@@ -76,8 +76,8 @@ public class SaleController {
     public void mainMenu() {
         boolean running = true;
         while (running) {
-            saleView.displaySaleMenu("SALE MANAGEMENT");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            baseView.displayMessageln(OptionsMenuSale.viewMenu("SALE MANAGEMENT"));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuSale selectedOption = OptionsMenuSale.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -253,7 +253,7 @@ public class SaleController {
     private void listAllSales() {
         try {
             List<Sale> sales = saleDAO.findAll();
-            saleView.displaySales(sales);
+            saleView.displayListSales(sales);
         } catch (DAOException e) {
             handleError("An error occurred while listing sales: ", e);
         }

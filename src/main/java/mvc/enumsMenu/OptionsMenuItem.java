@@ -12,12 +12,10 @@ public enum OptionsMenuItem {
     private final String DESCRIPTION;
     private final int OPTION_NUMBER;
 
-
     OptionsMenuItem(int optionNumber, String description) {
         this.OPTION_NUMBER = optionNumber;
         this.DESCRIPTION = description;
     }
-
 
     public String getDESCRIPTION() {
         return DESCRIPTION;
@@ -27,12 +25,18 @@ public enum OptionsMenuItem {
         return OPTION_NUMBER;
     }
 
-    public static void viewMenuItem(String title) {
-        System.out.println(System.lineSeparator() + title + System.lineSeparator());
+    public static String viewMenu(String title) {
+        StringBuilder message = new StringBuilder();
+        message.append(System.lineSeparator()).append(title).append(System.lineSeparator()).append(System.lineSeparator());
+
         for (OptionsMenuItem optionMenu : OptionsMenuItem.values()) {
-            System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
+            message
+                    .append(optionMenu.getOPTION_NUMBER())
+                    .append(". ")
+                    .append(optionMenu.getDESCRIPTION())
+                    .append(System.lineSeparator());
         }
-        //System.out.println("0. Return to main menu");
+        return message.toString();
     }
 
     public static OptionsMenuItem getOptionByNumber(int number) {
