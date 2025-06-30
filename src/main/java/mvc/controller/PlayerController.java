@@ -114,10 +114,10 @@ public class PlayerController {
             playerView.displayRecordPlayer(existPlayerOpt.get());
 
             baseView.displayMessage2ln("List of Rewards Wins");
-            rewardWinController.getRewardWinForPlayerWithList(existPlayerOpt.get().getId());
+            rewardWinController.listAllCertificatesWinForPlayerDetail(existPlayerOpt.get().getId());
 
             baseView.displayMessage2ln("List of Certificate Wins");
-            certificateWinController.getCertificateWinForPlayerWithList(existPlayerOpt.get().getId());
+            certificateWinController.listAllCertificatesWinForPlayerDetail(existPlayerOpt.get().getId());
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error retrieving " + NAME_OBJECT + ": " + e.getMessage());
         }

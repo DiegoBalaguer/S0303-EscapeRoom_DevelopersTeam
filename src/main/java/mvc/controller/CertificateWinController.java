@@ -32,7 +32,7 @@ public class CertificateWinController {
 
 
     public int getCertificateWinForPlayerWithList(int playerId) {
-        ListAllCertificatesWinForPlayerDetail(playerId);
+        listAllCertificatesWinForPlayerDetail(playerId);
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
         if (searchID.isEmpty() || CERTIFICATEWIN_DAO.findByPlayerId(searchID.get()).isEmpty()) {
             String message = NAME_OBJECT + " with ID required or not found.";
@@ -42,7 +42,7 @@ public class CertificateWinController {
         return searchID.get();
     }
 
-    private void ListAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
+    public void listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
         List<CertificateWinDisplayDTO> certificateWinDisplayDTOS = CERTIFICATEWIN_DAO.findByPlayerId(playerId);
         certificateWinView.displayListCertificateWinDTO(certificateWinDisplayDTOS);
     }
