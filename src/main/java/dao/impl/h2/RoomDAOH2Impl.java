@@ -7,6 +7,9 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.dto.InventoryDisplayDTO;
+import mvc.model.Clue;
+import mvc.model.Decoration;
 import mvc.model.Room;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -196,6 +199,8 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     public void addClueToRoom(Integer roomId, Integer clueId) throws DAOException {}
     public void addDecorationToRoom(Integer roomId, Integer decorationId) throws DAOException {}
 
+
+
     private Room listResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
@@ -207,5 +212,29 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
                 .active(rs.getBoolean("isActive"))
                 .description(rs.getString("description"))
                 .build();
+    }
+    @Override
+    public List<InventoryDisplayDTO> findInventory() throws DAOException {
+        String sql = "SELECT i.inventory i.id, i.name, i.price FROM inventory i";
+
+        List<InventoryDisplayDTO> inventoryList = new ArrayList<>();
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                InventoryDisplayDTO item = InventoryDisplayDTO.builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .price(rs.getBigDecimal("price"))
+                        .build();
+                inventoryList.add(item);
+            }
+        } catch (SQLException e) {
+            String messageError = "Error retrieving inventory items";
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return inventoryList;
     }
 }

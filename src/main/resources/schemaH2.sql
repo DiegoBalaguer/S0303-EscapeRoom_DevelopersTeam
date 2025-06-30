@@ -119,7 +119,7 @@ CREATE TABLE notifications (
      idPlayer INT NOT NULL,
      message TEXT NOT NULL,
      dateTimeSent TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     FOREIGN KEY (idPlayer) REFERENCES player(idPlayer)
+     isActive BOOLEAN DEFAULT TRUE
 );
 
 -- Insert data test
