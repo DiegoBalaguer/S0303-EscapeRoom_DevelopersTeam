@@ -3,7 +3,7 @@ package mvc.enumsMenu;
 public enum OptionsMenuPlayerNotify {
     SUBSCRIBE(1, "Subscribe"),
     UNSUBSCRIBE(2, "Unsubscribe"),
-    NOTIFY(3, "Notify Player"),
+    NOTIFICATIONS(3, "Player Notifications"),
     EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;
