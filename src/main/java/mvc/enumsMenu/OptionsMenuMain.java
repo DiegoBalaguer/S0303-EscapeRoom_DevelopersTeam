@@ -25,18 +25,20 @@ public enum OptionsMenuMain {
         return DESCRIPTION;
     }
 
-    public static void viewMenu(String title) {
-        System.out.println(System.lineSeparator() + title + System.lineSeparator());
+    public static String viewMenu(String title) {
+        StringBuilder message = new StringBuilder();
+        message.append(System.lineSeparator()).append(title).append(System.lineSeparator()).append(System.lineSeparator());
 
-        OptionsMenuMain[] options = OptionsMenuMain.values();
-
-        for (OptionsMenuMain optionMenu : options) {
-             System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
+        for (OptionsMenuMain optionMenu : OptionsMenuMain.values()) {
+            message
+                    .append(optionMenu.getOPTION_NUMBER())
+                    .append(". ")
+                    .append(optionMenu.getDESCRIPTION())
+                    .append(System.lineSeparator());
         }
-        System.out.println("");
+        return message.toString();
     }
 
-    // Optional
     public static OptionsMenuMain getOptionByNumber(int number) {
         for (OptionsMenuMain option : OptionsMenuMain.values()) {
             if (option.getOPTION_NUMBER() == number) {

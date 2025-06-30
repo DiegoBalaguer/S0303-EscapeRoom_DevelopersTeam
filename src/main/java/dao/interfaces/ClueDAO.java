@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ClueDAO extends BaseDAO<Clue, Integer> {
     List<ClueDisplayDTO> findAllCluesCompleteInfo() throws DAOException;
-    List<Clue> findCluesByRoomId(Integer roomId) throws DAOException;
+    List<ClueDisplayDTO> findCluesByRoomId(Integer roomId) throws DAOException;
     BigDecimal findPriceByRoomId(Integer roomId) throws DAOException;
 
 }

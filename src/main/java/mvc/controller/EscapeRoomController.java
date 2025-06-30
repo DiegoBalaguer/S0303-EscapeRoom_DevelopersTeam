@@ -1,52 +1,53 @@
 package mvc.controller;
 
-import mvc.enumsMenu.OptionsMenuEscapeRoom;
-import config.loadConfigApp.LoadConfigApp;
-import lombok.extern.slf4j.Slf4j;
+import dao.exceptions.DAOException;
+import mvc.enumsMenu.*;
 import mvc.view.BaseView;
 
-
-@Slf4j
 public class EscapeRoomController {
 
-    private static BaseView baseView;
-
     private static EscapeRoomController escapeRoomControllerInstance;
+    private static BaseView baseView;
+    private static final String NAME_OBJECT = "Escape Room";
+
+    private EscapeRoomController() {
+        baseView = new BaseView();
+        baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
+    }
 
     public static EscapeRoomController getInstance() {
-        baseView = new BaseView();
-            if (escapeRoomControllerInstance == null) {
-                synchronized (EscapeRoomController.class) {
-                    if (escapeRoomControllerInstance == null) {
-                        escapeRoomControllerInstance = new EscapeRoomController();
-                    }
+        if (escapeRoomControllerInstance == null) {
+            synchronized (EscapeRoomController.class) {
+                if (escapeRoomControllerInstance == null) {
+                    escapeRoomControllerInstance = new EscapeRoomController();
                 }
             }
-            log.debug("Created EscapeRoomWorkers Singleton");
-            return escapeRoomControllerInstance;
         }
-
+        return escapeRoomControllerInstance;
+    }
 
     public void mainMenu() {
         do {
-            OptionsMenuEscapeRoom.viewMenu(LoadConfigApp.getAppName());
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            baseView.displayMessageln(OptionsMenuEscapeRoom.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEENT"));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             try {
                 OptionsMenuEscapeRoom idMenu = OptionsMenuEscapeRoom.getOptionByNumber(answer);
                 switch (idMenu) {
                     case EXIT -> {
+                        baseView.displayMessage2ln("Returning to Main Menu...");
                         return;
                     }
-                        case CLUE_MANAGEMENT -> ClueController.getInstance().mainMenu();
-                        case DECORATION_MANAGEMENT -> DecorationController.getInstance().mainMenu();
-
-                    default -> log.warn("Error: The value {} is wrong.", idMenu);
+                    case CLUE_MANAGEMENT -> ClueController.getInstance().mainMenu();
+                    case DECORATION_MANAGEMENT -> DecorationController.getInstance().mainMenu();
+                    default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }
-            } catch (NullPointerException e) {
-                log.error("Error: The value is wrong in main menu.");
+            } catch (IllegalArgumentException | NullPointerException e) {
+                baseView.displayErrorMessage("Error: The value in menu is wrong." + e.getMessage());
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error: Database operation failed: " + e.getMessage());
+            } catch (Exception e) {
+                baseView.displayErrorMessage("Error: An unexpected error occurred: " + e.getMessage());
             }
         } while (true);
     }
-
-
 }

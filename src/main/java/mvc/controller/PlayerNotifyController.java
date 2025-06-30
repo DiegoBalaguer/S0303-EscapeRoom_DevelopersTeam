@@ -5,24 +5,23 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.PlayerDAO;
 import mvc.enumsMenu.OptionsMenuPlayerNotify;
-import lombok.extern.slf4j.Slf4j;
 import mvc.model.Player;
 import mvc.view.BaseView;
 import mvc.view.PlayerNotifyView;
 
-import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class PlayerNotifyController {
 
     private static PlayerNotifyController playerNotifyController;
     private final BaseView baseView;
     private final PlayerNotifyView playerNotifyView;
     private final PlayerDAO playerDAO;
+    private static final String NAME_OBJECT = "Player Notify";
 
     private PlayerNotifyController() {
         this.baseView = new BaseView();
+        baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         this.playerNotifyView = new PlayerNotifyView();
         try {
             this.playerDAO = DAOFactory.getDAOFactory().getPlayerDAO();
@@ -39,14 +38,13 @@ public class PlayerNotifyController {
                 }
             }
         }
-        log.debug("Created PlayerNotifyWorkers Singleton");
         return playerNotifyController;
     }
 
     public void mainMenu() {
         do {
-            playerNotifyView.displayPlayerMenu("PLAYER NOTIFY MANAGEMENT");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            baseView.displayMessageln(OptionsMenuPlayerNotify.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuPlayerNotify selectedOption = OptionsMenuPlayerNotify.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -58,7 +56,7 @@ public class PlayerNotifyController {
                         }
                         case SUBSCRIBE -> subscribePlayer();
                         case UNSUBSCRIBE -> unSubscribePlayer();
-                       // case NOTIFY -> showNotifications();
+                        // case NOTIFY -> showNotifications();
                     }
 
                 } catch (DAOException e) {
@@ -75,34 +73,19 @@ public class PlayerNotifyController {
     private void subscribePlayer() throws DAOException {
         baseView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
 
-        Optional<Player> existingPlayerOpt = playerDAO.findById(getPlayerId());
-        if (existingPlayerOpt.isPresent()) {
-            Player existingPlayer = existingPlayerOpt.get();
-            existingPlayer.setSubscribed(true);
-            playerDAO.update(existingPlayer);
-            baseView.displayMessageln("Player subscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
+        Optional<Player> existPlayerOpt = playerDAO.findById(PlayerController.getInstance().getPlayerIdWithList());
+            existPlayerOpt.get().setSubscribed(true);
+            playerDAO.update(existPlayerOpt.get());
+            baseView.displayMessageln("Player subscribed successfully: " + existPlayerOpt.get().getName() + " (ID: " + existPlayerOpt.get().getId() + ")");
         }
-    }
+
 
     private void unSubscribePlayer() throws DAOException {
-        baseView.displayMessageln("#### SUBSCRIBE PLAYER  #################");
+        baseView.displayMessageln("#### UNSUBSCRIBE PLAYER  #################");
 
-        Optional<Player> existingPlayerOpt = playerDAO.findById(getPlayerId());
-        if (existingPlayerOpt.isPresent()) {
-            Player existingPlayer = existingPlayerOpt.get();
-            existingPlayer.setSubscribed(false);
-            playerDAO.update(existingPlayer);
-            baseView.displayMessageln("Player unsubscribed successfully: " + existingPlayer.getName() + " (ID: " + existingPlayer.getId() + ")");
-        }
-    }
-
-    private void listAllPayersIntern() throws DAOException {
-        List<Player> players = playerDAO.findAll();
-        playerNotifyView.displayPlayers(players);
-    }
-
-    private int getPlayerId() throws DAOException {
-        listAllPayersIntern();
-        return playerNotifyView.getPlayerId();
+        Optional<Player> existPlayerOpt = playerDAO.findById(PlayerController.getInstance().getPlayerIdWithList());
+        existPlayerOpt.get().setSubscribed(false);
+        playerDAO.update(existPlayerOpt.get());
+        baseView.displayMessageln("Player subscribed successfully: " + existPlayerOpt.get().getName() + " (ID: " + existPlayerOpt.get().getId() + ")");
     }
 }

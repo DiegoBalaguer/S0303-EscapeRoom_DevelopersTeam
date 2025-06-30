@@ -17,7 +17,7 @@ import java.util.Optional;
 public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>, CertificateWinDAO {
 
     private final ConnectionDAO connectionDAO;
-    private static final String nameObject = "certificateWin";
+    private static final String NAME_OBJECT = "certificateWin";
 
     public CertificateWinDAOH2Impl(ConnectionDAO connectionDAO) {
         this.connectionDAO = connectionDAO;
@@ -25,7 +25,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public CertificateWin create(CertificateWin certificateWin) throws DAOException {
-        String sql = "INSERT INTO " + nameObject + " (idCertificate, idPlayer, idRoom, description, dateDelivery, isActive) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO " + NAME_OBJECT + " (idCertificate, idPlayer, idRoom, description, dateDelivery, isActive) VALUES (?, ?, ?, ?, ?, ?);";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, certificateWin.getIdCertificate());
@@ -41,7 +41,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             }
             return certificateWin;
         } catch (Exception e) {
-            String messageError = "Error creating " + nameObject + ": ";
+            String messageError = "Error creating " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -49,7 +49,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public Optional<CertificateWin> findById(Integer id) throws DAOException {
-        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + nameObject + " WHERE idCertificateWin = ?;";
+        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + NAME_OBJECT + " WHERE idCertificateWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -59,7 +59,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             }
             return Optional.empty();
         } catch (Exception e) {
-            String messageError = "Error finding " + nameObject + " by ID: ";
+            String messageError = "Error finding " + NAME_OBJECT + " by ID: ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -68,7 +68,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
     @Override
     public List<CertificateWin> findAll() throws DAOException {
         List<CertificateWin> certificateWins = new ArrayList<>();
-        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + nameObject + ";";
+        String sql = "SELECT idCertificateWin, idCertificate, idPlayer, idRoom, dateDelivery, isActive, description FROM " + NAME_OBJECT + ";";
         try (Connection connection = connectionDAO.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -77,7 +77,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
             }
             return certificateWins;
         } catch (SQLException e) {
-            String messageError = "Error retrieving all " + nameObject + ": ";
+            String messageError = "Error retrieving all " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -85,7 +85,7 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public CertificateWin update(CertificateWin certificateWin) throws DAOException {
-        String sql = "UPDATE " + nameObject + " SET idCertificate = ?, idPlayer = ?, idRoom = ?, description = ?, dateDelivery = ?, isActive = ? WHERE idCertificateWin = ?;";
+        String sql = "UPDATE " + NAME_OBJECT + " SET idCertificate = ?, idPlayer = ?, idRoom = ?, description = ?, dateDelivery = ?, isActive = ? WHERE idCertificateWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, certificateWin.getIdCertificate());
@@ -98,13 +98,13 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {
-                String messageError = "No " + nameObject + " found to update with ID: " + certificateWin.getId();
+                String messageError = "No " + NAME_OBJECT + " found to update with ID: " + certificateWin.getId();
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
             return certificateWin;
         } catch (Exception e) {
-            String messageError = "Error updating " + nameObject + ": ";
+            String messageError = "Error updating " + NAME_OBJECT + ": ";
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -112,18 +112,18 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        String sql = "DELETE FROM " + nameObject + " WHERE idCertificateWin = ?;";
+        String sql = "DELETE FROM " + NAME_OBJECT + " WHERE idCertificateWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             int affected = stmt.executeUpdate();
             if (affected == 0) {
-                String messageError = "No " + nameObject + " found to delete with ID: " + id;
+                String messageError = "No " + NAME_OBJECT + " found to delete with ID: " + id;
                 log.error(messageError);
                 throw new DAOException(messageError);
             }
         } catch (Exception e) {
-            String messageError = "Error deleting " + nameObject + " by ID: " + id;
+            String messageError = "Error deleting " + NAME_OBJECT + " by ID: " + id;
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
@@ -131,14 +131,14 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
 
     @Override
     public boolean isExistsById(Integer id) {
-        String sql = "SELECT 1 FROM " + nameObject + " WHERE idCertificateWin = ?;";
+        String sql = "SELECT 1 FROM " + NAME_OBJECT + " WHERE idCertificateWin = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            String messageError = "Error check if exist in " + nameObject + " the ID: " + id;
+            String messageError = "Error check if exist in " + NAME_OBJECT + " the ID: " + id;
             log.error(messageError, e);
             return false;
         }

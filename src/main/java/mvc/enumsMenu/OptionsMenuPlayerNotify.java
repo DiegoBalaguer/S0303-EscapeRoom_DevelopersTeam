@@ -22,15 +22,18 @@ public enum OptionsMenuPlayerNotify {
         return DESCRIPTION;
     }
 
-    public static void viewMenu(String title) {
-        System.out.println(System.lineSeparator() + title + System.lineSeparator());
+    public static String viewMenu(String title) {
+        StringBuilder message = new StringBuilder();
+        message.append(System.lineSeparator()).append(title).append(System.lineSeparator()).append(System.lineSeparator());
 
-        OptionsMenuPlayerNotify[] options = OptionsMenuPlayerNotify.values();
-
-        for (OptionsMenuPlayerNotify optionMenu : options) {
-            System.out.println(optionMenu.getOPTION_NUMBER() + ". " + optionMenu.getDESCRIPTION());
+        for (OptionsMenuPlayerNotify optionMenu :  OptionsMenuPlayerNotify.values()) {
+            message
+                    .append(optionMenu.getOPTION_NUMBER())
+                    .append(". ")
+                    .append(optionMenu.getDESCRIPTION())
+                    .append(System.lineSeparator());
         }
-        System.out.println("");
+        return message.toString();
     }
 
     public static OptionsMenuPlayerNotify getOptionByNumber(int number) {

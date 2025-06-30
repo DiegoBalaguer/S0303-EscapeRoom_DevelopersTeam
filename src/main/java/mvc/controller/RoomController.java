@@ -53,8 +53,8 @@ public class RoomController {
 
     public void mainMenu() {
         do {
-            roomView.displayRoomMenu("=== ROOM MANAGEMENT MENU ===");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
+            baseView.displayMessageln(OptionsMenuCrud.viewMenu("=== ROOM MANAGEMENT MENU ==="));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
 
             if (selectedOption != null) {
@@ -216,7 +216,9 @@ public class RoomController {
         return roomDAO.findById(roomId);
     }
 
-    public int getRoomId() throws DAOException, IllegalArgumentException {
+    // Queries for other Classes
+
+    public int getRoomIdWithList() throws DAOException, IllegalArgumentException {
             listAllRoomsDetail();
             Optional<Integer> roomIdOpt = roomView.getRoomId();
             Optional<Room> roomSearch = roomDAO.findById(roomIdOpt.get());
@@ -230,7 +232,7 @@ public class RoomController {
 
     private void listAllRoomsDetail() throws DAOException {
         List<Room> rooms = roomDAO.findAll();
-        roomView.displayRoomsList(rooms);
+        roomView.displayListRooms(rooms);
     }
 
 

@@ -7,37 +7,31 @@ import dao.interfaces.*;
 
 import mvc.dto.ClueDisplayDTO;
 import mvc.enumsMenu.OptionsMenuItem;
-import lombok.extern.slf4j.Slf4j;
 import mvc.model.Clue;
 
-import mvc.model.Room;
 import mvc.view.BaseView;
 import mvc.view.ClueView;
-import mvc.view.RoomView;
 
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class ClueController {
 
     private static ClueController clueControllerInstance;
-    private final ClueView clueView;
-    private final RoomView roomView;
-    private final BaseView baseView;
-    private final ClueDAO clueDAO;
-    private final RoomDAO roomDAO;
+    private final ClueDAO CLUE_DAO;
+    private BaseView baseView;
+    private ClueView clueView;
+    private static final String NAME_OBJECT = "Clue";
 
     private ClueController() {
         baseView = new BaseView();
-        this.clueView = new ClueView();
+        baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         try {
-            this.roomView = new RoomView();
-            this.roomDAO = DAOFactory.getDAOFactory().getRoomDAO();
-            this.clueDAO = DAOFactory.getDAOFactory().getClueDAO();
+            this.CLUE_DAO = DAOFactory.getDAOFactory().getClueDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
+        clueView = new ClueView();
     }
 
     public static ClueController getInstance() {
@@ -48,176 +42,158 @@ public class ClueController {
                 }
             }
         }
-        log.debug("Created ClueWorkers Singleton");
         return clueControllerInstance;
     }
 
     public void mainMenu() {
         do {
-            clueView.displayClueMenu("=== CLUE MANAGEMENT MENU ===");
-            int answer = baseView.getInputRequiredInt("Choose an option: ");
-            OptionsMenuItem selectedOption = OptionsMenuItem.getOptionByNumber(answer);
-
-            if (selectedOption != null) {
-                try {
-                    switch (selectedOption) {
-                        case EXIT -> {
-                            baseView.displayMessageln("Returning to Main Menu...");
-                            return;
-                        }
-                        case ADD -> createClue();
-                        case SHOW -> getClueById();
-                        case LIST_ALL -> listAllClues();
-                        case LIST_BY_ROOM -> listCluesByRoom();
-                        case UPDATE -> updateClue();
-                        case DELETE -> deleteClueById();
-                        default -> baseView.displayErrorMessage("Unknown option selected.");
+            baseView.displayMessageln(OptionsMenuItem.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            int answer = baseView.getReadRequiredInt("Choose an option: ");
+            OptionsMenuItem idMenu = OptionsMenuItem.getOptionByNumber(answer);
+            try {
+                switch (idMenu) {
+                    case EXIT -> {
+                        baseView.displayMessage2ln("Returning to Main Menu...");
+                        return;
                     }
-                } catch (DAOException e) {
-                    baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                } catch (Exception e) {
-                    baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    case ADD -> createClue();
+                    case SHOW -> getClueById();
+                    case LIST_ALL -> listAllClues();
+                    case LIST_BY_ROOM -> listCluesByRoom();
+                    case UPDATE -> updateClue();
+                    case DELETE -> deleteClueById();
+
+                    default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }
-            } else {
-                baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+            } catch (IllegalArgumentException | NullPointerException e) {
+                baseView.displayErrorMessage("Error: The value in menu is wrong." + e.getMessage());
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error: Database operation failed: " + e.getMessage());
+            } catch (Exception e) {
+                baseView.displayErrorMessage("Error: An unexpected error occurred: " + e.getMessage());
             }
         } while (true);
     }
 
+
     private void createClue() {
-        baseView.displayMessageln("#### CREATE CLUE  #################");
+        baseView.displayMessageln("#### CREATE " + NAME_OBJECT + "  #################");
         try {
-            int roomId = RoomController.getInstance().getRoomId();
+            baseView.displayMessage2ln("List of Rooms:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
 
             Clue newClue = clueView.getClueDetailsCreate(roomId);
-            if (newClue == null || newClue.getIdRoom() == 0) {
-                baseView.displayErrorMessage("Invalid input. Operation canceled.");
-                return;
-            }
-            Clue savedClue = clueDAO.create(newClue);
-            baseView.displayMessage2ln("Clue created successfully: " + savedClue.getName() + " (ID: " + savedClue.getId() + ")");
+            Clue savedClue = CLUE_DAO.create(newClue);
+            baseView.displayMessage2ln(NAME_OBJECT + " created successfully: " + savedClue.getName() + " (ID: " + savedClue.getId() + ")");
         } catch (DAOException | IllegalArgumentException e) {
-            baseView.displayErrorMessage("Error creating the clue: " + e.getMessage());
+            baseView.displayErrorMessage("Error creating " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
     private void getClueById() {
+        baseView.displayMessage2ln("####  GET " + NAME_OBJECT.toUpperCase() + " BY ID  #################");
         try {
             baseView.displayMessageln(baseView.LINE + "=== GET CLUE BY ID ===");
 
-            Optional<Integer> id = clueView.getClueId();
-            if (id.isEmpty()) {
-                return;
-            }
+            Optional<Clue> optionalClue = CLUE_DAO.findById(getClueIdWithList());
 
-            Optional<Clue> optionalClue = clueDAO.findById(id.get());
-            if (optionalClue.isPresent()) {
-                clueView.displayClue(optionalClue.get());
-            } else {
-                baseView.displayMessageln("No clue found with the provided ID.");
-            }
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error querying the clue: " + e.getMessage());
+            clueView.displayRecordClue(optionalClue.get());
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error show " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
     private void listAllClues() throws DAOException {
-        baseView.displayMessage2ln("#### LIST ALL CLUES  #################");
-        listAllCluesDetail();
+        baseView.displayMessage2ln("####  LIST ALL " + NAME_OBJECT.toUpperCase() + "S  #################");
+        try {
+            listAllClueDetail();
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error list all " + NAME_OBJECT + ": " + e.getMessage());
+        }
     }
 
-
-
-
-    private void deleteClueById() {
+    private void listCluesByRoom() {
+        baseView.displayMessage2ln("####  LIST " + NAME_OBJECT.toUpperCase() + "S BY ROOM  #################");
         try {
-            baseView.displayMessageln("\n=== DELETE CLUE ===");
-            Optional<Integer> id = clueView.getClueId();
-            if (id.isEmpty()) {
-                return; // Cancel if invalid input
-            }
+            baseView.displayMessage2ln("List of Rooms:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
 
-            if (clueDAO.isExistsById(id.get())) {
-                clueDAO.deleteById(id.get());
-                baseView.displayMessageln("Clue successfully deleted with ID: " + id.get());
+            List<ClueDisplayDTO> clues = CLUE_DAO.findCluesByRoomId(roomId);
+            if (clues.isEmpty()) {
+                baseView.displayMessageln("No " + NAME_OBJECT + " found for the provided Room ID.");
             } else {
-                baseView.displayMessageln("No clue found with the provided ID.");
+                clueView.displayClueListDto(clues);
             }
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error deleting the clue: " + e.getMessage());
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error retrieving " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
     private void updateClue() {
+        baseView.displayMessage2ln("####  UPDATE  " + NAME_OBJECT.toUpperCase() + "  #################");
         try {
-            baseView.displayMessageln("\n=== UPDATE CLUE ===");
-            Optional<Integer> id = clueView.getClueId();
-            if (id.isEmpty()) {
-                baseView.displayMessageln("No ID provided. Canceling update operation.");
-                return;
-            }
+            Optional<Clue> existClueOpt = CLUE_DAO.findById(getClueIdWithList());
 
-            Optional<Clue> optionalClue = clueDAO.findById(id.get());
-            if (optionalClue.isEmpty()) {
-                baseView.displayMessageln("No clue found with the provided ID.");
-                return;
-            }
+            baseView.displayMessage2ln("Current " + NAME_OBJECT + " Details:");
+            clueView.displayRecordClue(existClueOpt.get());
 
-            Clue existingClue = optionalClue.get();
-            baseView.displayMessageln("\n=== Current Clue Data ===");
-            clueView.displayClue(existingClue);
+            baseView.displayMessage2ln("Enter new details:");
+            baseView.displayMessageln("Enter new value or [INTRO] for not changes.");
+            baseView.displayMessageln("Enter new Room:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
+            existClueOpt.get().setIdRoom(roomId);
+            Clue updatedClue = clueView.getUpdateClueDetails(existClueOpt.get());
 
-            Clue updatedClue = clueView.editClue(existingClue); // Allow user to modify details.
-            if (updatedClue == null) {
-                return; // Cancel if user decides not to proceed.
-            }
-
-            clueDAO.update(updatedClue);
-            baseView.displayMessageln("Clue successfully updated:\n" + updatedClue);
-
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error updating the clue: " + e.getMessage());
-        } catch (Exception e) {
-            baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
-            log.error("Unexpected error: ", e);
-        }
-    }
-
-
-
-    private void listCluesByRoom() {
-        baseView.displayMessage2ln(baseView.LINE + "=== LIST CLUES BY ROOM ===");
-        try {
-            baseView.displayMessageln("=== list rooms ===");
-            int roomId = RoomController.getInstance().getRoomId();
-
-            List<Clue> clues = clueDAO.findCluesByRoomId(roomId);
-            if (clues.isEmpty()) {
-                baseView.displayMessageln("No clues found for the provided Room ID.");
-            } else {
-                clueView.displayClues(clues);
-            }
+            Clue savedClue = CLUE_DAO.update(updatedClue);
+            baseView.displayMessage2ln(NAME_OBJECT + " updated successfully: " + savedClue.getName() + " (ID: " + savedClue.getId() + ")");
         } catch (DAOException | IllegalArgumentException e) {
-            baseView.displayErrorMessage("Error retrieving clues: " + e.getMessage());
+            baseView.displayErrorMessage("Error updating " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
+    private void deleteClueById() {
+        baseView.displayMessage2ln("####  DELETE " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            CLUE_DAO.deleteById(getClueIdWithList());
+            baseView.displayMessage2ln(NAME_OBJECT + " deleted successfully (if existed).");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error deleting the " + NAME_OBJECT + ": " + e.getMessage());
+        }
+    }
 
-    public int getClueId() throws DAOException, IllegalArgumentException {
-        listAllCluesDetail();
-        Optional<Integer> roomIdOpt = roomView.getRoomId();
-        Optional<Room> roomSearch = roomDAO.findById(roomIdOpt.get());
-        if (roomSearch.isEmpty()) {
-            String message = "Room ID required or not found.";
+    private void softDeleteClue() throws DAOException {
+        baseView.displayMessage2ln("#### SOFT DELETE  " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            Optional<Clue> existClueOpt = CLUE_DAO.findById(getClueIdWithList());
+            existClueOpt.get().setActive(false);
+
+            CLUE_DAO.update(existClueOpt.get());
+            baseView.displayMessage2ln(NAME_OBJECT + " soft deleted successfully: " + existClueOpt.get().getName() + " (ID: " + existClueOpt.get().getId() + ")");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT +": " + e.getMessage());
+        }
+    }
+
+// Queries for other Classes
+
+    public int getClueIdWithList() {
+        listAllClueDetailDto();
+        Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
+        if (searchID.isEmpty() || CLUE_DAO.findById(searchID.get()).isEmpty()) {
+            String message = NAME_OBJECT + " with ID required or not found.";
             baseView.displayErrorMessage(message);
             throw new IllegalArgumentException(message);
         }
-        return roomIdOpt.get();
+        return searchID.get();
     }
 
-    private void listAllCluesDetail() throws DAOException {
+    private void listAllClueDetailDto() throws DAOException {
+        List<ClueDisplayDTO> clues = CLUE_DAO.findAllCluesCompleteInfo();
+        clueView.displayClueListDto(clues);
+    }
 
-        List<ClueDisplayDTO> clues = clueDAO.findAllCluesCompleteInfo();
+    private void listAllClueDetail() throws DAOException {
+        List<Clue> clues = CLUE_DAO.findAll();
         clueView.displayClueList(clues);
     }
 }

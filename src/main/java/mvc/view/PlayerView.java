@@ -1,12 +1,7 @@
 package mvc.view;
 
-import mvc.dto.CertificateWinDisplayDTO;
-import mvc.dto.PlayerDisplayDTO;
 import mvc.dto.PlayerMapper;
-import mvc.dto.RewardWinDisplayDTO;
-import mvc.enumsMenu.OptionsMenuPlayer;
 import mvc.model.Player;
-import lombok.extern.slf4j.Slf4j;
 import utils.ConsoleUtils;
 import utils.StringUtils;
 
@@ -14,25 +9,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
-@Slf4j
 public class PlayerView {
 
     private final BaseView baseView = new BaseView();
-
-    public void displayPlayerMenu(String title) {
-        OptionsMenuPlayer.viewMenu(title);
-    }
-
-    public Optional<Integer> getPlayerId() {
-        try {
-            int id = ConsoleUtils.readRequiredInt("Enter player ID: ");
-            return Optional.of(id);
-        } catch (NumberFormatException e) {
-            baseView.displayErrorMessage("Invalid ID. Please enter a number.");
-            return Optional.empty();
-        }
-    }
+    private static final String NAME_OBJECT = "Player";
 
     public Player getPlayerDetailsCreate() {
         return Player.builder()
@@ -104,7 +84,7 @@ public class PlayerView {
         return email;
     }
 
-    public void displayPlayer(Player player) {
+    public void displayRecordPlayer(Player player) {
         String message = "";
         if (player != null) {
             message += "--- Player Details ---" + baseView.LINE;
@@ -122,45 +102,16 @@ public class PlayerView {
         baseView.displayMessageln(message);
     }
 
-    public void displayRewardWinDTOs(List<RewardWinDisplayDTO> rewardWinsData) {
-        if (rewardWinsData.isEmpty()) {
-            baseView.displayMessageln("No reward wins found for this player.");
-            return;
-        }
-        baseView.displayMessage2ln(baseView.LINE + "--- Player Reward Wins ---");
-        baseView.displayMessage2ln(StringUtils.makeLineToList(rewardWinsData.getFirst().toListHead()));
-        rewardWinsData.forEach(dto -> baseView.displayMessageln(
-                StringUtils.makeLineToList(dto.toList())
-        ));
-        baseView.displayMessage2ln("--------------------------");
-    }
-
-    public void displayCertificateWinDTOs(List<CertificateWinDisplayDTO> certificateWinsData) {
-        if (certificateWinsData.isEmpty()) {
-            baseView.displayMessageln("No certificate wins found for this player.");
-            return;
-        }
-        baseView.displayMessageln(baseView.LINE + "--- Player Certificate Wins ---");
-        baseView.displayMessageln(StringUtils.makeLineToList(certificateWinsData.getFirst().toListHead()));
-        certificateWinsData.forEach(dto -> baseView.displayMessageln(
-                StringUtils.makeLineToList(dto.toList())
-        ));
-        baseView.displayMessage2ln("-----------------------------");
-    }
-
-    public void displayPlayers(List<Player> players) {
+    public void displayListPlayers(List<Player> players) {
         if (players.isEmpty()) {
-            System.out.println("No players found.");
+            System.out.println("No " + NAME_OBJECT + "s found.");
             return;
         }
-        baseView.displayMessageln(StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(players.getFirst()).toListHead()));
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(players.getFirst()).toListHead()));
 
-        players.stream()
-                .map(PlayerMapper::toDisplayDTO)
-                .map(PlayerDisplayDTO::toList)
-                .map(StringUtils::makeLineToList)
-                .forEach(baseView::displayMessageln);
-
+        players.forEach(player -> baseView.displayMessageln(
+                StringUtils.makeLineToList(PlayerMapper.toDisplayDTO(player).toList())));
         baseView.displayMessage2ln("-------------------");
     }
 }
