@@ -1,10 +1,10 @@
 package dao.interfaces;
 
+import dao.exceptions.DAOException;
 import mvc.model.Notification;
 import java.util.List;
 
 public interface NotificationDAO {
     void saveNotification(Notification notification);
-    List<Notification> findNotificationsByPlayerId(int playerId);
-    List<Notification> findAllNotifications();
+    List<Notification> findAllNotifications() throws DAOException;
 }

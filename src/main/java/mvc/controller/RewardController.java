@@ -51,4 +51,11 @@ public class RewardController {
         List<Reward> rewards = REWARD_DAO.findAll();
         rewardView.displayListRewards(rewards);
     }
+
+    public String getRewardNameById(int rewardId) throws DAOException {
+        return REWARD_DAO.findById(rewardId)
+                .map(Reward::getName)
+                .orElse("Unknown Reward"); // Si no se encuentra la recompensa
+    }
+
 }

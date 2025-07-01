@@ -7,10 +7,11 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.controller.PlayerNotifyController;
 import mvc.dto.InventoryDisplayDTO;
-import mvc.model.Clue;
-import mvc.model.Decoration;
 import mvc.model.Room;
+import mvc.view.BaseView;
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -103,15 +104,13 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
         Room existingRoom = existingRoomOptional.get();
 
-        // Conservamos los valores actuales si los campos en el objeto 'room' son nulos o vacíos
         String newName = room.getName() != null ? room.getName() : existingRoom.getName();
         String newDescription = room.getDescription() != null ? room.getDescription() : existingRoom.getDescription();
         BigDecimal newPrice = room.getPrice() != null ? room.getPrice() : existingRoom.getPrice();
         Difficulty newDifficulty = room.getDifficulty() != null ? room.getDifficulty() : existingRoom.getDifficulty();
         Theme newTheme = room.getTheme() != null ? room.getTheme() : existingRoom.getTheme();
-        boolean newIsActive = room.isActive() || existingRoom.isActive(); // manejar campo booleano
+        boolean newIsActive = room.isActive() || existingRoom.isActive();
 
-        // Actualización en la base de datos
         String sql = "UPDATE " + NAME_OBJECT + " SET name = ?, description = ?, price = ?, idDifficulty = ?, idTheme = ?, isActive = ? WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
