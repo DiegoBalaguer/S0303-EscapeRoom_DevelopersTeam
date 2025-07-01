@@ -105,13 +105,13 @@ public class RoomController {
 
             for (Player player : subscribedPlayers) {
                 Notification notification = Notification.builder()
-                        .idPlayer(player.getId()) // ID del jugador a notificar
+                        .idPlayer(player.getId())
                         .message("A new room has been created: " + savedRoom.getName())
-                        .dateTimeSent(LocalDateTime.now()) // Fecha y hora actual
-                        .isActive(true) // Notificación activa
+                        .dateTimeSent(LocalDateTime.now())
+                        .isActive(true)
                         .build();
 
-                notificationDAO.saveNotification(notification); // Guardar en la base de datos
+                notificationDAO.saveNotification(notification);
 
                 player.update("Notification: A new room has been created: " + savedRoom.getName());
             }
@@ -125,35 +125,6 @@ public class RoomController {
         }
     }
 
-/*
-
-    private void createRoom() {
-            baseView.displayMessageln("\n=== CREATE ROOM ===");
-        try {
-
-            Room newRoom = roomView.getRoomDetails(false);
-            Room savedRoom = ROOM_DAO.create(newRoom);
-            baseView.displayMessageln("Room successfully created:\n" + savedRoom);
-
-            NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
-            Notification notification = Notification.builder()
-                    .idPlayer(0) // ID del jugador si aplica, 0 o NULL si es general
-                    .message("A new room has been created: " + savedRoom.getName())
-                    .dateTimeSent(LocalDateTime.now()) // Fecha y hora actual
-                    .isActive(true) // Notificación activa
-                    .build();
-
-            notificationDAO.saveNotification(notification);
-            baseView.displayMessageln("Notification generated for the created room.");
-
-
-        }  catch (DAOException | IllegalArgumentException e) {
-            baseView.displayErrorMessage("Error creating " + NAME_OBJECT + ": " + e.getMessage());
-} catch (DatabaseConnectionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-*/
 
     private void getRoomById() {
         try {
@@ -178,24 +149,14 @@ public class RoomController {
             baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT +": " + e.getMessage());
         }
     }
-    /*private void deleteRoomById() {
-        try {
-            baseView.displayMessageln("\n=== DELETE ROOM ===");
-
-            Room savedRoom = ROOM_DAO.deleteById(getRoomIdWithList());
-            baseView.displayMessageln("Room successfully created:\n" + savedRoom);
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error deleting the room: " + e.getMessage());
-        }
-    }*/
 
     private void updateRoom() {
         try {
             baseView.displayMessageln("\n=== UPDATE ROOM ===");
-            Optional<Integer> id = roomView.getRoomId(); // Solicitamos el ID de la Room
+            Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
                 baseView.displayMessageln("No ID provided. Canceling update operation.");
-                return; // Cancelar si no hay ID proporcionado
+                return;
             }
 
             Optional<Room> optionalRoom = ROOM_DAO.findById(id.get());
@@ -206,15 +167,11 @@ public class RoomController {
 
             Room existingRoom = optionalRoom.get();
             baseView.displayMessageln("\n=== Current Room Data ===");
-            roomView.displayRoom(existingRoom); // Mostramos la información actual de la Room
-
-            // Solicitamos los nuevos datos permitiendo que algunos campos sean dejados vacíos
+            roomView.displayRoom(existingRoom);
             Room updatedRoom = roomView.getRoomDetailsWithDefaults(existingRoom);
             if (updatedRoom == null) {
-                return; // Cancelar si el usuario decide salir
+                return;
             }
-
-            // Actualizar la room en la base de datos
             ROOM_DAO.update(updatedRoom);
             baseView.displayMessageln("Room successfully updated:\n" + updatedRoom);
 
@@ -243,7 +200,6 @@ public class RoomController {
             Room room = optionalRoom.get();
             BigDecimal roomPrice = room.getPrice();
 
-            // Retrieve prices
             BigDecimal cluePrice = clueDAO.findPriceByRoomId(room.getId());
             BigDecimal decorationPrice = decorationDAO.findPriceByRoomId(room.getId());
             BigDecimal totalValue = roomPrice.add(cluePrice).add(decorationPrice);
@@ -270,8 +226,6 @@ public class RoomController {
     public Optional<Room> findRoomById(int roomId) {
         return ROOM_DAO.findById(roomId);
     }
-
-    // Queries for other Classes
 
     public int getRoomIdWithList() throws DAOException, IllegalArgumentException {
             listAllRoomsDetail();

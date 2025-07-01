@@ -21,7 +21,7 @@ public class InventoryDisplayDTO {
     private BigDecimal price;
 
     private int getLong(int position) {
-        return List.of(10, 6, 20, 10).get(position); // Define los anchos de las columnas
+        return List.of(30, 6, 100, 20).get(position);
     }
 
     public List<PairTextLength> toListHead() {
