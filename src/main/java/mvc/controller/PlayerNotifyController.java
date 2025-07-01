@@ -116,30 +116,4 @@ public class PlayerNotifyController {
         }
 
     }
-    private void notifySubscribedPlayers(String message) throws DAOException, DatabaseConnectionException {
-        PlayerDAO playerDAO = new PlayerDAOH2Impl(ConnectionDAOH2Impl.getInstance());
-        NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
-
-        // Busca a los jugadores suscritos
-        List<Player> subscribedPlayers = playerDAO.findSubscribedPlayers();
-        if (subscribedPlayers.isEmpty()) {
-            baseView.displayMessageln("No players are subscribed to notifications.");
-            return;
-        }
-
-        // Crea una notificación para cada jugador suscrito
-        for (Player player : subscribedPlayers) {
-            Notification notification = Notification.builder()
-                    .idPlayer(player.getId())
-                    .message(message)
-                    .dateTimeSent(LocalDateTime.now())
-                    .build();
-
-
-            // Guarda la notificación en la base de datos usando el método ya existente
-            notificationDAO.saveNotification(notification);
-        }
-
-        baseView.displayMessageln("Notifications sent to subscribed players.");
-    }
 }

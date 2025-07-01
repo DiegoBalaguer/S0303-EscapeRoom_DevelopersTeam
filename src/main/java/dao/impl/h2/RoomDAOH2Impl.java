@@ -44,18 +44,17 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             stmt.setBigDecimal(6, room.getPrice());
             stmt.setBoolean(7, room.isActive());
             stmt.executeUpdate();
-
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
                 room.setId(keys.getInt(1));
             }
             return room;
+
         } catch (Exception e) {
             log.error("Error creating room: ", e);
             throw new DAOException("Error creating room: ", e);
         }
     }
-
 
     @Override
     public Optional<Room> findById(Integer id) throws DAOException {
@@ -105,15 +104,13 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
         Room existingRoom = existingRoomOptional.get();
 
-        // Conservamos los valores actuales si los campos en el objeto 'room' son nulos o vacíos
         String newName = room.getName() != null ? room.getName() : existingRoom.getName();
         String newDescription = room.getDescription() != null ? room.getDescription() : existingRoom.getDescription();
         BigDecimal newPrice = room.getPrice() != null ? room.getPrice() : existingRoom.getPrice();
         Difficulty newDifficulty = room.getDifficulty() != null ? room.getDifficulty() : existingRoom.getDifficulty();
         Theme newTheme = room.getTheme() != null ? room.getTheme() : existingRoom.getTheme();
-        boolean newIsActive = room.isActive() || existingRoom.isActive(); // manejar campo booleano
+        boolean newIsActive = room.isActive() || existingRoom.isActive();
 
-        // Actualización en la base de datos
         String sql = "UPDATE " + NAME_OBJECT + " SET name = ?, description = ?, price = ?, idDifficulty = ?, idTheme = ?, isActive = ? WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {

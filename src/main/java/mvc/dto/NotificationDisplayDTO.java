@@ -15,18 +15,18 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class NotificationDisplayDTO {
-    private int id;
-    private String message;
-    private LocalDateTime dateTime;
+    private int id; // ID de la notificación
+    private String message; // Mensaje de la notificación
+    private LocalDateTime dateTime; // Fecha y hora de envío
 
     private int getLong(int position) {
-        return List.of(10, 50, 20).get(position); // Define los anchos de las columnas
+        return List.of(10, 50, 20).get(position); // Anchos de las columnas
     }
 
     public List<PairTextLength> toListHead() {
         List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
-        listValues.add(new PairTextLength("Player ID", getLong(position++)));
+        listValues.add(new PairTextLength("Notification ID", getLong(position++))); // Cambiado a ID de notificación
         listValues.add(new PairTextLength("Message", getLong(position++)));
         listValues.add(new PairTextLength("Date Sent", getLong(position++)));
         return listValues;
