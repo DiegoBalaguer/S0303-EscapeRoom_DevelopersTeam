@@ -20,7 +20,7 @@ public class NotificationDisplayDTO {
     private LocalDateTime dateTime; // Fecha y hora de envío
 
     private int getLong(int position) {
-        return List.of(10, 50, 20).get(position); // Anchos de las columnas
+        return List.of(10, 50, 20).get(position);
     }
 
     public List<PairTextLength> toListHead() {
