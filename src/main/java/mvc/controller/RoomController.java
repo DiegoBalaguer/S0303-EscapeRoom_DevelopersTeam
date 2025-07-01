@@ -25,7 +25,7 @@ public class RoomController {
     private final ClueDAO clueDAO;
     private final DecorationDAO decorationDAO;
     private final BaseView baseView;
-     
+
 
     private RoomController() {
         baseView = new BaseView();
@@ -91,6 +91,7 @@ public class RoomController {
             }
             Room createdRoom = roomDAO.create(newRoom);
             baseView.displayMessageln("Room successfully created:\n" + createdRoom);
+
         } catch (Exception e) {
             baseView.displayErrorMessage("Error creating the room: " + e.getMessage());
         }

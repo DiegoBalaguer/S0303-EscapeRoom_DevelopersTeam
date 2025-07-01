@@ -7,10 +7,11 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.controller.PlayerNotifyController;
 import mvc.dto.InventoryDisplayDTO;
-import mvc.model.Clue;
-import mvc.model.Decoration;
 import mvc.model.Room;
+import mvc.view.BaseView;
+
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -43,17 +44,18 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
             stmt.setBigDecimal(6, room.getPrice());
             stmt.setBoolean(7, room.isActive());
             stmt.executeUpdate();
+
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
                 room.setId(keys.getInt(1));
             }
             return room;
-
         } catch (Exception e) {
             log.error("Error creating room: ", e);
             throw new DAOException("Error creating room: ", e);
         }
     }
+
 
     @Override
     public Optional<Room> findById(Integer id) throws DAOException {

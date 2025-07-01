@@ -15,12 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class InventoryDisplayDTO {
-    private String inventory; // Tipo: 'room', 'clue', 'decoration' o 'TOTAL'
-    private int id;           // ID del inventario, será 0 para 'TOTAL'
-    private String name;      // Nombre del ítem, será vacío para 'TOTAL'
-    private BigDecimal price; // Precio del ítem o suma total en el caso de 'TOTAL'
+    private String inventory;
+    private int id;
+    private String name;
+    private BigDecimal price;
 
-    // Define el ancho de cada columna
     private int getLong(int position) {
         return List.of(10, 6, 20, 10).get(position); // Define los anchos de las columnas
     }

@@ -19,20 +19,18 @@ public class NotificationDAOH2Impl implements NotificationDAO {
     }
 
     @Override
-    public void saveNotification(Notification notification) {
-        if (notification == null || notification.getMessage() == null) {
-            throw new IllegalArgumentException("Invalid notification: missing required fields");
-        }
-
-        String sql = "INSERT INTO notifications (idPlayer, message) VALUES (?, ?);";
+    public void saveNotification(Notification notification) throws DAOException {
+        String sql = "INSERT INTO notifications (idPlayer, message, dateTimeSent, isActive) VALUES (?, ?, ?, ?)";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, notification.getIdPlayer());
             stmt.setString(2, notification.getMessage());
+            stmt.setTimestamp(3, Timestamp.valueOf(notification.getDateTimeSent()));
+            stmt.setBoolean(4, true);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            log.error("Error saving notification: {}", e.getMessage());
-            throw new DAOException("Failed to save notification.", e);
+            log.error("Error saving notification: ", e);
+            throw new DAOException("Error saving notification", e);
         }
     }
     @Override

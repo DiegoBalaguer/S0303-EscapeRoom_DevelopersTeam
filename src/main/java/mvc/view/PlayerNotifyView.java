@@ -9,8 +9,5 @@ import utils.ConsoleUtils;
 public class PlayerNotifyView {
 
     private static BaseView baseView =  new BaseView();
-/*
-    public int getPlayerId() {
-        return ConsoleUtils.readRequiredInt("Enter player ID: ");
-    }*/
+
 }
