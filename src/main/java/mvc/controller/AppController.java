@@ -40,7 +40,7 @@ public class AppController {
                     case ROOM_MANAGEMENT -> RoomController.getInstance().mainMenu();
                     case PLAYER_MANAGEMENT -> PlayerController.getInstance().mainMenu();
                     case ESCAPE_ROOM_MANAGEMENT -> EscapeRoomController.getInstance().mainMenu();
-                    case FINANCIAL_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " + idMenu.getDESCRIPTION());
+                    case FINANCIAL_MANAGEMENT -> InventoryController.getInstance().showInventoryMenu();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }

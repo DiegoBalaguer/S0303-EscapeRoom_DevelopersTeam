@@ -7,6 +7,9 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.dto.InventoryDisplayDTO;
+import mvc.model.Clue;
+import mvc.model.Decoration;
 import mvc.model.Room;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -196,6 +199,8 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     public void addClueToRoom(Integer roomId, Integer clueId) throws DAOException {}
     public void addDecorationToRoom(Integer roomId, Integer decorationId) throws DAOException {}
 
+
+
     private Room listResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
@@ -208,4 +213,42 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
                 .description(rs.getString("description"))
                 .build();
     }
+    @Override
+    public List<InventoryDisplayDTO> findInventory() throws DAOException {
+        String sql = """
+        SELECT u.inventory, u.id, u.name, u.price
+        FROM inventory u
+        UNION ALL
+        SELECT 'TOTAL' AS inventory, 0 AS id, '' AS name, t.price
+        FROM (
+            SELECT SUM(i.price) AS price
+            FROM inventory i
+        ) t
+    """;
+
+        List<InventoryDisplayDTO> inventoryList = new ArrayList<>();
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                InventoryDisplayDTO item = InventoryDisplayDTO.builder()
+                        .inventory(rs.getString("inventory")) // Tipo: room, clue, decoration o TOTAL
+                        .id(rs.getInt("id"))                 // ID, será 0 para TOTAL
+                        .name(rs.getString("name"))           // Nombre, será vacío para TOTAL
+                        .price(rs.getBigDecimal("price"))     // Precio, o suma total para TOTAL
+                        .build();
+                inventoryList.add(item);
+            }
+
+        } catch (SQLException e) {
+            String messageError = "Error retrieving inventory items: " + e.getMessage();
+            log.error(messageError, e); // Log detallado del error
+            throw new DAOException(messageError, e);
+        }
+
+        return inventoryList;
+    }
+
 }
