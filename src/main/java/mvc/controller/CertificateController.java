@@ -6,6 +6,7 @@ import dao.factory.DAOFactory;
 import dao.interfaces.CertificateDAO;
 import mvc.enumsMenu.OptionsMenuCLFUSDE;
 import mvc.model.Certificate;
+import mvc.model.Reward;
 import mvc.view.BaseView;
 import mvc.view.CertificateView;
 
@@ -162,5 +163,10 @@ public class CertificateController {
     private void listAllCertificateDetail() throws DAOException {
         List<Certificate> certificates = CERTIFICATE_DAO.findAll();
         certificateView.displayListCertificates(certificates);
+    }
+    public String getCertificateNameById(int rewardId) throws DAOException {
+        return CERTIFICATE_DAO.findById(rewardId)
+                .map(Certificate::getName)
+                .orElse("Unknown Reward");
     }
 }

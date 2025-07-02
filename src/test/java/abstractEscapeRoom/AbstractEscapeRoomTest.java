@@ -17,15 +17,12 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createRoom_ValidParameters_ShouldCreateRoom() {
-        // Arrange
         String name = "Mysterious Room";
         Difficulty difficulty = Difficulty.MEDIUM;
         BigDecimal price = new BigDecimal("100.50");
 
-        // Act
         Element room = abstractEscapeRoom.createElement(name, "room", difficulty, price);
 
-        // Assert
         assertTrue(room instanceof Room);
         Room createdRoom = (Room) room;
         assertEquals(name, createdRoom.getName());
@@ -35,15 +32,12 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createClue_ValidParameters_ShouldCreateClue() {
-        // Arrange
         String name = "Ancient Scroll";
         String theme = "Mystery";
         BigDecimal price = new BigDecimal("50.00");
 
-        // Act
         Element clue = abstractEscapeRoom.createElement(name, "clue", theme, price);
 
-        // Assert
         assertTrue(clue instanceof Clue);
         Clue createdClue = (Clue) clue;
         assertEquals(name, createdClue.getName());
@@ -53,15 +47,12 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createDecoration_ValidParameters_ShouldCreateDecoration() {
-        // Arrange
         String name = "Golden Vase";
         String material = "Gold";
         BigDecimal price = new BigDecimal("200.75");
 
-        // Act
         Element decoration = abstractEscapeRoom.createElement(name, "decoration", material, price);
 
-        // Assert
         assertTrue(decoration instanceof Decoration);
         Decoration createdDecoration = (Decoration) decoration;
         assertEquals(name, createdDecoration.getName());
@@ -71,11 +62,9 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createElement_InvalidType_ShouldThrowException() {
-        // Arrange
         String name = "Unknown";
         String invalidType = "invalid";
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> abstractEscapeRoom.createElement(name, invalidType));
         assertEquals("Unknown type: " + invalidType, exception.getMessage());
@@ -83,10 +72,8 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createElement_InvalidParametersForRoom_ShouldThrowException() {
-        // Arrange
         String name = "Room without Difficulty";
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> abstractEscapeRoom.createElement(name, "room"));
         assertEquals("Missing or invalid difficulty for Room.", exception.getMessage());
@@ -94,10 +81,8 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createElement_InvalidParametersForClue_ShouldThrowException() {
-        // Arrange
         String name = "Clue without Theme";
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> abstractEscapeRoom.createElement(name, "clue"));
         assertEquals("Missing or invalid theme for Clue.", exception.getMessage());
@@ -105,22 +90,16 @@ class AbstractEscapeRoomTest {
 
     @Test
     void createElement_InvalidParametersForDecoration_ShouldThrowException() {
-        // Arrange
         String name = "Decoration without Material";
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                // Paso solo "decoration" sin el material necesario
                 () -> abstractEscapeRoom.createElement(name, "decoration", null));
         assertEquals("Missing or invalid material for Decoration.", exception.getMessage());
     }
 
     @Test
     void createElement_WithoutType_ShouldThrowException() {
-        // Arrange
         String name = "No Type Defined";
-
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> abstractEscapeRoom.createElement(name));
         assertEquals("Invalid arguments: type is required.", exception.getMessage());

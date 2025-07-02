@@ -31,10 +31,8 @@ public class Player implements Observer {
         this.isSubscribed = isSubscribed;
     }
 
-    @Override
     public void update(String message) {
-        if (isSubscribed) {
-            System.out.println("Player ID " + id + ": " + message); // Notificación.
-        }
+        System.out.println("Player updated with message: " + message);
     }
+
 }

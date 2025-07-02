@@ -7,6 +7,7 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.dto.InventoryDisplayDTO;
 import mvc.model.Room;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -90,7 +91,6 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Room update(Room room) throws DAOException {
-        // Primero obtenemos toda la información del registro actual
         Optional<Room> existingRoomOptional = findById(room.getId());
         if (existingRoomOptional.isEmpty()) {
             String messageError = "No " + NAME_OBJECT + " found to update with ID: " + room.getId();
@@ -100,15 +100,13 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
         Room existingRoom = existingRoomOptional.get();
 
-        // Conservamos los valores actuales si los campos en el objeto 'room' son nulos o vacíos
         String newName = room.getName() != null ? room.getName() : existingRoom.getName();
         String newDescription = room.getDescription() != null ? room.getDescription() : existingRoom.getDescription();
         BigDecimal newPrice = room.getPrice() != null ? room.getPrice() : existingRoom.getPrice();
         Difficulty newDifficulty = room.getDifficulty() != null ? room.getDifficulty() : existingRoom.getDifficulty();
         Theme newTheme = room.getTheme() != null ? room.getTheme() : existingRoom.getTheme();
-        boolean newIsActive = room.isActive() || existingRoom.isActive(); // manejar campo booleano
+        boolean newIsActive = room.isActive() || existingRoom.isActive();
 
-        // Actualización en la base de datos
         String sql = "UPDATE " + NAME_OBJECT + " SET name = ?, description = ?, price = ?, idDifficulty = ?, idTheme = ?, isActive = ? WHERE idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -196,6 +194,8 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
     public void addClueToRoom(Integer roomId, Integer clueId) throws DAOException {}
     public void addDecorationToRoom(Integer roomId, Integer decorationId) throws DAOException {}
 
+
+
     private Room listResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
@@ -208,4 +208,42 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
                 .description(rs.getString("description"))
                 .build();
     }
+    @Override
+    public List<InventoryDisplayDTO> findInventory() throws DAOException {
+        String sql = """
+        SELECT u.inventory, u.id, u.name, u.price
+        FROM inventory u
+        UNION ALL
+        SELECT 'TOTAL' AS inventory, 0 AS id, '' AS name, t.price
+        FROM (
+            SELECT SUM(i.price) AS price
+            FROM inventory i
+        ) t
+    """;
+
+        List<InventoryDisplayDTO> inventoryList = new ArrayList<>();
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                InventoryDisplayDTO item = InventoryDisplayDTO.builder()
+                        .inventory(rs.getString("inventory"))
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .price(rs.getBigDecimal("price"))
+                        .build();
+                inventoryList.add(item);
+            }
+
+        } catch (SQLException e) {
+            String messageError = "Error retrieving inventory items: " + e.getMessage();
+            log.error(messageError, e); // Log detallado del error
+            throw new DAOException(messageError, e);
+        }
+
+        return inventoryList;
+    }
+
 }

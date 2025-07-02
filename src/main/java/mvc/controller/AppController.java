@@ -43,7 +43,7 @@ public class AppController {
                     case ROOM_MANAGEMENT -> RoomController.getInstance().mainMenu();
                     case PLAYER_MANAGEMENT -> PlayerController.getInstance().mainMenu();
                     case ESCAPE_ROOM_MANAGEMENT -> EscapeRoomController.getInstance(escapeRoom).mainMenu();
-                    case FINANCIAL_MANAGEMENT -> nada(idMenu.getOPTION_NUMBER() + ". " + idMenu.getDESCRIPTION());
+                    case FINANCIAL_MANAGEMENT -> InventoryController.getInstance().showInventoryMenu();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }
@@ -54,10 +54,6 @@ public class AppController {
             } catch (Exception e) {
                 baseView.displayErrorMessage("Error: An unexpected error occurred: " + e.getMessage());
             }
-     } while (true);
-}
-
-    private void nada(String message) {
-        System.err.println(System.lineSeparator() + message + System.lineSeparator());
+        } while (true);
     }
 }

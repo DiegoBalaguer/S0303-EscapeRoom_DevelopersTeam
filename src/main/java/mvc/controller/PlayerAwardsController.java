@@ -4,10 +4,14 @@ import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 
+import dao.impl.h2.ConnectionDAOH2Impl;
+import dao.impl.h2.NotificationDAOH2Impl;
 import dao.interfaces.CertificateWinDAO;
+import dao.interfaces.NotificationDAO;
 import dao.interfaces.RewardWinDAO;
 import mvc.enumsMenu.OptionsMenuPlayerAward;
 import mvc.model.CertificateWin;
+import mvc.model.Notification;
 import mvc.model.RewardWin;
 import mvc.view.BaseView;
 import mvc.view.PlayerAwardsView;
@@ -61,7 +65,7 @@ public class PlayerAwardsController {
                             baseView.displayMessage2ln("Returning to Main Menu...");
                             return;
                         }
-                        case AWARD_REWARD_WIN -> awardRewardWinToPlayer();
+                        case AWARD_REWARD_WIN -> addRewardWinToPlayer();
                         case AWARD_CERTIFICATE_WIN -> addCertificateWinToPlayer();
                         case REVOKE_REWARD_WIN ->  delRewardWinToPlayer();
                         case REVOKE_CERTIFICATE_WIN -> delCertificateWinToPlayer();
@@ -77,7 +81,7 @@ public class PlayerAwardsController {
         } while (true);
     }
 
-    private void awardRewardWinToPlayer() throws DAOException {
+    private void addRewardWinToPlayer() throws DAOException {
         baseView.displayMessage2ln("#### AWARD REWARD WIN TO PLAYER #################");
 
         int playerId = 0;
@@ -109,6 +113,28 @@ public class PlayerAwardsController {
         if (newRewardWin != null) {
             RewardWin savedRewardWin = rewardWinDAO.create(newRewardWin);
             baseView.displayMessage2ln("Award created successfully with ID: " + savedRewardWin.getId());
+            try {
+                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+
+                String rewardName = rewardController.getRewardNameById(rewardId);
+
+                Notification notification = Notification.builder()
+                        .idPlayer(playerId)
+                        .message("Congratulations! You have won the reward: " + rewardName)
+                        .dateTimeSent(LocalDateTime.now())
+                        .isActive(true)
+                        .build();
+
+                notificationDAO.saveNotification(notification);
+
+                baseView.displayMessage2ln("Notification sent to Player ID: " + playerId
+                        + " for winning reward: " + rewardName);
+
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error while sending notification: " + e.getMessage());
+            } catch (DatabaseConnectionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -149,6 +175,28 @@ public class PlayerAwardsController {
         if (newCertificateWin != null) {
             CertificateWin savedCertificateWin = certificateWinDAO.create(newCertificateWin);
             baseView.displayMessage2ln("Certificate Win added successfully for Player ID " + playerId + " (Certificate Win ID: " + savedCertificateWin.getId() + ")");
+            try {
+                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+
+                String certificateName = certificateController.getCertificateNameById(certificateId);
+
+                Notification notification = Notification.builder()
+                        .idPlayer(playerId)
+                        .message("Congratulations! You have won the reward: " + certificateName)
+                        .dateTimeSent(LocalDateTime.now())
+                        .isActive(true)
+                        .build();
+
+                notificationDAO.saveNotification(notification);
+
+                baseView.displayMessage2ln("Notification sent to Player ID: " + playerId
+                        + " for winning reward: " + certificateName);
+
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error while sending notification: " + e.getMessage());
+            } catch (DatabaseConnectionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

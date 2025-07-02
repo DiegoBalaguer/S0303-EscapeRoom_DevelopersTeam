@@ -165,7 +165,6 @@ public class PlayerController {
         }
     }
 
-    // Queries for other Classes
 
     public int getPlayerIdWithList() {
         listAllPayersDetail();

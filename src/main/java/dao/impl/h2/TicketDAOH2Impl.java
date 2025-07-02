@@ -148,27 +148,5 @@ public class TicketDAOH2Impl implements BaseDAO<Ticket, Integer>, TicketDAO {
                 .build();
     }
 
-   /* @Override
-        public Optional<Ticket> findById(int id) {
-            String query = "SELECT * FROM ticket WHERE id = ?"; // Ajusta el nombre de la tabla y columna si es necesario
-
-            try (Connection connection = connectionDAO.getConnection();
-                 PreparedStatement ps = connection.prepareStatement(query)) {
-
-                ps.setInt(1, id);
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next()) {
-                    Ticket ticket = Ticket.builder().build();
-                    ticket.setId(rs.getInt("id"));
-                    ticket.setName(rs.getString("name"));       // Ajusta los campos según tu modelo
-                    ticket.setPrice(rs.getBigDecimal("price")); // Ajusta los campos según tu modelo
-                    return Optional.of(ticket);
-                }
-            } catch (SQLException e) {
-                log.error("Error al buscar Ticket por ID: {}", e.getMessage(), e);
-            }
-            return Optional.empty();
-        }*/
 
     }

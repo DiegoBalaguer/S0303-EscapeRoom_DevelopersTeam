@@ -228,6 +228,32 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
             throw new DAOException(messageError, e);
         }
     }
+    @Override
+    public List<Ticket> findAllActiveTickets() throws DAOException {
+        List<Ticket> tickets = new ArrayList<>();
+        String sql = "SELECT idTicket, name, description, price, isActive FROM ticket WHERE isActive = TRUE;";
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                tickets.add(Ticket.builder()
+                        .id(rs.getInt("idTicket"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .price(rs.getBigDecimal("price"))
+                        .isActive(rs.getBoolean("isActive"))
+                        .build());
+            }
+
+            return tickets;
+        } catch (SQLException e) {
+            String messageError = "Error retrieving active tickets: ";
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+    }
 
 }
 

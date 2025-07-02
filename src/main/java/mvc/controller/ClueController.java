@@ -172,8 +172,6 @@ public class ClueController {
         }
     }
 
-// Queries for other Classes
-
     public int getClueIdWithList() {
         listAllClueDetailDto();
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
