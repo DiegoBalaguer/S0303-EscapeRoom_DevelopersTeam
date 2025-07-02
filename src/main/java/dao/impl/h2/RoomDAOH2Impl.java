@@ -7,11 +7,8 @@ import dao.interfaces.RoomDAO;
 import enums.Difficulty;
 import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
-import mvc.controller.PlayerNotifyController;
 import mvc.dto.InventoryDisplayDTO;
 import mvc.model.Room;
-import mvc.view.BaseView;
-
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -94,7 +91,6 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
     @Override
     public Room update(Room room) throws DAOException {
-        // Primero obtenemos toda la información del registro actual
         Optional<Room> existingRoomOptional = findById(room.getId());
         if (existingRoomOptional.isEmpty()) {
             String messageError = "No " + NAME_OBJECT + " found to update with ID: " + room.getId();
@@ -233,10 +229,10 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
 
             while (rs.next()) {
                 InventoryDisplayDTO item = InventoryDisplayDTO.builder()
-                        .inventory(rs.getString("inventory")) // Tipo: room, clue, decoration o TOTAL
-                        .id(rs.getInt("id"))                 // ID, será 0 para TOTAL
-                        .name(rs.getString("name"))           // Nombre, será vacío para TOTAL
-                        .price(rs.getBigDecimal("price"))     // Precio, o suma total para TOTAL
+                        .inventory(rs.getString("inventory"))
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .price(rs.getBigDecimal("price"))
                         .build();
                 inventoryList.add(item);
             }

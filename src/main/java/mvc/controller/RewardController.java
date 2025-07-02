@@ -34,7 +34,6 @@ public class RewardController {
          log.debug("Created Class: {}", this.getClass().getName());
     }
 
-    // Queries for other Classes
 
     public int getRewardIdWithList() {
         listAllRewardsDetail();

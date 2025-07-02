@@ -106,7 +106,6 @@ public class PlayerNotifyController {
             return;
         }
 
-        // Mostrar todas las notificaciones en formato simple o tabular
         for (Notification notification : notifications) {
             baseView.displayMessageln(
                     "Player ID: " + notification.getIdPlayer() +

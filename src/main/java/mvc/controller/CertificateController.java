@@ -50,6 +50,6 @@ public class CertificateController {
     public String getCertificateNameById(int rewardId) throws DAOException {
         return CERTIFICATE_DAO.findById(rewardId)
                 .map(Certificate::getName)
-                .orElse("Unknown Reward"); // Si no se encuentra la recompensa
+                .orElse("Unknown Reward");
     }
 }

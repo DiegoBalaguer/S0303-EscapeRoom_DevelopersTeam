@@ -35,21 +35,6 @@ public class NotificationDAOH2Impl implements NotificationDAO {
             throw new DAOException("Error saving notification", e);
         }
     }
-    /*@Override
-    public void saveNotification(Notification notification) throws DAOException {
-        String sql = "INSERT INTO notifications (idPlayer, message, dateTimeSent, isActive) VALUES (?, ?, ?, ?)";
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, notification.getIdPlayer());
-            stmt.setString(2, notification.getMessage());
-            stmt.setTimestamp(3, Timestamp.valueOf(notification.getDateTimeSent()));
-            stmt.setBoolean(4, true);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            log.error("Error saving notification: ", e);
-            throw new DAOException("Error saving notification", e);
-        }
-    }*/
 
     @Override
     public List<Notification> findAllNotifications() throws DAOException {
@@ -78,12 +63,4 @@ public class NotificationDAOH2Impl implements NotificationDAO {
         return notifications;
     }
 
-    private Notification mapResultSetToNotification(ResultSet rs) throws SQLException {
-        return Notification.builder()
-                .idNotification(rs.getInt("idNotification"))
-                .idPlayer(rs.getInt("idPlayer"))
-                .message(rs.getString("message"))
-                .dateTimeSent(rs.getTimestamp("dateTimeSent").toLocalDateTime())
-                .build();
-    }
 }

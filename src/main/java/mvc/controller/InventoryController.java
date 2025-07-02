@@ -58,15 +58,13 @@ public class InventoryController {
                 baseView.displayMessageln("The inventory is empty.");
                 return;
             }
-
-            // Cabecera con tipo incluido
             baseView.displayMessageln("### FULL INVENTORY ###");
             baseView.displayMessageln("INVENTORY\tID\tNAME\tPRICE");
 
             for (InventoryDisplayDTO item : inventoryList) {
                 String output = String.format(
                         "%s\t%d\t%s\t$%.2f",
-                        item.getInventory(), // Mostrar el tipo del elemento (Room, Clue, Decoration)
+                        item.getInventory(),
                         item.getId(),
                         item.getName(),
                         item.getPrice()

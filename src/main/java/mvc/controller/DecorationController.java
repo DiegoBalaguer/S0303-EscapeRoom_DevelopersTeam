@@ -95,7 +95,7 @@ public class DecorationController {
             baseView.displayMessageln("\n=== DELETE DECORATION ===");
             Optional<Integer> id = decorationView.getDecorationId();
             if (id.isEmpty()) {
-                return; // Cancel if invalid input
+                return;
             }
 
             if (decorationDAO.isExistsById(id.get())) {
@@ -128,9 +128,9 @@ public class DecorationController {
             baseView.displayMessageln("\n=== Current Decoration Data ===");
             decorationView.displayDecoration(existingDecoration);
 
-            Decoration updatedDecoration = decorationView.editDecoration(existingDecoration); // Allow user to modify details.
+            Decoration updatedDecoration = decorationView.editDecoration(existingDecoration);
             if (updatedDecoration == null) {
-                return; // Cancel if user decides not to proceed.
+                return;
             }
 
             decorationDAO.update(updatedDecoration);

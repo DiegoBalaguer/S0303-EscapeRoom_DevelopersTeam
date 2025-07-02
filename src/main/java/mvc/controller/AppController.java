@@ -54,7 +54,4 @@ public class AppController {
      } while (true);
 }
 
-    private void nada(String message) {
-        System.err.println(System.lineSeparator() + message + System.lineSeparator());
-    }
 }
