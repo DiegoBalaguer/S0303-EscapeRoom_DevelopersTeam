@@ -1,6 +1,6 @@
 package mvc.enumsMenu;
 
-public enum OptionsMenuCrud {
+public enum OptionsMenuRoom {
     ADD (1,"Create"),
     SHOW(2,"Show"),
     REMOVE(3,"Delete"),
@@ -11,7 +11,7 @@ public enum OptionsMenuCrud {
     private final String DESCRIPTION;
     private final int OPTION_NUMBER;
 
-    OptionsMenuCrud(int optionNumber, String description) {
+    OptionsMenuRoom(int optionNumber, String description) {
         this.OPTION_NUMBER = optionNumber;
         this.DESCRIPTION = description;
     }
@@ -28,7 +28,7 @@ public enum OptionsMenuCrud {
     StringBuilder message = new StringBuilder();
     message.append(System.lineSeparator()).append(title).append(System.lineSeparator()).append(System.lineSeparator());
 
-        for (OptionsMenuCrud optionMenu : OptionsMenuCrud.values()) {
+        for (OptionsMenuRoom optionMenu : OptionsMenuRoom.values()) {
             message
                     .append(optionMenu.getOPTION_NUMBER())
                     .append(". ")
@@ -38,8 +38,8 @@ public enum OptionsMenuCrud {
         return message.toString();
     }
 
-    public static OptionsMenuCrud getOptionByNumber(int number) {
-        for (OptionsMenuCrud option : OptionsMenuCrud.values()) {
+    public static OptionsMenuRoom getOptionByNumber(int number) {
+        for (OptionsMenuRoom option : OptionsMenuRoom.values()) {
             if (option.getOPTION_NUMBER() == number) {
                 return option;
             }

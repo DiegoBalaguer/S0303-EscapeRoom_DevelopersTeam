@@ -5,7 +5,7 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.DecorationDAO;
 import mvc.dto.DecorationDisplayDTO;
-import mvc.enumsMenu.OptionsMenuItem;
+import mvc.enumsMenu.OptionsMenuCLFUSDE;
 import mvc.model.Decoration;
 import mvc.view.BaseView;
 import mvc.view.DecorationView;
@@ -45,20 +45,20 @@ public class DecorationController {
 
     public void mainMenu() {
         do {
-            baseView.displayMessageln(OptionsMenuItem.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            baseView.displayMessageln(OptionsMenuCLFUSDE.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
-            OptionsMenuItem idMenu = OptionsMenuItem.getOptionByNumber(answer);
+            OptionsMenuCLFUSDE idMenu = OptionsMenuCLFUSDE.getOptionByNumber(answer);
             try {
                 switch (idMenu) {
                     case EXIT -> {
                         baseView.displayMessage2ln("Returning to Main Menu...");
                         return;
                     }
-                    case ADD -> createDecoration();
-                    case SHOW -> getDecorationById();
+                    case CREATE -> createDecoration();
                     case LIST_ALL -> listAllDecorations();
-                    case LIST_BY_ROOM -> listDecorationsByRoom();
+                    case FIND_BY_ID -> getDecorationById();
                     case UPDATE -> updateDecoration();
+                    case SOFT_DELETE -> softDeleteDecorationById();
                     case DELETE -> deleteDecorationById();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
@@ -152,6 +152,18 @@ public class DecorationController {
             baseView.displayMessage2ln(NAME_OBJECT + " deleted successfully (if existed).");
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error deleting the " + NAME_OBJECT + ": " + e.getMessage());
+        }
+    }
+    private void softDeleteDecorationById() throws DAOException {
+        baseView.displayMessage2ln("#### SOFT DELETE  " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            Optional<Decoration> existDecorationOpt = DECORATION_DAO.findById(getDecorationIdWithList());
+            existDecorationOpt.get().setActive(false);
+
+            DECORATION_DAO.update(existDecorationOpt.get());
+            baseView.displayMessage2ln(NAME_OBJECT + " soft deleted successfully: " + existDecorationOpt.get().getName() + " (ID: " + existDecorationOpt.get().getId() + ")");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT +": " + e.getMessage());
         }
     }
 

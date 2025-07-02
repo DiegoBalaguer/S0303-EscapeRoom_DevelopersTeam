@@ -67,8 +67,8 @@ public class PlayerAwardsController {
                         }
                         case AWARD_REWARD_WIN -> addRewardWinToPlayer();
                         case AWARD_CERTIFICATE_WIN -> addCertificateWinToPlayer();
-                        case REVOKE_REWARD_WIN ->  delRewardWinToPlayer();
-                        case REVOKE_CERTIFICATE_WIN -> delCertificateWinToPlayer();
+                        case REVOKE_REWARD_WIN ->  revokeRewardWinToPlayer();
+                        case REVOKE_CERTIFICATE_WIN -> revokeCertificateWinToPlayer();
                     }
                 } catch (DAOException e) {
                     baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
@@ -200,7 +200,7 @@ public class PlayerAwardsController {
         }
     }
 
-    private void delRewardWinToPlayer() throws IllegalArgumentException, DAOException {
+    private void revokeRewardWinToPlayer() throws IllegalArgumentException, DAOException {
         baseView.displayMessage2ln("#### REVOKE REWARD WIN TO PLAYER #################");
 
         int playerId = 0;
@@ -227,7 +227,7 @@ public class PlayerAwardsController {
         }
     }
 
-    private void delCertificateWinToPlayer() throws DAOException {
+    private void revokeCertificateWinToPlayer() throws DAOException {
         baseView.displayMessage2ln("#### REVOKE CERTIFICATE WIN TO PLAYER #################");
 
         int playerId = 0;
