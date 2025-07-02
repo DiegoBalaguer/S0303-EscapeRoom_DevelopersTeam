@@ -2,9 +2,9 @@ package mvc.model;
 
 import dao.interfaces.NotificationDAO;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mvc.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import interfaces.Observer;
@@ -14,17 +14,20 @@ import dao.interfaces.PlayerDAO;
 import dao.impl.h2.PlayerDAOH2Impl;
 import dao.impl.h2.ConnectionDAOH2Impl;
 import dao.exceptions.DatabaseConnectionException;
+import org.bson.types.ObjectId;
 
 @Slf4j
+@Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EscapeRoom implements Observable {
-    private int id;
+    private String id;
     private static EscapeRoom escapeRoom;
+    private String name;
+    private String address;
     private List<Room> rooms;
     private List<Player> players;
     private final List<Observer> observers = new ArrayList<>();
     private PlayerDAO playerDAO;
-
 
     private void initialize() {
         try {

@@ -50,6 +50,7 @@ public class PlayerAwardsController {
     public void mainMenu() {
         do {
             playerAwardsView.displayPlayerMenu("PLAYER AWARDS MANAGEMENT");
+            baseView.displayMessageln(OptionsMenuPlayerAward.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuPlayerAward selectedOption = OptionsMenuPlayerAward.getOptionByNumber(answer);
 

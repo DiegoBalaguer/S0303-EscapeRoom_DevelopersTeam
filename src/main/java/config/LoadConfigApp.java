@@ -1,4 +1,4 @@
-package config.loadConfigApp;
+package config;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,17 +15,30 @@ public class LoadConfigApp {
 
     private LoadConfigApp() {}
 
-    public static void initialitze() {
+    public static void initialitze(String configFileApp) {
         if(loadConfigApp == null) {
             loadConfigApp = new LoadConfigApp();
         }
+        Path newFilePath = Path.of(configFileApp).normalize();
         properties = new Properties();
         try {
-            properties.load(new FileInputStream(INPUT_FILE_WITH_PATH.toFile()));
+            properties.load(new FileInputStream(String.valueOf(configFileApp.isBlank() ? INPUT_FILE_WITH_PATH.toFile() : newFilePath)));
             log.info("Config file load to: {}", INPUT_FILE_WITH_PATH);
         } catch (IOException e) {
             log.error("Error loading config file: {}", e.getMessage());
         }
+    }
+
+    public static void setAppBusinessId(String value) {
+        properties.setProperty("app.businessId", value);
+    }
+
+    public static void setAppBusinessName(String value) {
+        properties.setProperty("app.businessName", value);
+    }
+
+    public static void setAppBusinessAddress(String value) {
+        properties.setProperty("app.businessAddress", value);
     }
 
     public static String get(String key) {
@@ -40,9 +53,22 @@ public class LoadConfigApp {
         return Integer.parseInt(properties.getProperty(key));
     }
 
-    public static String getAppName() {
-        return properties.getProperty("app.name");
+    public static String getAppBusinessId() {
+        return properties.getProperty("app.businessId");
     }
+
+    public static String getAppBusinessName() {
+        return properties.getProperty("app.businessName");
+    }
+
+    public static String getAppBusinessAddress() {
+        return properties.getProperty("app.businessAddress");
+    }
+
+    public static boolean getAppDebug() {
+        return Boolean.parseBoolean(properties.getProperty("app.debug"));
+    }
+
 
     public static String getAppFileDbConfig() {
         return properties.getProperty("app.fileDbConfig");

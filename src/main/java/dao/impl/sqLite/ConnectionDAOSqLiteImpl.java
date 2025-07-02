@@ -1,4 +1,4 @@
-package dao.impl.h2;
+package dao.impl.sqLite;
 
 import dao.connection.SSHSessionManager;
 import dao.exceptions.DatabaseConnectionException;
@@ -13,35 +13,37 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Slf4j
-public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
-    private static volatile ConnectionDAOH2Impl instance;
+public class ConnectionDAOSqLiteImpl implements ConnectionDAO, ConnectionDAOsql {
+    private static volatile ConnectionDAOSqLiteImpl instance;
     private static Connection connection;
 
-    private static final Path INPUT_FILE_WITH_PATH = Path.of(LoadConfigDB.getH2FileWithPath()).normalize().toAbsolutePath();
+    private static final Path INPUT_FILE_WITH_PATH = Path.of(LoadConfigDB.getSqLiteFileWithPath()).normalize().toAbsolutePath();
 
-    private static final String DRIVER = LoadConfigDB.getH2Driver();
-    private static final String URL = LoadConfigDB.getH2Url() + INPUT_FILE_WITH_PATH;
-    private static final String USERNAME = LoadConfigDB.getH2User();
-    private static final String PASSWORD = LoadConfigDB.getH2Password();
+    private static final String DRIVER = LoadConfigDB.getSqLiteDriver();
+    private static final String URL = LoadConfigDB.getSqLiteUrl() + INPUT_FILE_WITH_PATH;
+    private static final String USERNAME = LoadConfigDB.getSqLiteUser();
+    private static final String PASSWORD = LoadConfigDB.getSqLitePassword();
 
-    private ConnectionDAOH2Impl() throws DatabaseConnectionException {
+
+    private ConnectionDAOSqLiteImpl() throws DatabaseConnectionException {
         initializeConnection();
     }
 
     private void initializeConnection() throws DatabaseConnectionException {
         try {
             Class.forName(DRIVER);
+
             this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            log.info("Database connection to H2 established successfully.");
+            log.info("Database connection to SqLite established successfully.");
         } catch (ClassNotFoundException | SQLException e) {
             log.error("Database connection failed: {}", e.getMessage());
             throw new DatabaseConnectionException("Failed to connect to the database.", e);
         }
     }
 
-    public static synchronized ConnectionDAOH2Impl getInstance() throws DatabaseConnectionException {
+    public static synchronized ConnectionDAOSqLiteImpl getInstance() throws DatabaseConnectionException {
         if (instance == null) {
-            instance = new ConnectionDAOH2Impl();
+            instance = new ConnectionDAOSqLiteImpl();
         }
         return instance;
     }

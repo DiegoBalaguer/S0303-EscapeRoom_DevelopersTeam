@@ -3,7 +3,6 @@ package mvc.view;
 import mvc.dto.*;
 import mvc.model.Clue;
 
-import mvc.model.Player;
 import utils.ConsoleUtils;
 import utils.StringUtils;
 
@@ -26,7 +25,7 @@ public class ClueView {
                     .isActive(true)
                     .build();
         } catch (Exception e) {
-            baseView.displayErrorMessage("Error collecting clue details: " + e.getMessage());
+            baseView.displayErrorMessage("Error collecting " + NAME_OBJECT + " details: " + e.getMessage());
             return null;
         }
     }
@@ -51,11 +50,10 @@ public class ClueView {
             clue.setActive(getUpdateIsActive(clue.isActive()));
             return clue;
         } catch (Exception e) {
-            baseView.displayErrorMessage("Error editing clue: " + e.getMessage());
+            baseView.displayErrorMessage("Error editing " + NAME_OBJECT + ": " + e.getMessage());
             throw new IllegalArgumentException("Error editing " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
-
 
     private String getUpdateName(String oldValue) {
         return ConsoleUtils.readStringWithDefault("Enter name: ", Optional.of(oldValue)).get();
@@ -76,7 +74,7 @@ public class ClueView {
     public void displayRecordClue(Clue clue) {
         String message = "";
         if (clue != null) {
-            message += baseView.LINE + "--- Clue Details ---" + baseView.LINE;
+            message += baseView.LINE + "--- " + NAME_OBJECT + " Details ---" + baseView.LINE;
             message += "ID: " + clue.getId() + baseView.LINE;
             message += "Name: " + clue.getName() + baseView.LINE;
             message += "Price: $" + clue.getPrice() + baseView.LINE;
@@ -84,14 +82,14 @@ public class ClueView {
             message += "Is Active: " + (clue.isActive() ? "Yes" : "No") + baseView.LINE;
             message += "-------------------------" + baseView.LINE;
         } else {
-            message = "Clue not found.";
+            message = NAME_OBJECT + " not found.";
         }
         baseView.displayMessageln(message);
     }
 
     public void displayClueListDto(List<ClueDisplayDTO> clueDisplayDTOS) {
         if (clueDisplayDTOS.isEmpty()) {
-            baseView.displayMessageln("No clues found.");
+            baseView.displayMessageln("No " + NAME_OBJECT + " found.");
             return;
         }
         baseView.displayMessageln(
@@ -104,7 +102,7 @@ public class ClueView {
 
     public void displayClueList(List<Clue> clues) {
         if (clues.isEmpty()) {
-            baseView.displayMessageln("No Clues found.");
+            baseView.displayMessageln("No "+ NAME_OBJECT + " found.");
             return;
         }
         baseView.displayMessageln(
@@ -114,5 +112,4 @@ public class ClueView {
                 StringUtils.makeLineToList(ClueMapper.toDisplayDTO(clue).toList())));
         baseView.displayMessage2ln("-------------------");
     }
-
 }

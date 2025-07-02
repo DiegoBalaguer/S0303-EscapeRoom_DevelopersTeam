@@ -1,11 +1,15 @@
 package mvc.view;
 
+import config.LoadConfigApp;
+import lombok.extern.slf4j.Slf4j;
 import utils.ConsoleUtils;
 
 import java.util.Optional;
 
+@Slf4j
 public class BaseView {
 
+    private final boolean DEBUG = LoadConfigApp.getAppDebug();
     public final String LINE = System.lineSeparator();
 
     public int getReadRequiredInt(String message) {
@@ -34,9 +38,13 @@ public class BaseView {
 
     public void displayErrorMessage(String message) {
         System.err.println(LINE + "ERROR: " + message + LINE);
+        log.error("ERROR: " + message);
     }
 
     public void displayDebugMessage(String message) {
-        System.out.print(LINE + "DEBUG: " + message + LINE);
+        if (DEBUG) {
+            System.out.print(LINE + "DEBUG: " + message + LINE);
+        }
+        log.error("DEBUG: " + message);
     }
 }

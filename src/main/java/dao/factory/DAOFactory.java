@@ -1,7 +1,7 @@
 package dao.factory;
 
 import dao.exceptions.DatabaseConnectionException;
-import config.loadConfigDB.LoadConfigDB;
+import config.LoadConfigDB;
 import dao.interfaces.EscapeRoomDAO;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +19,8 @@ public class DAOFactory {
                     String factoryType = LoadConfigDB.getDbType().toLowerCase();
                     switch (factoryType) {
                         case "h2" -> factoryInstance = new EscapeRoomDAOH2();
+                        case "sqlite" -> factoryInstance = new EscapeRoomDAOSqLite();
+                        case "mysql" -> factoryInstance = new EscapeRoomDAOMySql();
                         // others...
                         default -> {
                             log.warn("Unsupported factory type: {}", factoryType);

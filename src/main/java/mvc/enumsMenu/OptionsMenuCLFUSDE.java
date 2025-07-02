@@ -1,19 +1,19 @@
 package mvc.enumsMenu;
 
-public enum OptionsMenuEscapeRoom {
+public enum OptionsMenuCLFUSDE {
 
-    CLUE_MANAGEMENT(1, "Clue management"),
-    DECORATION_MANAGEMENT(2, "Decoration management"),
-    REWARD_MANAGEMENT(3, "Reward management"),
-    CERTIFICATE_MANAGEMENT(4, "Certificate management"),
-    SHOW_BUSINESS_DATA(5, "Show business data"),
-    UPDATE_DATA_BUSINESS(6, "Update name business"),
-    EXIT(0, "Exit");
+    CREATE(1, "Create item"),
+    LIST_ALL(2, "List All items"), // Nueva opción
+    FIND_BY_ID(3, "Find item by ID"),
+    UPDATE(4, "Update item"),
+    SOFT_DELETE(5, "Soft delete item"),
+    DELETE(6, "Delete item"),
+    EXIT(0, "Back to Main Menu");
 
     private final int OPTION_NUMBER;
     private final String DESCRIPTION;
 
-    OptionsMenuEscapeRoom(int optionNumber, String description) {
+    OptionsMenuCLFUSDE(int optionNumber, String description) {
         this.OPTION_NUMBER = optionNumber;
         this.DESCRIPTION = description;
     }
@@ -30,7 +30,7 @@ public enum OptionsMenuEscapeRoom {
         StringBuilder message = new StringBuilder();
         message.append(System.lineSeparator()).append(title).append(System.lineSeparator()).append(System.lineSeparator());
 
-        for (OptionsMenuEscapeRoom optionMenu : OptionsMenuEscapeRoom.values()) {
+        for (OptionsMenuCLFUSDE optionMenu : OptionsMenuCLFUSDE.values()) {
             message
                     .append(optionMenu.getOPTION_NUMBER())
                     .append(". ")
@@ -40,8 +40,8 @@ public enum OptionsMenuEscapeRoom {
         return message.toString();
     }
 
-    public static OptionsMenuEscapeRoom getOptionByNumber(int number) {
-        for (OptionsMenuEscapeRoom option : OptionsMenuEscapeRoom.values()) {
+    public static OptionsMenuCLFUSDE getOptionByNumber(int number) {
+        for (OptionsMenuCLFUSDE option : OptionsMenuCLFUSDE.values()) {
             if (option.getOPTION_NUMBER() == number) {
                 return option;
             }
