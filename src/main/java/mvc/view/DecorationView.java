@@ -1,51 +1,77 @@
 package mvc.view;
 
-import mvc.enumsMenu.OptionsMenuItem;
-import lombok.extern.slf4j.Slf4j;
+import mvc.dto.DecorationDisplayDTO;
+import mvc.dto.DecorationMapper;
 import mvc.model.Decoration;
 import utils.ConsoleUtils;
+import utils.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 public class DecorationView {
 
-    private static BaseView baseView =  new BaseView();
+    private static BaseView baseView = new BaseView();
+    private static final String NAME_OBJECT = "Decoration";
 
-    public Decoration getDecorationDetails() {
+    public Decoration getDecorationDetailsCreate(int roomId) {
         try {
-            String name = ConsoleUtils.readRequiredString("Enter decoration name: ");
-            int idRoom = ConsoleUtils.readRequiredInt("Enter Room ID (existing): ");
-            BigDecimal price = ConsoleUtils.readRequiredBigDecimal("Enter decoration price: ");
-            String description = ConsoleUtils.readRequiredString("Enter decoration description: ");
-            boolean isActive = ConsoleUtils.readRequiredBoolean("Is the decoration active? (T/F, Y/N, S/N): ");
-
             return Decoration.builder()
-                    .name(name)
-                    .idRoom(idRoom)
-                    .price(price)
-                    .isActive(isActive)
+                    .name(getInputName())
+                    .idRoom(roomId)
+                    .price(getInputPrice())
+                    .description(getInputDescription())
+                    .isActive(true)
                     .build();
-
         } catch (Exception e) {
             baseView.displayErrorMessage("Error collecting decoration details: " + e.getMessage());
             return null;
         }
     }
 
-    public Optional<Integer> getDecorationId() {
+    private String getInputName() {
+        return ConsoleUtils.readRequiredString("Enter name: ");
+    }
+
+    private String getInputDescription() {
+        return ConsoleUtils.readRequiredString("Enter description: ");
+    }
+
+    private BigDecimal getInputPrice() {
+        return ConsoleUtils.readRequiredBigDecimal("Enter price: ");
+    }
+
+    public Decoration getUpdateDecorationDetails(Decoration decoration) {
         try {
-            int id = ConsoleUtils.readRequiredInt("Enter decoration ID: ");
-            return Optional.of(id);
-        } catch (NumberFormatException e) {
-            baseView.displayErrorMessage("Invalid ID. Please enter a valid number.");
-            return Optional.empty();
+            decoration.setName(getUpdateName(decoration.getName()));
+            decoration.setDescription(getUpdateDescription(decoration.getDescription()));
+            decoration.setPrice(getUpdatePrice(decoration.getPrice()));
+            decoration.setActive(getUpdateIsActive(decoration.isActive()));
+            return decoration;
+        } catch (Exception e) {
+            baseView.displayErrorMessage("Error editing decoration: " + e.getMessage());
+            throw new IllegalArgumentException("Error editing " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    public void displayDecoration(Decoration decoration) {
+    private String getUpdateName(String oldValue) {
+        return ConsoleUtils.readStringWithDefault("Enter name: ", Optional.of(oldValue)).get();
+    }
+
+    private String getUpdateDescription(String oldValue) {
+        return ConsoleUtils.readStringWithDefault("Enter description: ", Optional.of(oldValue)).get();
+    }
+
+    private BigDecimal getUpdatePrice(BigDecimal oldValue) {
+        return ConsoleUtils.readBigDecimalWithDefault("Enter price: ", Optional.of(oldValue)).get();
+    }
+
+    private Boolean getUpdateIsActive(boolean oldValue) {
+        return ConsoleUtils.readBooleanWithDefault("Enter is active ('Y' or 'N'): ", Optional.of(oldValue)).get();
+    }
+
+    public void displayRecordDecoration(Decoration decoration) {
         String message = "";
         if (decoration != null) {
             message += baseView.LINE + "--- Decoration Details ---" + baseView.LINE;
@@ -61,34 +87,29 @@ public class DecorationView {
         baseView.displayMessageln(message);
     }
 
-    public void displayDecorations(List<Decoration> decorations) {
-        baseView.displayMessageln(baseView.LINE + "--- List of Decorations ---");
-        for (Decoration decoration : decorations) {
-            displayDecoration(decoration);
+    public void displayDecorationListDto(List<DecorationDisplayDTO> decorationDisplayDTOS) {
+        if (decorationDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No decorations found.");
+            return;
         }
-        baseView.displayMessage2ln("-------------------------");
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(decorationDisplayDTOS.get(0).toListHead()));
+
+        decorationDisplayDTOS.forEach(dto -> baseView.displayMessageln(
+                StringUtils.makeLineToList(dto.toList())));
+        baseView.displayMessage2ln("-------------------");
     }
 
-    public Decoration editDecoration(Decoration currentDecoration) {
-        try {
-            baseView.displayMessageln(baseView.LINE + "=== EDIT DECORATION ===");
-            String name = ConsoleUtils.readOptionalString("Current Name: " + currentDecoration.getName() + ". New Name: ").orElse(currentDecoration.getName());
-            BigDecimal price = ConsoleUtils.readOptionalBigDecimal("Current Price: " + currentDecoration.getPrice() + ". New Price: ").orElse(currentDecoration.getPrice());
-            String description = ConsoleUtils.readOptionalString("Current Description: " + currentDecoration.getDescription() + ". New Description: ").orElse(currentDecoration.getDescription());
-            boolean isActive = ConsoleUtils.readOptionalBoolean("Current Active Status: " + (currentDecoration.isActive() ? "Yes" : "No") + ". New Status (true/false): ").orElse(currentDecoration.isActive());
-
-            return Decoration.builder()
-                    .id(currentDecoration.getId())
-                    .name(name)
-                    .idRoom(currentDecoration.getIdRoom())
-                    .price(price)
-                    .description(description)
-                    .isActive(isActive)
-                    .build();
-
-        } catch (Exception e) {
-            baseView.displayErrorMessage("Error editing decoration: " + e.getMessage());
-            return null;
+    public void displayDecorationList(List<Decoration> decorations) {
+        if (decorations.isEmpty()) {
+            baseView.displayMessageln("No Decorations found.");
+            return;
         }
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(DecorationMapper.toDisplayDTO(decorations.get(0)).toListHead()));
+
+        decorations.forEach(decoration -> baseView.displayMessageln(
+                StringUtils.makeLineToList(DecorationMapper.toDisplayDTO(decoration).toList())));
+        baseView.displayMessage2ln("-------------------");
     }
 }

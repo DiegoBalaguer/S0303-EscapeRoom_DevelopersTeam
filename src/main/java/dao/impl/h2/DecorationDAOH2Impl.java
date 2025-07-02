@@ -4,7 +4,10 @@ import dao.exceptions.DAOException;
 import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.DecorationDAO;
+import enums.Theme;
 import lombok.extern.slf4j.Slf4j;
+import mvc.dto.ClueDisplayDTO;
+import mvc.dto.DecorationDisplayDTO;
 import mvc.model.Decoration;
 
 import java.math.BigDecimal;
@@ -152,23 +155,50 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
+
     @Override
-    public List<Decoration> findDecorationsByRoomId(Integer roomId) throws DAOException {
+    public List<DecorationDisplayDTO> findAllDecorationsCompleteInfo() throws DAOException {
+        List<DecorationDisplayDTO> decorationsDisplayDTO = new ArrayList<>();
+        String sql = "SELECT " +
+                "d.idDecoration, d.name, d.idRoom, d.price, d.IsActive, d.description, " +
+                "r.name AS roomName, r.idTheme " +
+                "FROM Decoration d " +
+                "JOIN Room r ON d.idRoom = r.idRoom";
+
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                decorationsDisplayDTO.add(listResultSetToDecorationDisplayDTO(rs));
+            }
+
+        } catch (SQLException e) {
+            String errorMessage = "Error retrieving complete decorations";
+            log.error(errorMessage, e);
+            throw new DAOException(errorMessage, e);
+        }
+
+        return decorationsDisplayDTO;
+    }
+
+    @Override
+    public List<DecorationDisplayDTO> findDecorationsByRoomId(Integer roomId) throws DAOException {
+        List<DecorationDisplayDTO> decorationsDisplayDTO = new ArrayList<>();
         String sql = "SELECT idDecoration, idRoom, name, description, price, isActive FROM decoration WHERE idRoom = ? AND isActive = TRUE;";
-        List<Decoration> decorations = new ArrayList<>();
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, roomId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                decorations.add(mapResultSetToDecoration(rs));
+                decorationsDisplayDTO.add(listResultSetToDecorationDisplayDTO(rs));
             }
         } catch (Exception e) {
             String messageError = "Error retrieving decorations for room ID: " + roomId;
             log.error(messageError, e);
             throw new DAOException(messageError, e);
         }
-        return decorations;
+        return decorationsDisplayDTO;
     }
     @Override
     public BigDecimal findPriceByRoomId(Integer roomId) throws DAOException {
@@ -187,6 +217,19 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
             throw new DAOException(errorMessage, e);
         }
         return BigDecimal.ZERO;
+    }
+    private DecorationDisplayDTO listResultSetToDecorationDisplayDTO(ResultSet rs) throws SQLException {
+        return DecorationDisplayDTO.builder()
+                .id(rs.getInt("idDecoration"))
+                .name(rs.getString("name"))
+                .idRoom(rs.getInt("idRoom"))
+                .room(rs.getString("roomName"))
+                .idTheme(rs.getInt("idTheme"))
+                .theme(Theme.values()[rs.getInt("idTheme")])
+                .price(rs.getBigDecimal("price"))
+                .isActive(rs.getBoolean("isActive"))
+                .description(rs.getString("description"))
+                .build();
     }
 
 }
