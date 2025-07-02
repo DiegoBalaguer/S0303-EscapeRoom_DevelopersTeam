@@ -30,7 +30,6 @@ public class RewardWinController {
         baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
     }
 
-    // Queries for other Classes
 
     public int getRewardWinForPlayerWithList(int playerId) {
         listAllCertificatesWinForPlayerDetail(playerId);

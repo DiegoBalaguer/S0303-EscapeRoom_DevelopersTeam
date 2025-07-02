@@ -15,9 +15,5 @@ public abstract class Element{
     private String name;
     private String description;
     private boolean isActive;
-/*
-    protected Element(ElementBuilder<?, ?> builder) {
-        this.name = builder.name;
-        this.description = builder.description;
-    }*/
+
 }

@@ -115,26 +115,21 @@ public class PlayerAwardsController {
             try {
                 NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
 
-                // Obtener el nombre asociado a la recompensa, suponiendo que rewardController puede hacerlo
                 String rewardName = rewardController.getRewardNameById(rewardId);
 
-                // Crear notificación personalizada
                 Notification notification = Notification.builder()
-                        .idPlayer(playerId) // ID del jugador a quien se le envía la notificación
-                        .message("Congratulations! You have won the reward: " + rewardName) // Mensaje personalizado
-                        .dateTimeSent(LocalDateTime.now()) // Fecha actual del envío
-                        .isActive(true) // La notificación está activa por defecto
+                        .idPlayer(playerId)
+                        .message("Congratulations! You have won the reward: " + rewardName)
+                        .dateTimeSent(LocalDateTime.now())
+                        .isActive(true)
                         .build();
 
-                // Guardar la notificación en la base de datos
                 notificationDAO.saveNotification(notification);
 
-                // Mensaje de confirmación
                 baseView.displayMessage2ln("Notification sent to Player ID: " + playerId
                         + " for winning reward: " + rewardName);
 
             } catch (DAOException e) {
-                // Manejo de errores en el envío de la notificación
                 baseView.displayErrorMessage("Error while sending notification: " + e.getMessage());
             } catch (DatabaseConnectionException e) {
                 throw new RuntimeException(e);

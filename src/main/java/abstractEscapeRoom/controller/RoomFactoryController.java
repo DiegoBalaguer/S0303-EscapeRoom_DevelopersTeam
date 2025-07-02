@@ -35,7 +35,6 @@ public class RoomFactoryController {
     public Room createRoom(String theme, String name, BigDecimal price, Difficulty difficulty) throws DAOException {
         AbstractFactory factory = selectFactory(theme);
 
-        // Crear pistas y decoraciones usando la fábrica
         ClueDAO clueDAO = new ClueDAOH2Impl(connectionDAO);
         DecorationDAO decorationDAO = new DecorationDAOH2Impl(connectionDAO);
 
@@ -45,7 +44,6 @@ public class RoomFactoryController {
         Objects.requireNonNull(clue, "Clue cannot be null");
         Objects.requireNonNull(decoration, "Decoration cannot be null");
 
-        // Persistir pista y decoración en la base de datos
         clueDAO.create(clue);
         decorationDAO.create(decoration);
 

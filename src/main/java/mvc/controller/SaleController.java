@@ -22,7 +22,6 @@ public class SaleController {
     private static volatile SaleController saleControllerInstance;
     private final SaleView saleView;
     private final SaleDAO SALE_DAO;
-    private final TicketDAO TICKET_DAO;
 
     private static BaseView baseView;
     private static final String NAME_OBJECT = "Ticket";
@@ -33,7 +32,6 @@ public class SaleController {
 
         try {
             this.SALE_DAO = DAOFactory.getDAOFactory().getSaleDAO();
-            this.TICKET_DAO = DAOFactory.getDAOFactory().getTicketDAO();
         } catch (DatabaseConnectionException e) {
             log.error("Error al inicializar los DAOs debido a problemas de conexión con la base de datos: {}", e.getMessage(), e);
             throw new IllegalStateException("No se pudieron inicializar los DAOs.", e);
@@ -41,19 +39,7 @@ public class SaleController {
             log.error("Ocurrió un error inesperado al inicializar los DAOs: {}", e.getMessage(), e);
             throw new IllegalStateException("Error inesperado al inicializar los DAOs.", e);
         }
-
-       /* validateNotNull(this.SALE_DAO, "SaleDAO no pudo ser inicializado.");
-        validateNotNull(this.playerDAO, "PlayerDAO no pudo ser inicializado.");
-        validateNotNull(this.ticketDAO, "TicketDAO no pudo ser inicializado."); // Validamos que el ticketDAO no sea nulo*/
     }
-
-    // Método helper para validar nulos
-   /* private void validateNotNull(Object obj, String errorMsg) {
-        if (obj == null) {
-            log.error(errorMsg);
-            throw new IllegalStateException(errorMsg);
-        }
-    }*/
 
     public static SaleController getInstance() {
         if (saleControllerInstance == null) {
@@ -142,10 +128,10 @@ public class SaleController {
             Sale newSale = Sale.builder()
                     .idTicket(ticketId)
                     .idPlayer(playerId)
-                    .idRoom(1) // En este caso, asumimos que es la sala con ID 1 (sin lógica para seleccionarla)
+                    .idRoom(1)
                     .players(playersCount)
                     .price(totalPrice)
-                    .completion(0) // Por ahora, no estamos calculando "completion"
+                    .completion(0)
                     .dateSale(java.time.LocalDate.now())
                     .isActive(true)
                     .build();
@@ -188,17 +174,6 @@ public class SaleController {
         } catch (DAOException e) {
             handleError("An error occurred while calculating total benefits: ", e);
         }
-    }
-
-    public int getTicketIdWithList() {
-        listAllSalesDetail();
-        Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
-        if (searchID.isEmpty() || SALE_DAO.findById(searchID.get()).isEmpty()) {
-            String message = NAME_OBJECT + " with ID required or not found.";
-            baseView.displayErrorMessage(message);
-            throw new IllegalArgumentException(message);
-        }
-        return searchID.get();
     }
 
     private void listAllSalesDetail() {

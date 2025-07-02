@@ -188,7 +188,7 @@ public class RoomController {
             baseView.displayMessageln("\n=== CALCULATE TOTAL ROOM VALUE ===");
             Optional<Integer> id = roomView.getRoomId();
             if (id.isEmpty()) {
-                return; // Cancel if invalid input
+                return;
             }
 
             Optional<Room> optionalRoom = ROOM_DAO.findById(id.get());
@@ -212,19 +212,6 @@ public class RoomController {
         } catch (Exception e) {
             baseView.displayErrorMessage("Error calculating total value: " + e.getMessage());
         }
-    }
-
-    private OptionsMenuCrud getOptionByOrdinal(int ordinal) {
-        for (OptionsMenuCrud option : OptionsMenuCrud.values()) {
-            if (option.ordinal() == ordinal) {
-                return option;
-            }
-        }
-        return null;
-    }
-
-    public Optional<Room> findRoomById(int roomId) {
-        return ROOM_DAO.findById(roomId);
     }
 
     public int getRoomIdWithList() throws DAOException, IllegalArgumentException {
