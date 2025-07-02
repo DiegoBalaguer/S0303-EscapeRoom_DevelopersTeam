@@ -1,0 +1,8 @@
+use escaperoom;
+
+db.escaperoom.insertOne(
+{
+    "name": "La Salas de Morpheo",
+    "address": "Calle de los desaparecidos, 666",
+    "city": "Barcelona"
+})

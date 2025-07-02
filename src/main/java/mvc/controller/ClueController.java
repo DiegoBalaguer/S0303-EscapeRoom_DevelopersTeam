@@ -93,8 +93,6 @@ public class ClueController {
     private void getClueById() {
         baseView.displayMessage2ln("####  GET " + NAME_OBJECT.toUpperCase() + " BY ID  #################");
         try {
-            baseView.displayMessageln(baseView.LINE + "=== GET CLUE BY ID ===");
-
             Optional<Clue> optionalClue = CLUE_DAO.findById(getClueIdWithList());
 
             clueView.displayRecordClue(optionalClue.get());
@@ -161,7 +159,7 @@ public class ClueController {
         }
     }
 
-    private void softDeleteClue() throws DAOException {
+    private void softDeleteClueById() throws DAOException {
         baseView.displayMessage2ln("#### SOFT DELETE  " + NAME_OBJECT.toUpperCase() + "  #################");
         try {
             Optional<Clue> existClueOpt = CLUE_DAO.findById(getClueIdWithList());

@@ -1,47 +1,61 @@
-package dao.impl.h2;
+package dao.impl.mysql;
 
+import config.LoadConfigDB;
 import dao.connection.SSHSessionManager;
 import dao.exceptions.DatabaseConnectionException;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.ConnectionDAOsql;
-import config.LoadConfigDB;
 import lombok.extern.slf4j.Slf4j;
 
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Slf4j
-public class ConnectionDAOH2Impl implements ConnectionDAO, ConnectionDAOsql {
-    private static volatile ConnectionDAOH2Impl instance;
+public class ConnectionDAOMySqlImpl implements ConnectionDAO, ConnectionDAOsql {
+    private static volatile ConnectionDAOMySqlImpl instance;
     private static Connection connection;
+    private SSHSessionManager sshSessionManager;
 
-    private static final Path INPUT_FILE_WITH_PATH = Path.of(LoadConfigDB.getH2FileWithPath()).normalize().toAbsolutePath();
+    private static final boolean TUNNEL_SSH = LoadConfigDB.getMySqlSshEnable();
+    private static final String DRIVER = LoadConfigDB.getMySqlDriver();
+    private static final String URL = LoadConfigDB.getMySqlUrl();
+    private static final String USERNAME = LoadConfigDB.getMySqlUser();
+    private static final String PASSWORD = LoadConfigDB.getMySqlPassword();
 
-    private static final String DRIVER = LoadConfigDB.getH2Driver();
-    private static final String URL = LoadConfigDB.getH2Url() + INPUT_FILE_WITH_PATH;
-    private static final String USERNAME = LoadConfigDB.getH2User();
-    private static final String PASSWORD = LoadConfigDB.getH2Password();
-
-    private ConnectionDAOH2Impl() throws DatabaseConnectionException {
+    private ConnectionDAOMySqlImpl() throws DatabaseConnectionException {
         initializeConnection();
     }
 
     private void initializeConnection() throws DatabaseConnectionException {
         try {
             Class.forName(DRIVER);
+
+            if (TUNNEL_SSH) {
+                try {
+                    sshSessionManager = SSHSessionManager.getInstance();
+                    if (!sshSessionManager.isConnected()) {
+                        throw new DatabaseConnectionException("SSH tunnel failed to connect for MongoDB.");
+                    }
+                    log.info("SSH Tunnel established for MongoDB connection.");
+                } catch (Exception e) {
+                    log.error("Failed to establish SSH tunnel for MongoDB: {}", e.getMessage());
+                    throw new DatabaseConnectionException("Failed to establish SSH tunnel for MongoDB.", e);
+                }
+            }
             this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            log.info("Database connection to H2 established successfully.");
+            log.info("Database connection to SqLite established successfully.");
         } catch (ClassNotFoundException | SQLException e) {
             log.error("Database connection failed: {}", e.getMessage());
             throw new DatabaseConnectionException("Failed to connect to the database.", e);
+        } catch (DatabaseConnectionException e) {
+            throw e;
         }
     }
 
-    public static synchronized ConnectionDAOH2Impl getInstance() throws DatabaseConnectionException {
+    public static synchronized ConnectionDAOMySqlImpl getInstance() throws DatabaseConnectionException {
         if (instance == null) {
-            instance = new ConnectionDAOH2Impl();
+            instance = new ConnectionDAOMySqlImpl();
         }
         return instance;
     }

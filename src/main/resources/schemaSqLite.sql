@@ -17,12 +17,12 @@ DROP TABLE IF EXISTS notifications;
 -- Create tables
 
 CREATE TABLE escaperoom (
-  idEscaperoom INT PRIMARY KEY AUTO_INCREMENT,
+  idEscaperoom INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL
 );
 
 CREATE TABLE player (
-  idPlayer INT PRIMARY KEY AUTO_INCREMENT,
+  idPlayer INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL,
   email VARCHAR(40) NOT NULL,
   password VARCHAR(20) NOT NULL,
@@ -32,19 +32,19 @@ CREATE TABLE player (
 );
 
 CREATE TABLE room (
-  idRoom INT PRIMARY KEY AUTO_INCREMENT,
-  idEscapeRoom INT NOT NULL,
+  idRoom INTEGER PRIMARY KEY AUTOINCREMENT,
+  idEscapeRoom INTEGER NOT NULL,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
   price DECIMAL(5,2) NOT NULL,
-  idDifficulty INT NOT NULL,
-  idTheme INT NOT NULL,
+  idDifficulty INTEGER NOT NULL,
+  idTheme INTEGER NOT NULL,
   isActive BOOLEAN DEFAULT TRUE  
 );
 
 CREATE TABLE clue (
-  idClue INT PRIMARY KEY AUTO_INCREMENT,
-  idRoom INT NOT NULL,
+  idClue INTEGER PRIMARY KEY AUTOINCREMENT,
+  idRoom INTEGER NOT NULL,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
   price DECIMAL(5,2) NOT NULL,
@@ -52,8 +52,8 @@ CREATE TABLE clue (
 );
 
 CREATE TABLE decoration (
-  idDecoration INT PRIMARY KEY AUTO_INCREMENT,
-  idRoom INT NOT NULL,
+  idDecoration INTEGER PRIMARY KEY AUTOINCREMENT,
+  idRoom INTEGER NOT NULL,
   name VARCHAR(40) NOT NULL,
   description varchar(200),
   price DECIMAL(5,2) NOT NULL,
@@ -62,14 +62,14 @@ CREATE TABLE decoration (
 
 
 CREATE TABLE certificate (
-  idCertificate INT PRIMARY KEY AUTO_INCREMENT,
+  idCertificate INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
   isActive BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE reward (
-  idReward INT PRIMARY KEY AUTO_INCREMENT,
+  idReward INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
   isActive BOOLEAN DEFAULT TRUE
@@ -77,7 +77,7 @@ CREATE TABLE reward (
 
 
 CREATE TABLE ticket (
-  idTicket INT PRIMARY KEY AUTO_INCREMENT,
+  idTicket INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
   price DECIMAL(5,2) NOT NULL,  
@@ -85,41 +85,41 @@ CREATE TABLE ticket (
 );
 
 CREATE TABLE sale (
-	idSale INT PRIMARY KEY AUTO_INCREMENT,
-	idTicket INT NOT NULL,
-	idPlayer INT NOT NULL,
-	idRoom INT NOT NULL,
-	players INT NOT NULL,
+	idSale INTEGER PRIMARY KEY AUTOINCREMENT,
+	idTicket INTEGER NOT NULL,
+	idPlayer INTEGER NOT NULL,
+	idRoom INTEGER NOT NULL,
+	players INTEGER NOT NULL,
 	price DECIMAL(5, 2) NOT NULL,
-	completion INT NOT NULL,
+	completion INTEGER NOT NULL,
 	dateSale TIMESTAMP,
     isActive BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE certificatewin (
-	idCertificateWin INT PRIMARY KEY AUTO_INCREMENT,
-	idCertificate INT NOT NULL,
-	idPlayer INT NOT NULL,
-	idRoom INT NOT NULL,
+	idCertificateWin INTEGER PRIMARY KEY AUTOINCREMENT,
+	idCertificate INTEGER NOT NULL,
+	idPlayer INTEGER NOT NULL,
+	idRoom INTEGER NOT NULL,
 	description VARCHAR(200),
 	dateDelivery TIMESTAMP,
     isActive BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE rewardwin (
-	idRewardWin INT PRIMARY KEY AUTO_INCREMENT,
-	idReward INT NOT NULL,
-	idPlayer INT NOT NULL,
+	idRewardWin INTEGER PRIMARY KEY AUTOINCREMENT,
+	idReward INTEGER NOT NULL,
+	idPlayer INTEGER NOT NULL,
 	description VARCHAR(200),
 	dateDelivery TIMESTAMP,
     isActive BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE notifications (
-    idNotification INT AUTO_INCREMENT PRIMARY KEY,
-    idPlayer INT NOT NULL,
-    message TEXT NOT NULL,
-    dateTimeSent TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     idNotification INTEGER PRIMARY KEY AUTOINCREMENT,
+     idPlayer INTEGER NOT NULL,
+     message TEXT NOT NULL,
+     dateTimeSent TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     isActive BOOLEAN DEFAULT TRUE
 );
 

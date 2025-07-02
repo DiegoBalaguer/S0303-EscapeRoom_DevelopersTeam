@@ -2,14 +2,15 @@ package dao.connection;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import config.loadConfigDB.LoadConfigDB;
+import config.LoadConfigDB;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SSHSessionManager implements AutoCloseable {
+    private static SSHSessionManager instance;
     private Session session;
 
-    public SSHSessionManager() throws Exception {
+    private SSHSessionManager() throws Exception {
         JSch jsch = new JSch();
         session = jsch.getSession(
                 LoadConfigDB.getSshUser(),
@@ -20,11 +21,28 @@ public class SSHSessionManager implements AutoCloseable {
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
 
+        // Mongo
         session.setPortForwardingL(
-                LoadConfigDB.getSshLocalPort(),
-                LoadConfigDB.getSshRemoteHost(),
-                LoadConfigDB.getSshRemotePort()
+                LoadConfigDB.getMongodbLocalPort(),
+                LoadConfigDB.getMongodbHost(),
+                LoadConfigDB.getMongodbRemotePort()
         );
+
+        // MySQL
+        session.setPortForwardingL(
+                LoadConfigDB.getMySqlLocalPort(),
+                LoadConfigDB.getMySqlHost(),
+                LoadConfigDB.getMySqlRemotePort()
+        );
+
+        log.info("SSH session established with port forwardings for MongoDB and MySQL.");
+    }
+
+    public static synchronized SSHSessionManager getInstance() throws Exception {
+        if (instance == null || !instance.isConnected()) {
+            instance = new SSHSessionManager();
+        }
+        return instance;
     }
 
     public boolean isConnected() {
@@ -37,5 +55,6 @@ public class SSHSessionManager implements AutoCloseable {
             session.disconnect();
             log.info("SSH Session Closed");
         }
+        instance = null;
     }
 }

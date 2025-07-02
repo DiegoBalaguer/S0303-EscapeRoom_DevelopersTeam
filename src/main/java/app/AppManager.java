@@ -1,11 +1,15 @@
 package app;
 
-import dao.interfaces.EscapeRoomDAO;
-import config.loadConfigDB.LoadConfigDB;
+import config.ImportData;
 
-import config.loadConfigApp.LoadConfigApp;
+import config.LoadConfigDB;
+
+import config.LoadConfigApp;
+import dao.connection.SSHSessionManager;
+import dao.interfaces.EscapeRoomDAO;
 import lombok.extern.slf4j.Slf4j;
 import mvc.controller.AppController;
+import mvc.model.EscapeRoom;
 import utils.ConsoleUtils;
 
 
@@ -13,7 +17,9 @@ import utils.ConsoleUtils;
 public class AppManager {
 
     private static AppManager appManagerInstance;
-    private EscapeRoomDAO escapeRoomDAO;
+    private static EscapeRoom escapeRoom;
+    private static EscapeRoomDAO escapeRoomDAO;
+    private static SSHSessionManager sshSessionManager;
 
     public static AppManager getInstance() {
         if (appManagerInstance == null) {
@@ -27,20 +33,34 @@ public class AppManager {
         return appManagerInstance;
     }
 
-    public void startApp() {
-        LoadConfigApp.initialitze();
+    public void startApp(String configFileApp) {
+
+        LoadConfigApp.initialitze(configFileApp);
         LoadConfigDB.initialitze();
+        escapeRoom = EscapeRoom.getInstance();
+        ImportData.configDataEscapeRoom(escapeRoom);
+    try {
+        if (LoadConfigDB.getSshEnable()) {
+            sshSessionManager = SSHSessionManager.getInstance();
+        }
+    } catch (Exception e) {
+        log.error("Error connecting SSH instance {}", e.getMessage());
+    }
         log.debug("Database Type: {}", LoadConfigDB.getDbType());
         log.debug("run has started successfully.");
-        AppController.getInstance().mainMenu();
+
+        AppController.getInstance(escapeRoom).mainMenu();
         ConsoleUtils.closeScanner();
-        if (escapeRoomDAO != null) {
-            try {
+        try {
+            if (escapeRoomDAO != null) {
                 escapeRoomDAO.closeConnection();
                 log.info("Database connection closed via DAOFactory.");
-            } catch (Exception e) {
-                log.error("Error closing database connection via DAOFactory: {}", e.getMessage());
             }
+            if (sshSessionManager != null) {
+                sshSessionManager.close();
+            }
+        } catch (Exception e) {
+            log.error("Error closing database connection via DAOFactory: {}", e.getMessage());
         }
     }
 }

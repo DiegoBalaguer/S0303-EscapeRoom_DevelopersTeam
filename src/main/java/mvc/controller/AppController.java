@@ -2,20 +2,23 @@ package mvc.controller;
 
 import dao.exceptions.DAOException;
 import mvc.enumsMenu.OptionsMenuMain;
-import config.loadConfigApp.LoadConfigApp;
+import config.LoadConfigApp;
+import mvc.model.EscapeRoom;
 import mvc.view.BaseView;
 
 public class AppController {
 
     private static AppController appControllerInstance;
     private BaseView baseView;
+    private static EscapeRoom escapeRoom;
 
     private AppController() {
         baseView = new BaseView();
         baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
+        escapeRoom = EscapeRoom.getInstance();
     }
 
-    public static AppController getInstance() {
+    public static AppController getInstance(EscapeRoom escapeRoom) {
         if (appControllerInstance == null) {
             synchronized (AppController.class) {
                 if (appControllerInstance == null) {
@@ -28,7 +31,7 @@ public class AppController {
 
     public void mainMenu() {
         do {
-            baseView.displayMessageln(OptionsMenuMain.viewMenu(LoadConfigApp.getAppName()));
+            baseView.displayMessageln(OptionsMenuMain.viewMenu(escapeRoom.getName()));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
             try {
                 OptionsMenuMain idMenu = OptionsMenuMain.getOptionByNumber(answer);
@@ -39,7 +42,7 @@ public class AppController {
                     case TICKET_MANAGEMENT -> SaleController.getInstance().mainMenu();
                     case ROOM_MANAGEMENT -> RoomController.getInstance().mainMenu();
                     case PLAYER_MANAGEMENT -> PlayerController.getInstance().mainMenu();
-                    case ESCAPE_ROOM_MANAGEMENT -> EscapeRoomController.getInstance().mainMenu();
+                    case ESCAPE_ROOM_MANAGEMENT -> EscapeRoomController.getInstance(escapeRoom).mainMenu();
                     case FINANCIAL_MANAGEMENT -> InventoryController.getInstance().showInventoryMenu();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
@@ -51,7 +54,6 @@ public class AppController {
             } catch (Exception e) {
                 baseView.displayErrorMessage("Error: An unexpected error occurred: " + e.getMessage());
             }
-     } while (true);
-}
-
+        } while (true);
+    }
 }
