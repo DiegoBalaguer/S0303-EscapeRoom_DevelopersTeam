@@ -2,7 +2,6 @@
 
 package dao.impl.h2;
 
-import dao.exceptions.DAOException;
 import dao.interfaces.ConnectionDAO;
 import mvc.model.Player;
 import org.junit.jupiter.api.BeforeEach;
