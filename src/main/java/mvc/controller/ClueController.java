@@ -6,7 +6,7 @@ import dao.factory.DAOFactory;
 import dao.interfaces.*;
 
 import mvc.dto.ClueDisplayDTO;
-import mvc.enumsMenu.OptionsMenuItem;
+import mvc.enumsMenu.OptionsMenuCLFUSDE;
 import mvc.model.Clue;
 
 import mvc.view.BaseView;
@@ -47,20 +47,20 @@ public class ClueController {
 
     public void mainMenu() {
         do {
-            baseView.displayMessageln(OptionsMenuItem.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            baseView.displayMessageln(OptionsMenuCLFUSDE.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
-            OptionsMenuItem idMenu = OptionsMenuItem.getOptionByNumber(answer);
+            OptionsMenuCLFUSDE idMenu = OptionsMenuCLFUSDE.getOptionByNumber(answer);
             try {
                 switch (idMenu) {
                     case EXIT -> {
                         baseView.displayMessage2ln("Returning to Main Menu...");
                         return;
                     }
-                    case ADD -> createClue();
-                    case SHOW -> getClueById();
+                    case CREATE -> createClue();
                     case LIST_ALL -> listAllClues();
-                    case LIST_BY_ROOM -> listCluesByRoom();
+                    case FIND_BY_ID -> getClueById();
                     case UPDATE -> updateClue();
+                    case SOFT_DELETE -> softDeleteClueById();
                     case DELETE -> deleteClueById();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);

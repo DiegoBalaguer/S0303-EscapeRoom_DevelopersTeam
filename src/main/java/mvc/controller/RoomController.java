@@ -4,7 +4,7 @@ import dao.interfaces.*;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
-import mvc.enumsMenu.OptionsMenuCrud;
+import mvc.enumsMenu.OptionsMenuRoom;
 import dao.impl.h2.ConnectionDAOH2Impl;
 import dao.impl.h2.NotificationDAOH2Impl;
 import mvc.model.Notification;
@@ -57,9 +57,9 @@ public class RoomController {
 
     public void mainMenu() {
         do {
-            baseView.displayMessageln(OptionsMenuCrud.viewMenu("=== ROOM MANAGEMENT MENU ==="));
+            baseView.displayMessageln(OptionsMenuRoom.viewMenu("=== ROOM MANAGEMENT MENU ==="));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
-            OptionsMenuCrud selectedOption = OptionsMenuCrud.getOptionByNumber(answer);
+            OptionsMenuRoom selectedOption = OptionsMenuRoom.getOptionByNumber(answer);
 
             if (selectedOption != null) {
                 try {

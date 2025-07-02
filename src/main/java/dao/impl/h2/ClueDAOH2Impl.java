@@ -91,7 +91,7 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, clue.getIdRoom());
             stmt.setString(2, clue.getName());
-            stmt.setString(3, clue.getDescription()); // Actualizar descripción
+            stmt.setString(3, clue.getDescription());
             stmt.setBigDecimal(4, clue.getPrice());
             stmt.setBoolean(5, clue.isActive());
             stmt.setInt(6, clue.getId());

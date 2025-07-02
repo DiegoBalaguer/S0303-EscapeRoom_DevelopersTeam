@@ -46,7 +46,7 @@ public class ClueView {
         try {
             clue.setName(getUpdateName(clue.getName()));
             clue.setDescription(getUpdateDescription(clue.getDescription()));
-            clue.setPrice(getUpdatePrice(getUpdatePrice(clue.getPrice())));
+            clue.setPrice(getUpdatePrice(clue.getPrice()));
             clue.setActive(getUpdateIsActive(clue.isActive()));
             return clue;
         } catch (Exception e) {

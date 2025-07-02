@@ -4,11 +4,11 @@ import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.DecorationDAO;
-import mvc.enumsMenu.OptionsMenuItem;
+import mvc.dto.DecorationDisplayDTO;
+import mvc.enumsMenu.OptionsMenuCLFUSDE;
 import mvc.model.Decoration;
 import mvc.view.BaseView;
 import mvc.view.DecorationView;
-import mvc.view.RoomView;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,22 +16,20 @@ import java.util.Optional;
 public class DecorationController {
 
     private static DecorationController decorationControllerInstance;
+    private final DecorationDAO DECORATION_DAO;
     private BaseView baseView;
     private DecorationView decorationView;
-    private RoomView roomView;
-    private DecorationDAO decorationDAO;
     private static final String NAME_OBJECT = "Decoration";
 
     private DecorationController() {
         baseView = new BaseView();
         baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
-        decorationView = new DecorationView();
         try {
-            this.roomView = new RoomView();
-            this.decorationDAO = DAOFactory.getDAOFactory().getDecorationDAO();
+            this.DECORATION_DAO = DAOFactory.getDAOFactory().getDecorationDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
+        decorationView = new DecorationView();
     }
 
     public static DecorationController getInstance() {
@@ -47,118 +45,147 @@ public class DecorationController {
 
     public void mainMenu() {
         do {
-            baseView.displayMessageln(OptionsMenuItem.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
+            baseView.displayMessageln(OptionsMenuCLFUSDE.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
-            OptionsMenuItem selectedOption = OptionsMenuItem.getOptionByNumber(answer);
-
-            if (selectedOption != null) {
-                try {
-                    switch (selectedOption) {
-                        case EXIT -> {
-                            baseView.displayMessageln("Returning to Main Menu...");
-                            return;
-                        }
-                        case ADD -> createDecoration();
-                        case SHOW -> listDecorationsByRoom();
-                        case DELETE -> deleteDecorationById();
-                        case UPDATE -> updateDecoration();
-                        default -> baseView.displayErrorMessage("Unknown option selected.");
+            OptionsMenuCLFUSDE idMenu = OptionsMenuCLFUSDE.getOptionByNumber(answer);
+            try {
+                switch (idMenu) {
+                    case EXIT -> {
+                        baseView.displayMessage2ln("Returning to Main Menu...");
+                        return;
                     }
-                } catch (DAOException e) {
-                    baseView.displayErrorMessage("Database operation failed: " + e.getMessage());
-                } catch (Exception e) {
-                    baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+                    case CREATE -> createDecoration();
+                    case LIST_ALL -> listAllDecorations();
+                    case FIND_BY_ID -> getDecorationById();
+                    case UPDATE -> updateDecoration();
+                    case SOFT_DELETE -> softDeleteDecorationById();
+                    case DELETE -> deleteDecorationById();
+
+                    default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }
-            } else {
-                baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
+            } catch (IllegalArgumentException | NullPointerException e) {
+                baseView.displayErrorMessage("Error: The value in menu is wrong." + e.getMessage());
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error: Database operation failed: " + e.getMessage());
+            } catch (Exception e) {
+                baseView.displayErrorMessage("Error: An unexpected error occurred: " + e.getMessage());
             }
         } while (true);
     }
 
     private void createDecoration() {
+        baseView.displayMessageln("#### CREATE " + NAME_OBJECT + "  #################");
         try {
-            baseView.displayMessageln("\n=== CREATE DECORATION ===");
-            Decoration newDecoration = decorationView.getDecorationDetails(); // Collect decoration details from the user.
-            if (newDecoration == null || newDecoration.getIdRoom() == 0) {
-                baseView.displayErrorMessage("Invalid input. Operation canceled.");
-                return;
-            }
-            Decoration createdDecoration = decorationDAO.create(newDecoration); // Save decoration to database.
-            baseView.displayMessageln("Decoration successfully created:\n" + createdDecoration);
-        } catch (Exception e) {
-            baseView.displayErrorMessage("Error creating the decoration: " + e.getMessage());
+            baseView.displayMessage2ln("List of Rooms:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
+
+            Decoration newDecoration = decorationView.getDecorationDetailsCreate(roomId);
+            Decoration savedDecoration = DECORATION_DAO.create(newDecoration);
+            baseView.displayMessage2ln(NAME_OBJECT + " created successfully: " + savedDecoration.getName() + " (ID: " + savedDecoration.getId() + ")");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error creating " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void deleteDecorationById() {
+    private void getDecorationById() {
+        baseView.displayMessage2ln("####  GET " + NAME_OBJECT.toUpperCase() + " BY ID  #################");
         try {
-            baseView.displayMessageln("\n=== DELETE DECORATION ===");
-            Optional<Integer> id = decorationView.getDecorationId();
-            if (id.isEmpty()) {
-                return;
-            }
-
-            if (decorationDAO.isExistsById(id.get())) {
-                decorationDAO.deleteById(id.get());
-                baseView.displayMessageln("Decoration successfully deleted with ID: " + id.get());
-            } else {
-                baseView.displayMessageln("No decoration found with the provided ID.");
-            }
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error deleting the decoration: " + e.getMessage());
+            Optional<Decoration> optionalDecoration = DECORATION_DAO.findById(getDecorationIdWithList());
+            decorationView.displayRecordDecoration(optionalDecoration.get());
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error showing " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void updateDecoration() {
+    private void listAllDecorations() {
+        baseView.displayMessage2ln("####  LIST ALL " + NAME_OBJECT.toUpperCase() + "S  #################");
         try {
-            baseView.displayMessageln("\n=== UPDATE DECORATION ===");
-            Optional<Integer> id = decorationView.getDecorationId();
-            if (id.isEmpty()) {
-                baseView.displayMessageln("No ID provided. Canceling update operation.");
-                return;
-            }
-
-            Optional<Decoration> optionalDecoration = decorationDAO.findById(id.get());
-            if (optionalDecoration.isEmpty()) {
-                baseView.displayMessageln("No decoration found with the provided ID.");
-                return;
-            }
-
-            Decoration existingDecoration = optionalDecoration.get();
-            baseView.displayMessageln("\n=== Current Decoration Data ===");
-            decorationView.displayDecoration(existingDecoration);
-
-            Decoration updatedDecoration = decorationView.editDecoration(existingDecoration);
-            if (updatedDecoration == null) {
-                return;
-            }
-
-            decorationDAO.update(updatedDecoration);
-            baseView.displayMessageln("Decoration successfully updated:\n" + updatedDecoration);
-
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error updating the decoration: " + e.getMessage());
-        } catch (Exception e) {
-            baseView.displayErrorMessage("An unexpected error occurred: " + e.getMessage());
+            listAllDecorationDetail();
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error listing all " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
     private void listDecorationsByRoom() {
+        baseView.displayMessage2ln("####  LIST " + NAME_OBJECT.toUpperCase() + "S BY ROOM  #################");
         try {
-            baseView.displayMessageln("\n=== LIST DECORATIONS BY ROOM ===");
-            Optional<Integer> idRoom = roomView.getRoomId();
-            if (idRoom.isEmpty()) {
-                return; // Cancel if invalid input
-            }
+            baseView.displayMessage2ln("List of Rooms:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
 
-            List<Decoration> decorations = decorationDAO.findDecorationsByRoomId(idRoom.get());
+            List<DecorationDisplayDTO> decorations = DECORATION_DAO.findDecorationsByRoomId(roomId);
             if (decorations.isEmpty()) {
-                baseView.displayMessageln("No decorations found for the provided Room ID.");
+                baseView.displayMessageln("No " + NAME_OBJECT + " found for the provided Room ID.");
             } else {
-                decorationView.displayDecorations(decorations);
+                decorationView.displayDecorationListDto(decorations);
             }
-        } catch (DAOException e) {
-            baseView.displayErrorMessage("Error retrieving decorations: " + e.getMessage());
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error retrieving " + NAME_OBJECT + ": " + e.getMessage());
         }
+    }
+
+    private void updateDecoration() {
+        baseView.displayMessage2ln("####  UPDATE  " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            Optional<Decoration> existingDecorationOpt = DECORATION_DAO.findById(getDecorationIdWithList());
+
+            baseView.displayMessage2ln("Current " + NAME_OBJECT + " Details:");
+            decorationView.displayRecordDecoration(existingDecorationOpt.get());
+
+            baseView.displayMessageln("Enter new details:");
+            baseView.displayMessageln("Enter new value or [INTRO] for no changes.");
+            baseView.displayMessageln("Enter new Room:");
+            int roomId = RoomController.getInstance().getRoomIdWithList();
+            existingDecorationOpt.get().setIdRoom(roomId);
+            Decoration updatedDecoration = decorationView.getUpdateDecorationDetails(existingDecorationOpt.get());
+
+            Decoration savedDecoration = DECORATION_DAO.update(updatedDecoration);
+            baseView.displayMessage2ln(NAME_OBJECT + " updated successfully: " + savedDecoration.getName() + " (ID: " + savedDecoration.getId() + ")");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error updating " + NAME_OBJECT + ": " + e.getMessage());
+        }
+    }
+
+    private void deleteDecorationById() {
+        baseView.displayMessage2ln("####  DELETE " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            DECORATION_DAO.deleteById(getDecorationIdWithList());
+            baseView.displayMessage2ln(NAME_OBJECT + " deleted successfully (if existed).");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error deleting the " + NAME_OBJECT + ": " + e.getMessage());
+        }
+    }
+    private void softDeleteDecorationById() throws DAOException {
+        baseView.displayMessage2ln("#### SOFT DELETE  " + NAME_OBJECT.toUpperCase() + "  #################");
+        try {
+            Optional<Decoration> existDecorationOpt = DECORATION_DAO.findById(getDecorationIdWithList());
+            existDecorationOpt.get().setActive(false);
+
+            DECORATION_DAO.update(existDecorationOpt.get());
+            baseView.displayMessage2ln(NAME_OBJECT + " soft deleted successfully: " + existDecorationOpt.get().getName() + " (ID: " + existDecorationOpt.get().getId() + ")");
+        } catch (DAOException | IllegalArgumentException e) {
+            baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT +": " + e.getMessage());
+        }
+    }
+
+    private int getDecorationIdWithList() {
+        listAllDecorationDetail();
+        Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
+        if (searchID.isEmpty() || DECORATION_DAO.findById(searchID.get()).isEmpty()) {
+            String message = NAME_OBJECT + " with ID required or not found.";
+            baseView.displayErrorMessage(message);
+            throw new IllegalArgumentException(message);
+        }
+        return searchID.get();
+    }
+    private void listAllDecorationDetailDto() throws DAOException {
+        List<DecorationDisplayDTO> decorations = DECORATION_DAO.findAllDecorationsCompleteInfo();
+        decorationView.displayDecorationListDto(decorations);
+    }
+
+
+    private void listAllDecorationDetail() {
+            List<Decoration> decorations = DECORATION_DAO.findAll();
+            decorationView.displayDecorationList(decorations);
+
     }
 }
