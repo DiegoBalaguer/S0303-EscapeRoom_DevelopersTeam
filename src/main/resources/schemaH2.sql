@@ -36,7 +36,7 @@ CREATE TABLE room (
   idEscapeRoom INT NOT NULL,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
-  price DECIMAL(5,2) NOT NULL,
+  price DECIMAL(15,2) NOT NULL,
   idDifficulty INT NOT NULL,
   idTheme INT NOT NULL,
   isActive BOOLEAN DEFAULT TRUE  
@@ -47,7 +47,7 @@ CREATE TABLE clue (
   idRoom INT NOT NULL,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
-  price DECIMAL(5,2) NOT NULL,
+  price DECIMAL(15,2) NOT NULL,
   isActive BOOLEAN DEFAULT TRUE
 );
 
@@ -56,7 +56,7 @@ CREATE TABLE decoration (
   idRoom INT NOT NULL,
   name VARCHAR(40) NOT NULL,
   description varchar(200),
-  price DECIMAL(5,2) NOT NULL,
+  price DECIMAL(15,2) NOT NULL,
   isActive BOOLEAN DEFAULT TRUE
 );
 
@@ -80,7 +80,7 @@ CREATE TABLE ticket (
   idTicket INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(40) NOT NULL,
   description VARCHAR(200),
-  price DECIMAL(5,2) NOT NULL,  
+  price DECIMAL(15,2) NOT NULL,  
   isActive BOOLEAN DEFAULT TRUE
 );
 
@@ -126,7 +126,7 @@ CREATE TABLE notifications (
 
 -- create view's
 
-DROP VIEW IF EXISTS inventoryTotal;
+DROP VIEW IF EXISTS inventoryWithTotal;
 DROP VIEW IF EXISTS inventory;
 
 CREATE VIEW inventory AS
@@ -148,19 +148,6 @@ FROM (
     FROM decoration d
     WHERE d.ISACTIVE = TRUE
 ) final;
-
-CREATE VIEW inventoryTotal AS
-    SELECT u.inventory, u.id, u.name, u.PRICE
-    FROM inventory u
-
-    UNION ALL
-
-    SELECT 'TOTAL' AS inventory, 0 AS id, '' AS name, ti.PRICE
-    FROM (
-        SELECT sum(i.price) AS price
-        FROM inventory i
-     ) ti;
-
 
 -- Insert data test
 

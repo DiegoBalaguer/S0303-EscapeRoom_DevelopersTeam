@@ -21,7 +21,7 @@ public class InventoryDisplayDTO {
     private BigDecimal price;
 
     private int getLong(int position) {
-        return List.of(30, 6, 100, 20).get(position);
+        return List.of(20, 6, 25, 20).get(position);
     }
 
     public List<PairTextLength> toListHead() {
@@ -38,10 +38,10 @@ public class InventoryDisplayDTO {
         List<PairTextLength> listValues = new ArrayList<>();
         int position = 0;
 
-        if ("TOTAL".equalsIgnoreCase(inventory)) {
+        if (inventory.equalsIgnoreCase("total")) {
             listValues.add(new PairTextLength(inventory, getLong(position++)));
-            listValues.add(new PairTextLength("-", getLong(position++)));
-            listValues.add(new PairTextLength("-", getLong(position++)));
+            listValues.add(new PairTextLength("", getLong(position++)));
+            listValues.add(new PairTextLength("", getLong(position++)));
             listValues.add(new PairTextLength("$" + price.toString(), getLong(position++)));
         } else {
             listValues.add(new PairTextLength(inventory, getLong(position++)));

@@ -5,9 +5,8 @@ import dao.interfaces.BaseDAO;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.SaleDAO;
 import lombok.extern.slf4j.Slf4j;
-import mvc.model.Player;
+import mvc.dto.SaleDisplayDTO;
 import mvc.model.Sale;
-import mvc.model.Ticket;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
             stmt.setInt(4, sale.getPlayers());
             stmt.setBigDecimal(5, sale.getPrice());
             stmt.setInt(6, sale.getCompletion());
-            stmt.setDate(7, Date.valueOf(sale.getDateSale()));
+            stmt.setObject(7, sale.getDateSale());
             stmt.setBoolean(8, sale.isActive());
             stmt.executeUpdate();
             ResultSet keys = stmt.getGeneratedKeys();
@@ -58,7 +57,7 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return Optional.of(mapResultSetToSale(rs));
+                return Optional.of(listResultSetToSale(rs));
             }
             return Optional.empty();
         } catch (Exception e) {
@@ -76,7 +75,7 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                sales.add(mapResultSetToSale(rs));
+                sales.add(listResultSetToSale(rs));
             }
             return sales;
         } catch (SQLException e) {
@@ -97,7 +96,7 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
             stmt.setInt(4, sale.getPlayers());
             stmt.setBigDecimal(5, sale.getPrice());
             stmt.setInt(6, sale.getCompletion());
-            stmt.setDate(7, Date.valueOf(sale.getDateSale()));
+            stmt.setObject(7, sale.getDateSale());
             stmt.setBoolean(8, sale.isActive());
             stmt.setInt(9, sale.getId());
             int rows = stmt.executeUpdate();
@@ -148,7 +147,33 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
         }
     }
 
-    private Sale mapResultSetToSale(ResultSet rs) throws SQLException {
+    public List<SaleDisplayDTO> findAllCompleteInfo() throws DAOException {
+        List<SaleDisplayDTO> saleDisplayDTO = new ArrayList<>();
+        String sql = "SELECT " +
+                "s.idSale, s.idTicket, s.idPlayer, s.idRoom, s.players, s.price, s.completion, s.dateSale, s.isActive, " +
+                "t.name ticketName, " +
+                "p.name playerName, " +
+                "r.name roomName " +
+                "FROM " + NAME_OBJECT + " s " +
+                "JOIN ticket t ON s.idTicket = t.idTicket " +
+                "JOIN player p ON s.idPlayer = p.idPlayer " +
+                "JOIN room r ON s.idRoom = r.idRoom " +
+                "ORDER BY s.idSale;";
+        try (Connection connection = connectionDAO.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                saleDisplayDTO.add(listResultSetToSaleDisplayDTO(rs));
+            }
+        } catch (SQLException e) {
+            String messageError = "Error retrieving complete sales";
+            log.error(messageError, e);
+            throw new DAOException(messageError, e);
+        }
+        return saleDisplayDTO;
+    }
+
+    private Sale listResultSetToSale(ResultSet rs) throws SQLException {
         return Sale.builder()
                 .id(rs.getInt("idSale"))
                 .idTicket(rs.getInt("idTicket"))
@@ -159,101 +184,22 @@ public class SaleDAOH2Impl implements BaseDAO<Sale, Integer>, SaleDAO {
                 .isActive(rs.getBoolean("isActive"))
                 .build();
     }
-    @Override
-    public Optional<Ticket> findTicketById(int idTicket) {
-        String query = "SELECT * FROM ticket WHERE idTicket = ?"; // Ajusta el nombre de la tabla y columna si es necesario
 
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement ps = connection.prepareStatement(query)) {
-
-            ps.setInt(1, idTicket);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                Ticket ticket = Ticket.builder().build();
-                ticket.setId(rs.getInt("idTicket"));
-                ticket.setName(rs.getString("name"));       // Ajusta los campos según tu modelo
-                ticket.setPrice(rs.getBigDecimal("price")); // Ajusta los campos según tu modelo
-                return Optional.of(ticket);
-            }
-        } catch (SQLException e) {
-            log.error("Error al buscar Player por ID: {}", e.getMessage(), e);
-        }
-        return Optional.empty();
+    private SaleDisplayDTO listResultSetToSaleDisplayDTO(ResultSet rs) throws SQLException {
+        return SaleDisplayDTO.builder()
+                .id(rs.getInt("idSale"))
+                .idTicket(rs.getInt("idTicket"))
+                .idPlayer(rs.getInt("idPlayer"))
+                .idRoom(rs.getInt("idRoom"))
+                .players(rs.getInt("players"))
+                .price(rs.getBigDecimal("price"))
+                .completion(rs.getInt("completion"))
+                .dateSale(rs.getTimestamp("dateSale").toLocalDateTime())
+                .isActive(rs.getBoolean("isActive"))
+                .ticketName(rs.getString("ticketName"))
+                .playerName(rs.getString("playerName"))
+                .roomName(rs.getString("roomName"))
+                .build();
     }
-
-    @Override
-    public Optional<Player> findPlayerById(int idPlayer) throws DAOException {
-        String query = "SELECT * FROM player WHERE idPlayer = ?"; // Ajusta el nombre de la tabla y columna si es necesario
-
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement ps = connection.prepareStatement(query)) {
-
-            ps.setInt(1, idPlayer);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                Player player = Player.builder().build();
-                player.setId(rs.getInt("idPlayer"));
-                player.setName(rs.getString("name"));
-                player.setEmail(rs.getString("email"));
-                player.setPassword(rs.getString("password"));
-                player.setSubscribed(rs.getBoolean("isSubscribed"));
-                player.setActive(rs.getBoolean("isActive"));
-                return Optional.of(player);
-            }
-                 // Ajusta los campos según tu model
-
-        } catch (SQLException e) {
-            log.error("Error al buscar Ticket por ID: {}", e.getMessage(), e);
-        }
-        return Optional.empty();
-
-
-    }
-    @Override
-    public int getTotalPlayers() throws DAOException {
-        String sql = "SELECT SUM(players) AS totalPlayers FROM sale;";
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getInt("totalPlayers");
-            }
-            return 0; // Si no hay ventas, devolver 0
-        } catch (SQLException e) {
-            String messageError = "Error calculating players: ";
-            log.error(messageError, e);
-            throw new DAOException(messageError, e);
-        }
-    }
-    @Override
-    public List<Ticket> findAllActiveTickets() throws DAOException {
-        List<Ticket> tickets = new ArrayList<>();
-        String sql = "SELECT idTicket, name, description, price, isActive FROM ticket WHERE isActive = TRUE;";
-
-        try (Connection connection = connectionDAO.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                tickets.add(Ticket.builder()
-                        .id(rs.getInt("idTicket"))
-                        .name(rs.getString("name"))
-                        .description(rs.getString("description"))
-                        .price(rs.getBigDecimal("price"))
-                        .isActive(rs.getBoolean("isActive"))
-                        .build());
-            }
-
-            return tickets;
-        } catch (SQLException e) {
-            String messageError = "Error retrieving active tickets: ";
-            log.error(messageError, e);
-            throw new DAOException(messageError, e);
-        }
-    }
-
 }
 

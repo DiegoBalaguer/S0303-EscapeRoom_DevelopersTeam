@@ -9,12 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import interfaces.Observer;
 import interfaces.Observable;
-import dao.impl.h2.*;
 import dao.interfaces.PlayerDAO;
-import dao.impl.h2.PlayerDAOH2Impl;
-import dao.impl.h2.ConnectionDAOH2Impl;
 import dao.exceptions.DatabaseConnectionException;
-import org.bson.types.ObjectId;
+
 
 @Slf4j
 @Data
@@ -28,14 +25,15 @@ public class EscapeRoom implements Observable {
     private List<Player> players;
     private final List<Observer> observers = new ArrayList<>();
     private PlayerDAO playerDAO;
+    private NotificationDAO notificationDAO;
 
     private void initialize() {
-        try {
+    /*    try {
             this.playerDAO = new PlayerDAOH2Impl(ConnectionDAOH2Impl.getInstance());
         } catch (DatabaseConnectionException e) {
             log.error("Error initializing PlayerDAO: {}", e.getMessage());
             throw new RuntimeException("Failed to initialize EscapeRoom due to database connection issues.", e);
-        }
+        }*/
         rooms = new ArrayList<>();
     }
 
@@ -79,7 +77,7 @@ public class EscapeRoom implements Observable {
                         .idPlayer(player.getId())
                         .message(message)
                         .build();
-                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+               // NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
                 notificationDAO.saveNotification(notification);
             }
 

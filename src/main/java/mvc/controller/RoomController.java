@@ -32,7 +32,7 @@ public class RoomController {
 
 
     private RoomController() {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         this.roomView = new RoomView();
         try {
             this.ROOM_DAO = DAOFactory.getDAOFactory().getRoomDAO();
@@ -214,6 +214,10 @@ public class RoomController {
         }
     }
 
+    public Optional<Room> getFindRoomById(int roomId) {
+        return ROOM_DAO.findById(roomId);
+    }
+
     public int getRoomIdWithList() throws DAOException, IllegalArgumentException {
             listAllRoomsDetail();
             Optional<Integer> roomIdOpt = roomView.getRoomId();
@@ -230,6 +234,4 @@ public class RoomController {
         List<Room> rooms = ROOM_DAO.findAll();
         roomView.displayListRooms(rooms);
     }
-
-
 }

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class RewardView {
 
-    private static BaseView baseView;
+    private static BaseView baseView =  BaseView.getInstance();
     private static final String NAME_OBJECT = "Reward";
 
     public Reward getRewardDetailsCreate() {

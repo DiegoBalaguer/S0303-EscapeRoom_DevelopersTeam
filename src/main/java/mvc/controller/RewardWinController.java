@@ -5,6 +5,7 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.RewardWinDAO;
 import mvc.dto.RewardWinDisplayDTO;
+import mvc.model.RewardWin;
 import mvc.view.BaseView;
 import mvc.view.RewardWinView;
 
@@ -25,16 +26,19 @@ public class RewardWinController {
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         rewardWinView = new RewardWinView();
         baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
     }
 
-
     public int getRewardWinForPlayerWithList(int playerId) {
-        listAllCertificatesWinForPlayerDetail(playerId);
+        boolean status = listAllCertificatesWinForPlayerDetail(playerId);
+        if (!status) {
+            String message = "No " + NAME_OBJECT + "s found.";
+            throw new IllegalArgumentException(message);
+        }
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
-        if (searchID.isEmpty() || REWARDWIN_DAO.findByPlayerId(searchID.get()).isEmpty()) {
+        if (searchID.isEmpty() || getRewardFindForId(searchID.get()).isEmpty()) {
             String message = NAME_OBJECT + " with ID required or not found.";
             baseView.displayErrorMessage(message);
             throw new IllegalArgumentException(message);
@@ -42,10 +46,21 @@ public class RewardWinController {
         return searchID.get();
     }
 
-    public void listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
-        List<RewardWinDisplayDTO> rewardWinDisplayDTOS = REWARDWIN_DAO.findByPlayerId(playerId);
+    public boolean listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
+        List<RewardWinDisplayDTO> rewardWinDisplayDTOS = getRewardWinForPlayer(playerId);
+        if (rewardWinDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No " + NAME_OBJECT + "s found.");
+            return false;
+        }
         rewardWinView.displayListRewardWinDTO(rewardWinDisplayDTOS);
+        return true;
     }
 
+    public List<RewardWinDisplayDTO> getRewardWinForPlayer(int playerId) {
+        return REWARDWIN_DAO.findByPlayerId(playerId);
+    }
 
+    public Optional<RewardWin> getRewardFindForId(int id) {
+        return REWARDWIN_DAO.findById(id);
+    }
 }

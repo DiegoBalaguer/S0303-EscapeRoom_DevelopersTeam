@@ -17,7 +17,7 @@ import java.util.Optional;
 public class RewardWinDAOH2Impl implements BaseDAO<RewardWin, Integer>, RewardWinDAO {
 
     private final ConnectionDAO connectionDAO;
-    private static final String NAME_OBJECT = "rewardWin";
+    private static final String NAME_OBJECT = "rewardwin";
 
     public RewardWinDAOH2Impl(ConnectionDAO connectionDAO) {
         this.connectionDAO = connectionDAO;

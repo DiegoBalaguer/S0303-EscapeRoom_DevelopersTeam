@@ -17,7 +17,7 @@ import java.util.Optional;
 public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>, CertificateWinDAO {
 
     private final ConnectionDAO connectionDAO;
-    private static final String NAME_OBJECT = "certificateWin";
+    private static final String NAME_OBJECT = "certificatewin";
 
     public CertificateWinDAOH2Impl(ConnectionDAO connectionDAO) {
         this.connectionDAO = connectionDAO;
@@ -151,9 +151,9 @@ public class CertificateWinDAOH2Impl implements BaseDAO<CertificateWin, Integer>
                 "cw.idCertificateWin, cw.idCertificate, cw.idPlayer, cw.idRoom, cw.description, cw.dateDelivery, cw.isActive, " +
                 "c.name AS certificateName, " +
                 "r.name AS roomName " +
-                "FROM CertificateWin cw " +
-                "JOIN Certificate c ON cw.idCertificate = c.idCertificate " +
-                "JOIN Room r ON cw.idRoom = r.idRoom " +
+                "FROM " + NAME_OBJECT + " cw " +
+                "JOIN certificate c ON cw.idCertificate = c.idCertificate " +
+                "JOIN room r ON cw.idRoom = r.idRoom " +
                 "WHERE cw.idPlayer = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {

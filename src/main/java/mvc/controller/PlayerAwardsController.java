@@ -14,7 +14,6 @@ import mvc.model.CertificateWin;
 import mvc.model.Notification;
 import mvc.model.RewardWin;
 import mvc.view.BaseView;
-import mvc.view.PlayerAwardsView;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import java.util.Optional;
 public class PlayerAwardsController {
 
     private BaseView baseView;
-    private PlayerAwardsView playerAwardsView;
     private RewardWinDAO rewardWinDAO;
     private CertificateWinDAO certificateWinDAO;
     private CertificateController certificateController;
@@ -33,27 +31,22 @@ public class PlayerAwardsController {
     private static final String NAME_OBJECT = "Player Awards";
 
     public PlayerAwardsController() {
-
+        baseView = BaseView.getInstance();
+        baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
         try {
             this.rewardWinDAO = DAOFactory.getDAOFactory().getRewardWinDAO();
             this.certificateWinDAO = DAOFactory.getDAOFactory().getCertificateWinDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
-
-        baseView = new BaseView();
-        baseView = new BaseView();
-        playerAwardsView = new PlayerAwardsView();
         rewardController = new RewardController();
         certificateController =  new CertificateController();
         certificateWinController = new CertificateWinController();
         rewardWinController = new RewardWinController();
-        baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
-    }
+}
 
     public void mainMenu() {
         do {
-            playerAwardsView.displayPlayerMenu("PLAYER AWARDS MANAGEMENT");
             baseView.displayMessageln(OptionsMenuPlayerAward.viewMenu(NAME_OBJECT.toUpperCase() + " MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuPlayerAward selectedOption = OptionsMenuPlayerAward.getOptionByNumber(answer);
@@ -79,63 +72,6 @@ public class PlayerAwardsController {
                 baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
             }
         } while (true);
-    }
-
-    private void addRewardWinToPlayer() throws DAOException {
-        baseView.displayMessage2ln("#### AWARD REWARD WIN TO PLAYER #################");
-
-        int playerId = 0;
-        int rewardId = 0;
-        String description = "";
-
-        try {
-            baseView.displayMessage2ln("List of Players");
-            playerId = PlayerController.getInstance().getPlayerIdWithList();
-
-            baseView.displayMessage2ln("List of Rewards");
-            rewardId = rewardController.getRewardIdWithList();
-
-            description = getDescription();
-
-        } catch (IllegalArgumentException e) {
-            baseView.displayErrorMessage(e.getMessage());
-            return;
-        }
-
-        RewardWin newRewardWin = RewardWin.builder()
-                .idPlayer(playerId)
-                .idReward(rewardId)
-                .dateDelivery(LocalDateTime.now())
-                .description(description)
-                .isActive(true)
-                .build();
-
-        if (newRewardWin != null) {
-            RewardWin savedRewardWin = rewardWinDAO.create(newRewardWin);
-            baseView.displayMessage2ln("Award created successfully with ID: " + savedRewardWin.getId());
-            try {
-                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
-
-                String rewardName = rewardController.getRewardNameById(rewardId);
-
-                Notification notification = Notification.builder()
-                        .idPlayer(playerId)
-                        .message("Congratulations! You have won the reward: " + rewardName)
-                        .dateTimeSent(LocalDateTime.now())
-                        .isActive(true)
-                        .build();
-
-                notificationDAO.saveNotification(notification);
-
-                baseView.displayMessage2ln("Notification sent to Player ID: " + playerId
-                        + " for winning reward: " + rewardName);
-
-            } catch (DAOException e) {
-                baseView.displayErrorMessage("Error while sending notification: " + e.getMessage());
-            } catch (DatabaseConnectionException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     private void addCertificateWinToPlayer() throws DAOException {
@@ -200,30 +136,60 @@ public class PlayerAwardsController {
         }
     }
 
-    private void revokeRewardWinToPlayer() throws IllegalArgumentException, DAOException {
-        baseView.displayMessage2ln("#### REVOKE REWARD WIN TO PLAYER #################");
+    private void addRewardWinToPlayer() throws DAOException {
+        baseView.displayMessage2ln("#### AWARD REWARD WIN TO PLAYER #################");
 
         int playerId = 0;
-        int rewardWinId = 0;
+        int rewardId = 0;
+        String description = "";
 
         try {
             baseView.displayMessage2ln("List of Players");
             playerId = PlayerController.getInstance().getPlayerIdWithList();
 
-            baseView.displayMessage2ln("List of Rewards Wins");
-            rewardWinId = rewardWinController.getRewardWinForPlayerWithList(playerId);
+            baseView.displayMessage2ln("List of Rewards");
+            rewardId = rewardController.getRewardIdWithList();
+
+            description = getDescription();
 
         } catch (IllegalArgumentException e) {
             baseView.displayErrorMessage(e.getMessage());
             return;
         }
 
-        Optional<RewardWin> existingRewardWinOpt = rewardWinDAO.findById(rewardWinId);
-        if (existingRewardWinOpt.isPresent()) {
-            RewardWin existingRewardWin = existingRewardWinOpt.get();
-            existingRewardWin.setActive(false);
-            rewardWinDAO.update(existingRewardWin);
-            baseView.displayMessage2ln("Reward Win Player unsubscribed successfully.");
+        RewardWin newRewardWin = RewardWin.builder()
+                .idPlayer(playerId)
+                .idReward(rewardId)
+                .dateDelivery(LocalDateTime.now())
+                .description(description)
+                .isActive(true)
+                .build();
+
+        if (newRewardWin != null) {
+            RewardWin savedRewardWin = rewardWinDAO.create(newRewardWin);
+            baseView.displayMessage2ln("Award created successfully with ID: " + savedRewardWin.getId());
+            try {
+                NotificationDAO notificationDAO = new NotificationDAOH2Impl(ConnectionDAOH2Impl.getInstance());
+
+                String rewardName = rewardController.getRewardNameById(rewardId);
+
+                Notification notification = Notification.builder()
+                        .idPlayer(playerId)
+                        .message("Congratulations! You have won the reward: " + rewardName)
+                        .dateTimeSent(LocalDateTime.now())
+                        .isActive(true)
+                        .build();
+
+                notificationDAO.saveNotification(notification);
+
+                baseView.displayMessage2ln("Notification sent to Player ID: " + playerId
+                        + " for winning reward: " + rewardName);
+
+            } catch (DAOException e) {
+                baseView.displayErrorMessage("Error while sending notification: " + e.getMessage());
+            } catch (DatabaseConnectionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -245,12 +211,37 @@ public class PlayerAwardsController {
             return;
         }
 
-        Optional<CertificateWin> existingCertificateWinOpt = certificateWinDAO.findById(certificateWinId);
-        if (existingCertificateWinOpt.isPresent()) {
-            CertificateWin existingCertificateWin = existingCertificateWinOpt.get();
-            existingCertificateWin.setActive(false);
-            certificateWinDAO.update(existingCertificateWin);
+        Optional<CertificateWin> existCertificateWinOpt = certificateWinDAO.findById(certificateWinId);
+        if (existCertificateWinOpt.isPresent()) {
+            existCertificateWinOpt.get().setActive(false);
+            certificateWinDAO.update(existCertificateWinOpt.get());
             baseView.displayMessage2ln("Certificate Win Player unsubscribed successfully.");
+        }
+    }
+
+    private void revokeRewardWinToPlayer() throws IllegalArgumentException, DAOException {
+        baseView.displayMessage2ln("#### REVOKE REWARD WIN TO PLAYER #################");
+
+        int playerId = 0;
+        int rewardWinId = 0;
+
+        try {
+            baseView.displayMessage2ln("List of Players");
+            playerId = PlayerController.getInstance().getPlayerIdWithList();
+
+            baseView.displayMessage2ln("List of Rewards Wins");
+            rewardWinId = rewardWinController.getRewardWinForPlayerWithList(playerId);
+
+        } catch (IllegalArgumentException e) {
+            baseView.displayErrorMessage(e.getMessage());
+            return;
+        }
+
+        Optional<RewardWin> existRewardWinOpt = rewardWinDAO.findById(rewardWinId);
+        if (existRewardWinOpt.isPresent()) {
+            existRewardWinOpt.get().setActive(false);
+            rewardWinDAO.update(existRewardWinOpt.get());
+            baseView.displayMessage2ln("Reward Win Player unsubscribed successfully.");
         }
     }
 

@@ -20,6 +20,9 @@ public class ConnectionDAOMySqlImpl implements ConnectionDAO, ConnectionDAOsql {
     private static final boolean TUNNEL_SSH = LoadConfigDB.getMySqlSshEnable();
     private static final String DRIVER = LoadConfigDB.getMySqlDriver();
     private static final String URL = LoadConfigDB.getMySqlUrl();
+    private static final String HOST =  LoadConfigDB.getMySqlHost();
+    private static final int LOCAL_PORT = LoadConfigDB.getMySqlLocalPort();
+    private static final String SCHEMA = LoadConfigDB.getMySqlSchema();
     private static final String USERNAME = LoadConfigDB.getMySqlUser();
     private static final String PASSWORD = LoadConfigDB.getMySqlPassword();
 
@@ -37,14 +40,15 @@ public class ConnectionDAOMySqlImpl implements ConnectionDAO, ConnectionDAOsql {
                     if (!sshSessionManager.isConnected()) {
                         throw new DatabaseConnectionException("SSH tunnel failed to connect for MongoDB.");
                     }
-                    log.info("SSH Tunnel established for MongoDB connection.");
+                    log.info("SSH Tunnel established for MySql connection.");
                 } catch (Exception e) {
                     log.error("Failed to establish SSH tunnel for MongoDB: {}", e.getMessage());
                     throw new DatabaseConnectionException("Failed to establish SSH tunnel for MongoDB.", e);
                 }
             }
-            this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            log.info("Database connection to SqLite established successfully.");
+            String urlFin = URL + "//" + HOST + ":" + LOCAL_PORT + "/" + SCHEMA;
+            this.connection = DriverManager.getConnection(urlFin, USERNAME, PASSWORD);
+            log.info("Database connection to MySql established successfully.");
         } catch (ClassNotFoundException | SQLException e) {
             log.error("Database connection failed: {}", e.getMessage());
             throw new DatabaseConnectionException("Failed to connect to the database.", e);
@@ -70,7 +74,7 @@ public class ConnectionDAOMySqlImpl implements ConnectionDAO, ConnectionDAOsql {
             return connection;
         } catch (SQLException | DatabaseConnectionException e) {
             log.error("Error getting connection", e.getMessage());
-            throw new RuntimeException("H2 DB Connection Error.", e);
+            throw new RuntimeException("MySql DB Connection Error.", e);
         }
     }
 

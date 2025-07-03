@@ -24,7 +24,7 @@ public class ClueController {
     private static final String NAME_OBJECT = "Clue";
 
     private ClueController() {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         try {
             this.CLUE_DAO = DAOFactory.getDAOFactory().getClueDAO();

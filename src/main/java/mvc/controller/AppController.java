@@ -2,7 +2,6 @@ package mvc.controller;
 
 import dao.exceptions.DAOException;
 import mvc.enumsMenu.OptionsMenuMain;
-import config.LoadConfigApp;
 import mvc.model.EscapeRoom;
 import mvc.view.BaseView;
 
@@ -13,7 +12,7 @@ public class AppController {
     private static EscapeRoom escapeRoom;
 
     private AppController() {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
         escapeRoom = EscapeRoom.getInstance();
     }

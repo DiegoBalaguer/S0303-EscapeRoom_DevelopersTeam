@@ -4,16 +4,19 @@ import mvc.model.Sale;
 
 public class SaleMapper {
     public static SaleDisplayDTO toDisplayDTO(Sale sale) {
-        return new SaleDisplayDTO(
-                sale.getId(),
-                sale.getIdTicket(),
-                sale.getIdPlayer(),
-                sale.getIdRoom(),
-                sale.getPlayers(),
-                sale.getPrice(),
-                sale.getCompletion(),
-                sale.getDateSale(),
-                sale.isActive()
-        );
+        return SaleDisplayDTO.builder()
+                .id(sale.getId())
+                .idTicket(sale.getIdTicket())
+                .idPlayer(sale.getIdPlayer())
+                .idRoom(sale.getIdRoom())
+                .players(sale.getPlayers())
+                .price(sale.getPrice())
+                .completion(sale.getCompletion())
+                .dateSale(sale.getDateSale())
+                .isActive(sale.isActive())
+                .ticketName("")
+                .playerName("")
+                .roomName("")
+                .build();
     }
 }

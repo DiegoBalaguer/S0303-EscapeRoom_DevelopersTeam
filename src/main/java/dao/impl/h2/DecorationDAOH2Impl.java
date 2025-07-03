@@ -112,7 +112,6 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
 
     @Override
     public void deleteById(Integer id) throws DAOException {
-        // Corregida para incluir un espacio entre DELETE FROM y el nombre de la tabla
         String sql = "DELETE FROM " + NAME_OBJECT + " WHERE idDecoration = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -157,7 +156,7 @@ public class DecorationDAOH2Impl implements BaseDAO<Decoration, Integer>, Decora
     }
 
     @Override
-    public List<DecorationDisplayDTO> findAllDecorationsCompleteInfo() throws DAOException {
+    public List<DecorationDisplayDTO> findAllCompleteInfo() throws DAOException {
         String sql = "SELECT " +
                 "d.idDecoration, d.name, d.idRoom, d.price, d.isActive, d.description, " +
                 "r.name AS roomName, r.idTheme " +

@@ -148,11 +148,11 @@ public class ClueDAOH2Impl implements BaseDAO<Clue, Integer>, ClueDAO {
     public List<ClueDisplayDTO> findCluesByRoomId(Integer roomId) throws DAOException {
         List<ClueDisplayDTO> cluesDisplayDTO = new ArrayList<>();
         String sql = "SELECT " +
-                "cu.idClue, cu.name, cu.idRoom, cu.price, cu.IsActive, cu.description, " +
+                "c.idClue, c.name, c.idRoom, c.price, c.IsActive, c.description, " +
                 "r.name AS roomName, r.idTheme " +
-                "FROM Clue cu " +
-                "JOIN Room r ON cu.idRoom = r.idRoom " +
-                "WHERE cu.idRoom = ?;";
+                "FROM clue c " +
+                "JOIN room r ON c.idRoom = r.idRoom " +
+                "WHERE c.idRoom = ?;";
         try (Connection connection = connectionDAO.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, roomId);
