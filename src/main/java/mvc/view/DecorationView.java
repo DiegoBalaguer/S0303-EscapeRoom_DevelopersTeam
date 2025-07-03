@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class DecorationView {
 
-    private static BaseView baseView = new BaseView();
+    private static BaseView baseView = BaseView.getInstance();
     private static final String NAME_OBJECT = "Decoration";
 
     public Decoration getDecorationDetailsCreate(int roomId) {

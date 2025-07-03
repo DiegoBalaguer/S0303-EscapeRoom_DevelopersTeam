@@ -305,17 +305,17 @@ public class ConsoleUtils {
         }
     }
     public static Optional<Boolean> readOptionalBoolean(String message) {
-            System.out.print(message); // Mostrar mensaje al usuario
-            String input = sc.nextLine().trim().toUpperCase(); // Leer entrada del usuario, eliminando espacios y convirtiendo a mayúsculas
+            System.out.print(message);
+            String input = sc.nextLine().trim().toUpperCase();
 
             if (input.isEmpty()) {
-                return Optional.empty(); // Si la entrada está vacía, devolvemos Optional vacío
+                return Optional.empty();
             }
             try {
-                return Optional.of(calculateValueBoolean(input.charAt(0))); // Llamamos a calculateValueBoolean para validar la entrada
+                return Optional.of(calculateValueBoolean(input.charAt(0)));
             } catch (IllegalArgumentException e) {
-                System.err.println("Error: Only 'T', 'F', 'S', 'Y' or 'N' are allowed."); // Si la entrada es inválida
-                return Optional.empty(); // Devolvemos Optional vacío
+                System.err.println("Error: Only 'T', 'F', 'S', 'Y' or 'N' are allowed.");
+                return Optional.empty();
             }
     }
 

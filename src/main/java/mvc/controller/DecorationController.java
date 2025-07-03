@@ -22,7 +22,7 @@ public class DecorationController {
     private static final String NAME_OBJECT = "Decoration";
 
     private DecorationController() {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         try {
             this.DECORATION_DAO = DAOFactory.getDAOFactory().getDecorationDAO();
@@ -178,7 +178,7 @@ public class DecorationController {
         return searchID.get();
     }
     private void listAllDecorationDetailDto() throws DAOException {
-        List<DecorationDisplayDTO> decorations = DECORATION_DAO.findAllDecorationsCompleteInfo();
+        List<DecorationDisplayDTO> decorations = DECORATION_DAO.findAllCompleteInfo();
         decorationView.displayDecorationListDto(decorations);
     }
 

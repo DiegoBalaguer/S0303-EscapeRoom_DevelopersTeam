@@ -1,22 +1,21 @@
 package mvc.view;
 
-import mvc.dto.CertificateMapper;
-import mvc.model.Certificate;
+import mvc.dto.TicketMapper;
+import mvc.model.Ticket;
 import utils.ConsoleUtils;
 import utils.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
 
-public class CertificateView {
+public class TicketView {
 
     private static BaseView baseView = BaseView.getInstance();
-    private static final String NAME_OBJECT = "Certificate";
+    private static final String NAME_OBJECT = "Ticket";
 
-
-    public Certificate getCertificateDetailsCreate() {
+    public Ticket getTicketDetailsCreate() {
         try {
-            return Certificate.builder()
+            return Ticket.builder()
                     .name(getInputName())
                     .description(getInputDescription())
                     .isActive(true)
@@ -35,12 +34,12 @@ public class CertificateView {
         return ConsoleUtils.readRequiredString("Enter description: ");
     }
 
-    public Certificate getUpdateCertificateDetails(Certificate certificate) {
+    public Ticket getUpdateTicketDetails(Ticket ticket) {
         try {
-            certificate.setName(getUpdateName(certificate.getName()));
-            certificate.setDescription(getUpdateDescription(certificate.getDescription()));
-            certificate.setActive(getUpdateIsActive(certificate.isActive()));
-            return certificate;
+            ticket.setName(getUpdateName(ticket.getName()));
+            ticket.setDescription(getUpdateDescription(ticket.getDescription()));
+            ticket.setActive(getUpdateIsActive(ticket.isActive()));
+            return ticket;
         } catch (Exception e) {
             baseView.displayErrorMessage("Error editing " + NAME_OBJECT + ": " + e.getMessage());
             throw new IllegalArgumentException("Error editing " + NAME_OBJECT + ": " + e.getMessage());
@@ -59,14 +58,14 @@ public class CertificateView {
         return ConsoleUtils.readBooleanWithDefault("Enter is active ('Y' or 'N'): ", Optional.of(oldValue)).get();
     }
 
-    public void displayRecordCertificate(Certificate certificate) {
+    public void displayRecordTicket(Ticket ticket) {
         String message = "";
-        if (certificate != null) {
+        if (ticket != null) {
             message += baseView.LINE + "--- " + NAME_OBJECT + " Details ---" + baseView.LINE;
-            message += "ID: " + certificate.getId() + baseView.LINE;
-            message += "Name: " + certificate.getName() + baseView.LINE;
-            message += "Description: " + certificate.getDescription() + baseView.LINE;
-            message += "Is Active: " + (certificate.isActive() ? "Yes" : "No") + baseView.LINE;
+            message += "ID: " + ticket.getId() + baseView.LINE;
+            message += "Name: " + ticket.getName() + baseView.LINE;
+            message += "Description: " + ticket.getDescription() + baseView.LINE;
+            message += "Is Active: " + (ticket.isActive() ? "Yes" : "No") + baseView.LINE;
             message += "-------------------------" + baseView.LINE;
         } else {
             message = NAME_OBJECT + " not found.";
@@ -74,16 +73,16 @@ public class CertificateView {
         baseView.displayMessageln(message);
     }
 
-    public void displayListCertificates(List<Certificate> certificates) {
-        if (certificates.isEmpty()) {
+    public void displayListTickets(List<Ticket> tickets) {
+        if (tickets.isEmpty()) {
             baseView.displayMessageln("No " + NAME_OBJECT + "s found.");
             return;
         }
         baseView.displayMessageln(
-                StringUtils.makeLineToList(CertificateMapper.toDisplayDTO(certificates.getFirst()).toListHead()));
+                StringUtils.makeLineToList(TicketMapper.toDisplayDTO(tickets.getFirst()).toListHead()));
 
-        certificates.forEach(certificate -> baseView.displayMessageln(
-                StringUtils.makeLineToList(CertificateMapper.toDisplayDTO(certificate).toList())));
+        tickets.forEach(ticket -> baseView.displayMessageln(
+                StringUtils.makeLineToList(TicketMapper.toDisplayDTO(ticket).toList())));
         baseView.displayMessage2ln("-------------------");
     }
 }

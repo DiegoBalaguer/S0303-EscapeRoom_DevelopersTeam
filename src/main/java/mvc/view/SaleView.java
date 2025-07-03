@@ -1,7 +1,11 @@
 package mvc.view;
 
+//import mvc.dto.SaleMapper;
+import mvc.dto.CertificateWinDisplayDTO;
 import mvc.dto.PlayerMapper;
+import mvc.dto.SaleDisplayDTO;
 import mvc.dto.SaleMapper;
+import mvc.model.Player;
 import mvc.model.Sale;
 import mvc.model.Ticket;
 import utils.ConsoleUtils;
@@ -12,7 +16,7 @@ import java.util.Optional;
 
 public class SaleView {
 
-    private final BaseView baseView = new BaseView();
+    private final BaseView baseView = BaseView.getInstance();
     private static final String NAME_OBJECT = "Sale";
 
     public Optional<Integer> getSaleId() {
@@ -24,6 +28,7 @@ public class SaleView {
             return Optional.empty();
         }
     }
+
 
     public void displayListSales(List<Sale> sales) {
         if (sales.isEmpty()) {
@@ -37,6 +42,20 @@ public class SaleView {
                 StringUtils.makeLineToList(SaleMapper.toDisplayDTO(sale).toList())));
         baseView.displayMessage2ln("-------------------");
     }
+
+    public void displayListSaleDTO(List<SaleDisplayDTO> saleDisplayDTOS) {
+        if (saleDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No " + NAME_OBJECT + "s found.");
+            return;
+        }
+        baseView.displayMessageln(
+                StringUtils.makeLineToList(saleDisplayDTOS.getFirst().toListHead()));
+
+        saleDisplayDTOS.forEach(certificateWins -> baseView.displayMessageln(
+                StringUtils.makeLineToList(certificateWins.toList())));
+        baseView.displayMessage2ln("-------------------");
+    }
+
     public void displayActiveTickets(List<Ticket> tickets) {
         baseView.displayMessageln("--- Available Tickets ---");
         if (tickets.isEmpty()) {
@@ -52,29 +71,4 @@ public class SaleView {
         ));
         baseView.displayMessageln("-------------------------");
     }
-   /* public void displayRecordSale(Sale sale) {
-        String message = "";
-        if (sale != null) {
-            message += "--- Sale Details ---" + baseView.LINE;
-            message += "ID: " + sale.getId() + baseView.LINE;
-            message += "Ticket ID: " + sale.getIdTicket() + baseView.LINE;
-            message += "Player ID: " + sale.getIdPlayer() + baseView.LINE;
-            message += "Room ID: " + sale.getIdRoom() + baseView.LINE;
-            message += "Players: " + sale.getPlayers() + baseView.LINE;
-            message += "Price: " + sale.getPrice() + baseView.LINE;
-            message += "Completion: " + sale.getCompletion() + "%" + baseView.LINE;
-            message += "Sale Date: " + sale.getDateSale() + baseView.LINE;
-            message += "Active: " + (sale.isActive() ? "Yes" : "No") + baseView.LINE;
-            message += "----------------------" + baseView.LINE;
-        } else {
-            message = "Sale not found.";
-        }
-        baseView.displayMessageln(message);
-    }
-
-    public int getTicketId() {
-        return ConsoleUtils.readRequiredInt("Enter the ticket ID you want to purchase: ");
-    }
-*/
-
 }

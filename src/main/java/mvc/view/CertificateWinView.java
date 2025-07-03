@@ -7,13 +7,8 @@ import java.util.List;
 
 public class CertificateWinView {
 
-    private static BaseView baseView;
+    private static BaseView baseView = BaseView.getInstance();
     private static final String NAME_OBJECT = "Certificate Win";
-
-    public CertificateWinView(){
-        baseView = new BaseView();
-    }
-
 
     public void displayListCertificateWinDTO(List<CertificateWinDisplayDTO> certificateWinDisplayDTOS) {
         if (certificateWinDisplayDTOS.isEmpty()) {

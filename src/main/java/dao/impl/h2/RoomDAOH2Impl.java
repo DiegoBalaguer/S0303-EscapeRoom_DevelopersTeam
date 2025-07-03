@@ -191,11 +191,6 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
         }
     }
 
-    public void addClueToRoom(Integer roomId, Integer clueId) throws DAOException {}
-    public void addDecorationToRoom(Integer roomId, Integer decorationId) throws DAOException {}
-
-
-
     private Room listResultSetToRoom(ResultSet rs) throws SQLException {
         return Room.builder()
                 .id(rs.getInt("idRoom"))
@@ -214,7 +209,7 @@ public class RoomDAOH2Impl implements BaseDAO<Room, Integer>, RoomDAO {
         SELECT u.inventory, u.id, u.name, u.price
         FROM inventory u
         UNION ALL
-        SELECT 'TOTAL' AS inventory, 0 AS id, '' AS name, t.price
+        SELECT 'TOTAL' AS inventory, null AS id, '' AS name, t.price
         FROM (
             SELECT SUM(i.price) AS price
             FROM inventory i

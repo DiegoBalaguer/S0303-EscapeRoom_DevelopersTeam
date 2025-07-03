@@ -137,19 +137,6 @@ public class CertificateDAOH2Impl implements BaseDAO<Certificate, Integer>, Cert
         }
     }
 
-    @Override
-    public List<Certificate> findByPlayerId(Integer playerId) throws DAOException {
-        List<Certificate> certificates = new ArrayList<>();
-        return certificates;
-    }
-
-    @Override
-    public List<Certificate> findByRoomId(Integer roomId) throws DAOException {
-        List<Certificate> certificates = new ArrayList<>();
-        return certificates;
-
-    }
-
     private Certificate listResultSetToCertificate(ResultSet rs) throws SQLException {
         return Certificate.builder()
                 .id(rs.getInt("idCertificate"))

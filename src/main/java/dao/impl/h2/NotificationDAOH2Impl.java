@@ -59,8 +59,6 @@ public class NotificationDAOH2Impl implements NotificationDAO {
             log.error("Error retrieving notifications: ", e);
             throw new DAOException("Error retrieving notifications", e);
         }
-
         return notifications;
     }
-
 }

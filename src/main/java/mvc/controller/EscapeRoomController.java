@@ -22,7 +22,7 @@ public class EscapeRoomController {
     private static EscapeRoom escapeRoom;
 
     private EscapeRoomController(EscapeRoom escapeRoom) {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         escapeRoomView = new EscapeRoomView();
         baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         this.escapeRoom = escapeRoom;

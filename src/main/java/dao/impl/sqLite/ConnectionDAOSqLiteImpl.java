@@ -1,6 +1,5 @@
 package dao.impl.sqLite;
 
-import dao.connection.SSHSessionManager;
 import dao.exceptions.DatabaseConnectionException;
 import dao.interfaces.ConnectionDAO;
 import dao.interfaces.ConnectionDAOsql;
@@ -58,7 +57,7 @@ public class ConnectionDAOSqLiteImpl implements ConnectionDAO, ConnectionDAOsql 
             return connection;
         } catch (SQLException | DatabaseConnectionException e) {
             log.error("Error getting connection", e.getMessage());
-            throw new RuntimeException("H2 DB Connection Error.", e);
+            throw new RuntimeException("SqLite DB Connection Error.", e);
         }
     }
 

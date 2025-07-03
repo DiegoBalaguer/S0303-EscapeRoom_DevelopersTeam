@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,6 +20,6 @@ public class Sale {
         private int players;
         private BigDecimal price;
         private int completion;
-        private LocalDate dateSale;
+        private LocalDateTime dateSale;
         private boolean isActive;
 }

@@ -5,6 +5,7 @@ import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
 import dao.interfaces.CertificateWinDAO;
 import mvc.dto.CertificateWinDisplayDTO;
+import mvc.model.CertificateWin;
 import mvc.view.BaseView;
 import mvc.view.CertificateWinView;
 
@@ -25,16 +26,19 @@ public class CertificateWinController {
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         certificateWinView = new CertificateWinView();
         baseView.displayDebugMessage("Created Class: " + this.getClass().getName());
     }
 
-
     public int getCertificateWinForPlayerWithList(int playerId) {
-        listAllCertificatesWinForPlayerDetail(playerId);
+        boolean status = listAllCertificatesWinForPlayerDetail(playerId);
+        if (!status) {
+            String message = "No " + NAME_OBJECT + "s found.";
+            throw new IllegalArgumentException(message);
+        }
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
-        if (searchID.isEmpty() || CERTIFICATEWIN_DAO.findByPlayerId(searchID.get()).isEmpty()) {
+        if (searchID.isEmpty() || CERTIFICATEWIN_DAO.findById(searchID.get()).isEmpty()) {
             String message = NAME_OBJECT + " with ID required or not found.";
             baseView.displayErrorMessage(message);
             throw new IllegalArgumentException(message);
@@ -42,10 +46,21 @@ public class CertificateWinController {
         return searchID.get();
     }
 
-    public void listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
-        List<CertificateWinDisplayDTO> certificateWinDisplayDTOS = CERTIFICATEWIN_DAO.findByPlayerId(playerId);
+    public boolean listAllCertificatesWinForPlayerDetail(int playerId) throws DAOException {
+        List<CertificateWinDisplayDTO> certificateWinDisplayDTOS = getCertificateWinForPlayer(playerId);
+        if(certificateWinDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No " + NAME_OBJECT + "s found.");
+            return false;
+        }
         certificateWinView.displayListCertificateWinDTO(certificateWinDisplayDTOS);
+        return true;
     }
 
+    public List<CertificateWinDisplayDTO> getCertificateWinForPlayer(int playerId) {
+        return CERTIFICATEWIN_DAO.findByPlayerId(playerId);
+    }
 
+    public Optional<CertificateWin> getCertificateFindForId(int id) {
+        return CERTIFICATEWIN_DAO.findById(id);
+    }
 }

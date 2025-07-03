@@ -14,7 +14,7 @@ import java.util.Optional;
 @Slf4j // Para logging
 public class RoomView {
 
-    private final BaseView baseView = new BaseView();
+    private final BaseView baseView = BaseView.getInstance();
     private static final String NAME_OBJECT = "Room";
 
     public Room getRoomDetails(boolean forUpdate) {
@@ -70,7 +70,6 @@ public class RoomView {
             baseView.displayErrorMessage("Error collecting room details: " + e.getMessage());
             return null;
         }
-
     }
 
     public Optional<Integer> getRoomId() {
@@ -99,7 +98,6 @@ public class RoomView {
         }
         baseView.displayMessageln(message);
     }
-
 
     public Room getRoomDetailsWithDefaults(Room currentRoom) {
         try {

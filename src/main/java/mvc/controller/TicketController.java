@@ -3,43 +3,44 @@ package mvc.controller;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
-import dao.interfaces.RewardDAO;
+import dao.interfaces.TicketDAO;
 import mvc.enumsMenu.OptionsMenuCLFUSDE;
-import mvc.model.Reward;
+import mvc.model.Player;
+import mvc.model.Ticket;
 import mvc.view.BaseView;
-import mvc.view.RewardView;
+import mvc.view.TicketView;
 
 import java.util.List;
 import java.util.Optional;
 
-public class RewardController {
+public class TicketController {
 
-    private static RewardController rewardControllerInstance;
-    private final RewardDAO REWARD_DAO;
+    private static TicketController ticketControllerInstance;
+    private final TicketDAO TICKET_DAO;
     private BaseView baseView;
-    private RewardView rewardView;
-    private static final String NAME_OBJECT = "Reward";
+    private TicketView ticketView;
+    private static final String NAME_OBJECT = "Ticket";
 
-    public RewardController() {
+    public TicketController() {
         baseView = BaseView.getInstance();
         baseView.displayDebugMessage("Creation Class: " + this.getClass().getName());
         try {
-            REWARD_DAO = DAOFactory.getDAOFactory().getRewardDAO();
+            TICKET_DAO = DAOFactory.getDAOFactory().getTicketDAO();
         } catch (DatabaseConnectionException e) {
             throw new RuntimeException(e);
         }
-        rewardView = new RewardView();
+        ticketView = new TicketView();
     }
 
-    public static RewardController getInstance() {
-        if (rewardControllerInstance == null) {
-            synchronized (RewardController.class) {
-                if (rewardControllerInstance == null) {
-                    rewardControllerInstance = new RewardController();
+    public static TicketController getInstance() {
+        if (ticketControllerInstance == null) {
+            synchronized (TicketController.class) {
+                if (ticketControllerInstance == null) {
+                    ticketControllerInstance = new TicketController();
                 }
             }
         }
-        return rewardControllerInstance;
+        return ticketControllerInstance;
     }
 
     public void mainMenu() {
@@ -53,12 +54,12 @@ public class RewardController {
                         baseView.displayMessage2ln("Returning to Main Menu...");
                         return;
                     }
-                    case CREATE -> createReward();
-                    case LIST_ALL -> listAllRewards();
-                    case FIND_BY_ID -> getRewardById();
-                    case UPDATE -> updateReward();
-                    case SOFT_DELETE -> softDeleteRewardById();
-                    case DELETE -> deleteRewardById();
+                    case CREATE -> createTicket();
+                    case LIST_ALL -> listAllTickets();
+                    case FIND_BY_ID -> getTicketById();
+                    case UPDATE -> updateTicket();
+                    case SOFT_DELETE -> softDeleteTicketById();
+                    case DELETE -> deleteTicketById();
 
                     default -> baseView.displayErrorMessage("Error: The value in menu is wrong: " + idMenu);
                 }
@@ -72,121 +73,107 @@ public class RewardController {
         } while (true);
     }
 
-    private void createReward() {
+
+    private void createTicket() {
         baseView.displayMessageln("#### CREATE " + NAME_OBJECT + "  #################");
         try {
-            Reward newReward = rewardView.getRewardDetailsCreate();
-            Reward savedReward = create(newReward);
-            baseView.displayMessage2ln(NAME_OBJECT + " created successfully: " + savedReward.getName() + " (ID: " + savedReward.getId() + ")");
+            Ticket newTicket = ticketView.getTicketDetailsCreate();
+            Ticket savedTicket = TICKET_DAO.create(newTicket);
+            baseView.displayMessage2ln(NAME_OBJECT + " created successfully: " + savedTicket.getName() + " (ID: " + savedTicket.getId() + ")");
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error creating " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void getRewardById() {
+    private void getTicketById() {
         baseView.displayMessage2ln("####  GET " + NAME_OBJECT.toUpperCase() + " BY ID  #################");
         try {
-            Optional<Reward> optionalReward = findById(getRewardIdWithList());
+             Optional<Ticket> optionalTicket = TICKET_DAO.findById(getTicketIdWithList());
 
-            rewardView.displayRecordReward(optionalReward.get());
+            ticketView.displayRecordTicket(optionalTicket.get());
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error show " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void listAllRewards() throws DAOException {
+    private void listAllTickets() throws DAOException {
         baseView.displayMessage2ln("####  LIST ALL " + NAME_OBJECT.toUpperCase() + "S  #################");
         try {
-            listAllRewardDetail();
+            listAllTicketDetail();
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error list all " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void updateReward() {
+    private void updateTicket() {
         baseView.displayMessage2ln("####  UPDATE  " + NAME_OBJECT.toUpperCase() + "  #################");
         try {
-            Optional<Reward> existRewardOpt = findById(getRewardIdWithList());
+            Optional<Ticket> existTicketOpt = TICKET_DAO.findById(getTicketIdWithList());
 
             baseView.displayMessage2ln("Current " + NAME_OBJECT + " Details:");
-            rewardView.displayRecordReward(existRewardOpt.get());
+            ticketView.displayRecordTicket(existTicketOpt.get());
 
             baseView.displayMessage2ln("Enter new details:");
             baseView.displayMessageln("Enter new value or [INTRO] for not changes.");
-            Reward updatedReward = rewardView.getUpdateRewardDetails(existRewardOpt.get());
+            Ticket updatedTicket = ticketView.getUpdateTicketDetails(existTicketOpt.get());
 
-            Reward savedReward = update(updatedReward);
-            baseView.displayMessage2ln(NAME_OBJECT + " updated successfully: " + savedReward.getName() + " (ID: " + savedReward.getId() + ")");
+            Ticket savedTicket = TICKET_DAO.update(updatedTicket);
+            baseView.displayMessage2ln(NAME_OBJECT + " updated successfully: " + savedTicket.getName() + " (ID: " + savedTicket.getId() + ")");
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error updating " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void deleteRewardById() {
+    private void deleteTicketById() {
         baseView.displayMessage2ln("####  DELETE " + NAME_OBJECT.toUpperCase() + "  #################");
         try {
-            deleteById(getRewardIdWithList());
+            TICKET_DAO.deleteById(getTicketIdWithList());
             baseView.displayMessage2ln(NAME_OBJECT + " deleted successfully (if existed).");
         } catch (DAOException | IllegalArgumentException e) {
             baseView.displayErrorMessage("Error deleting the " + NAME_OBJECT + ": " + e.getMessage());
         }
     }
 
-    private void softDeleteRewardById() throws DAOException {
+    private void softDeleteTicketById() throws DAOException {
         baseView.displayMessage2ln("#### SOFT DELETE  " + NAME_OBJECT.toUpperCase() + "  #################");
         try {
-            Optional<Reward> existRewardOpt = findById(getRewardIdWithList());
-            existRewardOpt.get().setActive(false);
+            Optional<Ticket> existTicketOpt = TICKET_DAO.findById(getTicketIdWithList());
+            existTicketOpt.get().setActive(false);
 
-            update(existRewardOpt.get());
-            baseView.displayMessage2ln(NAME_OBJECT + " soft deleted successfully: " + existRewardOpt.get().getName() + " (ID: " + existRewardOpt.get().getId() + ")");
+            TICKET_DAO.update(existTicketOpt.get());
+            baseView.displayMessage2ln(NAME_OBJECT + " soft deleted successfully: " + existTicketOpt.get().getName() + " (ID: " + existTicketOpt.get().getId() + ")");
         } catch (DAOException | IllegalArgumentException e) {
-            baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT + ": " + e.getMessage());
+            baseView.displayErrorMessage("Error soft deleting " + NAME_OBJECT +": " + e.getMessage());
         }
     }
 
+    public Optional<Ticket> getFindTicketById(int ticketId) {
+        return TICKET_DAO.findById(ticketId);
+    }
 
-    public int getRewardIdWithList() {
-        listAllRewardDetail();
+    public int getTicketIdWithList() {
+        listAllTicketDetail();
         Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
-        if (searchID.isEmpty() || findById(searchID.get()).isEmpty()) {
-            String message = NAME_OBJECT + " with ID required or not found.";
+        if (searchID.isEmpty() || TICKET_DAO.findById(searchID.get()).isEmpty()) {
+            String message =  NAME_OBJECT + " with ID required or not found.";
             baseView.displayErrorMessage(message);
             throw new IllegalArgumentException(message);
         }
         return searchID.get();
     }
 
-    private void listAllRewardDetail() throws DAOException {
-        List<Reward> rewards = findAll();
-        rewardView.displayListRewards(rewards);
+    private void listAllTicketDetail() throws DAOException {
+        List<Ticket> tickets = getTicketFindAll();
+        ticketView.displayListTickets(tickets);
     }
 
-    public String getRewardNameById(int rewardId) throws DAOException {
-        return findById(rewardId)
-                .map(Reward::getName)
+    public String getTicketNameById(int ticketId) throws DAOException {
+        return TICKET_DAO.findById(ticketId)
+                .map(Ticket::getName)
                 .orElse("Unknown " + NAME_OBJECT);
     }
 
-    // queries for class
-
-    private Reward create(Reward newItem) {
-        return REWARD_DAO.create(newItem);
-    }
-
-    private Optional<Reward> findById(int id) {
-        return REWARD_DAO.findById(id);
-    }
-
-    private Reward update(Reward newItem) {
-        return REWARD_DAO.update(newItem);
-    }
-
-    private void deleteById(int id) {
-        REWARD_DAO.deleteById(id);
-    }
-
-    private List<Reward> findAll() {
-        return REWARD_DAO.findAll();
+    public List<Ticket> getTicketFindAll() {
+        return TICKET_DAO.findAll();
     }
 }

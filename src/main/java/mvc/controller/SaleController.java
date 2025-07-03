@@ -3,16 +3,18 @@ package mvc.controller;
 import dao.exceptions.DAOException;
 import dao.exceptions.DatabaseConnectionException;
 import dao.factory.DAOFactory;
-import dao.interfaces.TicketDAO;
+
 import dao.interfaces.SaleDAO;
+import mvc.dto.SaleDisplayDTO;
 import mvc.enumsMenu.OptionsMenuSale;
 import lombok.extern.slf4j.Slf4j;
 import mvc.model.Player;
+import mvc.model.Room;
 import mvc.model.Sale;
 import mvc.model.Ticket;
 import mvc.view.BaseView;
-import utils.ConsoleUtils;
 import mvc.view.SaleView;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +29,7 @@ public class SaleController {
     private static final String NAME_OBJECT = "Ticket";
 
     private SaleController() {
-        baseView = new BaseView();
+        baseView = BaseView.getInstance();
         this.saleView = new SaleView();
 
         try {
@@ -53,8 +55,7 @@ public class SaleController {
     }
 
     public void mainMenu() {
-        boolean running = true;
-        while (running) {
+        do {
             baseView.displayMessageln(OptionsMenuSale.viewMenu("SALE MANAGEMENT"));
             int answer = baseView.getReadRequiredInt("Choose an option: ");
             OptionsMenuSale selectedOption = OptionsMenuSale.getOptionByNumber(answer);
@@ -64,12 +65,12 @@ public class SaleController {
                     switch (selectedOption) {
                         case EXIT -> {
                             baseView.displayMessageln("Returning to Main Menu...");
-                            running = false; // Salimos del bucle
+                            return;
                         }
                         case SELL -> createSale();
                         case DELETE -> deleteSale();
                         case CALCULATE_TOTAL_BENEFITS -> calculateTotalBenefits();
-                        case SHOW_ALL_TICKETS -> listAllSalesDetail();
+                        case SHOW_ALL_TICKETS -> listAllSalesDetailDTO();
 
                         default -> baseView.displayErrorMessage("Unknown option selected.");
                     }
@@ -82,83 +83,80 @@ public class SaleController {
                 baseView.displayErrorMessage("Invalid option. Please choose a valid number from the menu.");
                 log.warn("Error: The value {} is invalid in the sale management menu.", answer);
             }
-        }
+        } while (true);
     }
-  private void createSale() {
-      baseView.displayMessage2ln("####  LIST ALL " + NAME_OBJECT.toUpperCase() + "S  #################");
 
-      try {
-          List<Ticket> activeTickets = SALE_DAO.findAllActiveTickets();
+    private void createSale() {
+        baseView.displayMessage2ln("####  LIST ALL " + NAME_OBJECT.toUpperCase() + "S  #################");
 
-          if (activeTickets.isEmpty()) {
-              baseView.displayErrorMessage("No active tickets found.");
-              return;
-          }
+        try {
+            List<Ticket> activeTickets = TicketController.getInstance().getTicketFindAll();
 
-          saleView.displayActiveTickets(activeTickets);
+            if (activeTickets.isEmpty()) {
+                baseView.displayErrorMessage("No active tickets found.");
+                return;
+            }
 
+            int roomId = RoomController.getInstance().getRoomIdWithList();
+            Optional<Room> roomOptional = RoomController.getInstance().getFindRoomById(roomId);
+            if (roomOptional.isEmpty()) {
+                baseView.displayErrorMessage("Sale failed: Room with ID " + roomId + " does not exist.");
+                return;
+            }
 
-
-          int ticketId = ConsoleUtils.readRequiredInt("Enter the Ticket ID you want to purchase: ");
-            Optional<Ticket> ticketOptional = SALE_DAO.findTicketById(ticketId);
-
+            int ticketId = TicketController.getInstance().getTicketIdWithList();
+            Optional<Ticket> ticketOptional = TicketController.getInstance().getFindTicketById(ticketId);
             if (ticketOptional.isEmpty()) {
                 baseView.displayErrorMessage("Sale failed: Ticket with ID " + ticketId + " does not exist.");
                 return;
             }
 
-            int playerId = ConsoleUtils.readRequiredInt("Enter the Player ID: ");
-            Optional<Player> playerOptional = SALE_DAO.findPlayerById(playerId);
-
+            int playerId = PlayerController.getInstance().getPlayerIdWithList();
+            Optional<Player> playerOptional = PlayerController.getInstance().findById(playerId);
             if (playerOptional.isEmpty()) {
                 baseView.displayErrorMessage("Sale failed: Player with ID " + playerId + " does not exist.");
                 return;
             }
 
-            int playersCount = ConsoleUtils.readRequiredInt("Enter the number of players: ");
+            int playersCount = baseView.getReadRequiredInt("Enter the number of players: ");
             if (playersCount <= 0) {
                 baseView.displayErrorMessage("Sale failed: The number of players must be greater than 0.");
                 return;
             }
 
-            Ticket ticket = ticketOptional.get();
-            Player player = playerOptional.get();
-            BigDecimal totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(playersCount));
+            BigDecimal totalPrice =
+                    ticketOptional.get().getPrice().multiply(BigDecimal.valueOf(playersCount));
 
             Sale newSale = Sale.builder()
                     .idTicket(ticketId)
                     .idPlayer(playerId)
-                    .idRoom(1)
+                    .idRoom(roomId)
                     .players(playersCount)
                     .price(totalPrice)
                     .completion(0)
-                    .dateSale(java.time.LocalDate.now())
+                    .dateSale(java.time.LocalDateTime.now())
                     .isActive(true)
                     .build();
 
-            Sale savedSale = SALE_DAO.create(newSale);
+            Sale savedSale = createSale(newSale);
             if (savedSale == null || savedSale.getId() == 0) {
                 baseView.displayErrorMessage("Sale creation failed: Unable to save the sale to the database.");
                 return;
             }
-
             baseView.displayMessageln("Sale created successfully! Sale ID: " + savedSale.getId());
         } catch (DAOException e) {
             handleError("An error occurred while creating the sale: ", e);
         } catch (NumberFormatException e) {
             baseView.displayErrorMessage("Invalid input. Please enter a valid number.");
         }
-  }
+    }
 
     private void deleteSale() {
         try {
-            Optional<Integer> idOpt = saleView.getSaleId();
-            if (idOpt.isPresent()) {
-                SALE_DAO.deleteById(idOpt.get());
-                baseView.displayMessageln("Sale with ID " + idOpt.get() + " deleted successfully (if existed).");
-            } else {
-                baseView.displayErrorMessage("Sale ID is required to delete a sale.");
-            }
+            getPlayerIdWithList();
+            int idOpt = getPlayerIdWithList();//saleView.getSaleId();
+            deleteById(idOpt);
+            baseView.displayMessageln("Sale with ID " + idOpt + " deleted successfully (if existed).");
         } catch (DAOException e) {
             handleError("An error occurred while deleting the sale: ", e);
         }
@@ -176,14 +174,50 @@ public class SaleController {
         }
     }
 
+    private Sale createSale(Sale sale) {
+        return SALE_DAO.create(sale);
+    }
+
+    private void deleteById(int saleId) {
+        SALE_DAO.deleteById(saleId);
+    }
+
+    public Optional<Sale> getfindById(int saleId) {
+        return SALE_DAO.findById(saleId);
+    }
+
+    public int getPlayerIdWithList() {
+        listAllSalesDetail();
+        Optional<Integer> searchID = baseView.getReadValueInt("Enter " + NAME_OBJECT + " ID: ");
+        if (searchID.isEmpty() || getfindById(searchID.get()).isEmpty()) {
+            String message = NAME_OBJECT + " with ID required or not found.";
+            baseView.displayErrorMessage(message);
+            throw new IllegalArgumentException(message);
+        }
+        return searchID.get();
+    }
+
     private void listAllSalesDetail() {
-            List<Sale> sales = SALE_DAO.findAll();
-            saleView.displayListSales(sales);
+        List<Sale> sales = SALE_DAO.findAll();
+        saleView.displayListSales(sales);
+    }
+
+    public boolean listAllSalesDetailDTO() throws DAOException {
+        List<SaleDisplayDTO> saleDisplayDTOS = getfindAllCompleteInfo();
+        if (saleDisplayDTOS.isEmpty()) {
+            baseView.displayMessageln("No " + NAME_OBJECT + "s found.");
+            return false;
+        }
+        saleView.displayListSaleDTO(saleDisplayDTOS);
+        return true;
+    }
+
+    public List<SaleDisplayDTO> getfindAllCompleteInfo() {
+        return SALE_DAO.findAllCompleteInfo();
     }
 
     private void handleError(String message, Exception e) {
         baseView.displayErrorMessage(message + e.getMessage());
         log.error(message, e);
     }
-
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class PlayerView {
 
-    private final BaseView baseView = new BaseView();
+    private final BaseView baseView = BaseView.getInstance();
     private static final String NAME_OBJECT = "Player";
 
     public Player getPlayerDetailsCreate() {
