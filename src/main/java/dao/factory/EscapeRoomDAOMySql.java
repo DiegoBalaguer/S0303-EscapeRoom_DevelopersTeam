@@ -1,9 +1,30 @@
 package dao.factory;
 
+import mvc.entities.decoration.DecorationDAOH2Impl;
+import mvc.entities.escapeRoom.EscapeRoomDAO;
+import mvc.entities.certificate.CertificateDAO;
+import mvc.entities.certificate.CertificateDAOH2Impl;
+import mvc.entities.certificateWin.CertificateWinDAO;
+import mvc.entities.certificateWin.CertificateWinDAOH2Impl;
+import mvc.entities.clue.ClueDAO;
 import dao.exceptions.DatabaseConnectionException;
-import dao.impl.mysql.ConnectionDAOMySqlImpl;
-import dao.interfaces.*;
-import dao.impl.h2.*;
+import dao.connections.ConnectionDAOMySqlImpl;
+import mvc.entities.decoration.DecorationDAO;
+import mvc.entities.clue.ClueDAOH2Impl;
+import mvc.entities.notification.NotificationDAO;
+import mvc.entities.notification.NotificationDAOH2Impl;
+import mvc.entities.player.PlayerDAO;
+import mvc.entities.player.PlayerDAOH2Impl;
+import mvc.entities.reward.RewardDAO;
+import mvc.entities.reward.RewardDAOH2Impl;
+import mvc.entities.rewardWin.RewardWinDAO;
+import mvc.entities.rewardWin.RewardWinDAOH2Impl;
+import mvc.entities.room.RoomDAO;
+import mvc.entities.room.RoomDAOH2Impl;
+import mvc.entities.sale.SaleDAO;
+import mvc.entities.sale.SaleDAOH2Impl;
+import mvc.entities.ticket.TicketDAO;
+import mvc.entities.ticket.TicketDAOH2Impl;
 
 public class EscapeRoomDAOMySql implements EscapeRoomDAO {
     private final ConnectionDAOMySqlImpl connectionDAO;
@@ -67,5 +88,10 @@ public class EscapeRoomDAOMySql implements EscapeRoomDAO {
     @Override
     public RewardWinDAO getRewardWinDAO() {
         return new RewardWinDAOH2Impl(connectionDAO);
+    }
+
+    @Override
+    public NotificationDAO getNotificationDAO() {
+        return new NotificationDAOH2Impl(connectionDAO);
     }
 }

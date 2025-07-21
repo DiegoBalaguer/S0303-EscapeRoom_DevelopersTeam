@@ -7,6 +7,7 @@ public enum OptionsMenuMain {
     PLAYER_MANAGEMENT(3, "Player management"),
     ESCAPE_ROOM_MANAGEMENT(4, "Escape room management"),
     FINANCIAL_MANAGEMENT(5, "Financial management"),
+    NOTIFICATION_MANAGEMENT(6, "Notification management"),
     EXIT(0, "Exit");
 
     private final int OPTION_NUMBER;

@@ -2,6 +2,7 @@ package mvc.view;
 
 import config.LoadConfigApp;
 import lombok.extern.slf4j.Slf4j;
+import mvc.entities.MessageMinMax;
 import utils.ConsoleUtils;
 
 import java.util.Optional;
@@ -32,8 +33,29 @@ public class BaseView {
         return ConsoleUtils.readRequiredInt(message);
     }
 
+    public Optional<Integer> getReadValueIntMinMax(String title, String inputText, MessageMinMax messageMinMax) {
+        Optional<Integer> input;
+        String message = title + System.lineSeparator() + messageMinMax.getMessage() + inputText;
+        do {
+            input = getReadValueInt(message);
+            if (input.isEmpty() || (input.get() >= messageMinMax.getMinium() && input.get() <= messageMinMax.getMaxium())) {
+             return input;
+            }
+        } while (true);
+    }
+
+
+    public Optional<Integer> getReadValueIntMinMaxx(String title, MessageMinMax messageMinMax) {
+        displayMessage2ln(title);
+        return getReadValueIntMinMax("", "", messageMinMax);
+    }
+
     public String getReadRequiredString(String message) {
         return ConsoleUtils.readRequiredString(message);
+    }
+
+    public Optional<String> getReadValueString(String message) {
+        return ConsoleUtils.readValueString(message).describeConstable();
     }
 
     public Optional<Integer> getReadValueInt(String message) {

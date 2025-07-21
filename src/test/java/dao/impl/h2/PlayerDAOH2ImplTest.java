@@ -3,7 +3,8 @@
 package dao.impl.h2;
 
 import dao.interfaces.ConnectionDAO;
-import mvc.model.Player;
+import mvc.entities.player.Player;
+import mvc.entities.player.PlayerDAOH2Impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
