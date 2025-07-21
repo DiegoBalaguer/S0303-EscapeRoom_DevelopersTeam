@@ -36,12 +36,13 @@ public class BaseView {
     public Optional<Integer> getReadValueIntMinMax(String title, String inputText, MessageMinMax messageMinMax) {
         Optional<Integer> input;
         String message = title + System.lineSeparator() + messageMinMax.getMessage() + inputText;
-        do {
+//        do {
             input = getReadValueInt(message);
-            if (input.isEmpty() || (input.get() >= messageMinMax.getMinium() && input.get() <= messageMinMax.getMaxium())) {
-             return input;
-            }
-        } while (true);
+//            if (input.isEmpty() || (input.get() >= messageMinMax.getMinium() && input.get() <= messageMinMax.getMaxium())) {
+//             return input;
+//            }
+//        } while (true);
+        return input;
     }
 
 
