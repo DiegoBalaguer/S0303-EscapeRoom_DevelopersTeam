@@ -2,10 +2,10 @@ package abstractEscapeRoom;
 
 import enums.Difficulty;
 import interfaces.AbstractFactory;
-import mvc.model.Clue;
-import mvc.model.Decoration;
+import mvc.entities.clue.Clue;
+import mvc.entities.decoration.Decoration;
 import mvc.model.Element;
-import mvc.model.Room;
+import mvc.entities.room.Room;
 
 import java.math.BigDecimal;
 
@@ -20,9 +20,9 @@ public class AbstractEscapeRoom implements AbstractFactory {
         BigDecimal price = extractPrice(args);
 
         return switch (typeLower) {
-            case "room" -> createRoom(name, price, args);
-            case "clue" -> createClue(name, price, args);
-            case "decoration" -> createDecoration(name, price, args);
+            case "mvc/entities/room" -> createRoom(name, price, args);
+            case "mvc/entities/clue" -> createClue(name, price, args);
+            case "mvc/entities/decoration" -> createDecoration(name, price, args);
             default -> throw new IllegalArgumentException("Unknown type: " + typeLower);
         };
     }

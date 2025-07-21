@@ -1,11 +1,11 @@
 package dao.impl.h2;
 
-import dao.exceptions.DAOException;
 import dao.interfaces.ConnectionDAO;
 import enums.Difficulty;
 import enums.Theme;
-import mvc.dto.InventoryDisplayDTO;
-import mvc.model.Room;
+import inventory.InventoryDisplayDTO;
+import mvc.entities.room.Room;
+import mvc.entities.room.RoomDAOH2Impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

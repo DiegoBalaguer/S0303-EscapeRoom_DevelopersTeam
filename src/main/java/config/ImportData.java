@@ -1,13 +1,12 @@
 package config;
 
 import dao.exceptions.DatabaseConnectionException;
-import dao.mongo.MongoDBConnection;
-import mvc.model.EscapeRoom;
+import mongo.MongoDBConnection;
+import mvc.entities.escapeRoom.EscapeRoom;
 
 public class ImportData {
 
     public static void configDataEscapeRoom(EscapeRoom escapeRoom) {
-        boolean estado = LoadConfigDB.getMongodbEnable();
         if (!LoadConfigDB.getMongodbEnable()) {
             escapeRoom.setId(LoadConfigApp.getAppBusinessId());
             escapeRoom.setName(LoadConfigApp.getAppBusinessName());

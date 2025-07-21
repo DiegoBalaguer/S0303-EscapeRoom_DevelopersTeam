@@ -2,7 +2,7 @@ package dao.factory;
 
 import dao.exceptions.DatabaseConnectionException;
 import config.LoadConfigDB;
-import dao.interfaces.EscapeRoomDAO;
+import mvc.entities.escapeRoom.EscapeRoomDAO;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

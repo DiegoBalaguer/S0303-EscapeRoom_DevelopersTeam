@@ -1,10 +1,10 @@
 package abstractEscapeRoom;
 
 import enums.Difficulty;
-import mvc.model.Clue;
-import mvc.model.Decoration;
+import mvc.entities.clue.Clue;
+import mvc.entities.decoration.Decoration;
 import mvc.model.Element;
-import mvc.model.Room;
+import mvc.entities.room.Room;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ class AbstractEscapeRoomTest {
         Difficulty difficulty = Difficulty.MEDIUM;
         BigDecimal price = new BigDecimal("100.50");
 
-        Element room = abstractEscapeRoom.createElement(name, "room", difficulty, price);
+        Element room = abstractEscapeRoom.createElement(name, "mvc/entities/room", difficulty, price);
 
         assertTrue(room instanceof Room);
         Room createdRoom = (Room) room;
@@ -36,7 +36,7 @@ class AbstractEscapeRoomTest {
         String theme = "Mystery";
         BigDecimal price = new BigDecimal("50.00");
 
-        Element clue = abstractEscapeRoom.createElement(name, "clue", theme, price);
+        Element clue = abstractEscapeRoom.createElement(name, "mvc/entities/clue", theme, price);
 
         assertTrue(clue instanceof Clue);
         Clue createdClue = (Clue) clue;
@@ -51,7 +51,7 @@ class AbstractEscapeRoomTest {
         String material = "Gold";
         BigDecimal price = new BigDecimal("200.75");
 
-        Element decoration = abstractEscapeRoom.createElement(name, "decoration", material, price);
+        Element decoration = abstractEscapeRoom.createElement(name, "mvc/entities/decoration", material, price);
 
         assertTrue(decoration instanceof Decoration);
         Decoration createdDecoration = (Decoration) decoration;
@@ -75,7 +75,7 @@ class AbstractEscapeRoomTest {
         String name = "Room without Difficulty";
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> abstractEscapeRoom.createElement(name, "room"));
+                () -> abstractEscapeRoom.createElement(name, "mvc/entities/room"));
         assertEquals("Missing or invalid difficulty for Room.", exception.getMessage());
     }
 
@@ -84,7 +84,7 @@ class AbstractEscapeRoomTest {
         String name = "Clue without Theme";
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> abstractEscapeRoom.createElement(name, "clue"));
+                () -> abstractEscapeRoom.createElement(name, "mvc/entities/clue"));
         assertEquals("Missing or invalid theme for Clue.", exception.getMessage());
     }
 
@@ -93,7 +93,7 @@ class AbstractEscapeRoomTest {
         String name = "Decoration without Material";
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> abstractEscapeRoom.createElement(name, "decoration", null));
+                () -> abstractEscapeRoom.createElement(name, "mvc/entities/decoration", null));
         assertEquals("Missing or invalid material for Decoration.", exception.getMessage());
     }
 
